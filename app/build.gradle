@@ -55,8 +55,8 @@ useHilt()
 dependencies {
 
     implementation project(':app:common')
-    implementation project(':app:stocks')
     implementation project(':app:weather')
+    implementation project(':app:stocks')
 
     implementation androidx.core_ktx
     implementation androidx.lifecycle_runtime_ktx

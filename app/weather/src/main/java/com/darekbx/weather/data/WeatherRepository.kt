@@ -1,17 +1,13 @@
 package com.darekbx.weather.data
 
-import com.darekbx.weather.data.network.antistorm.AntistormService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.darekbx.weather.data.network.WeatherDataSource
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
-class WeatherRepository @Inject constructor(val antistormService: AntistormService) {
+class WeatherRepository @Inject constructor(val weatherDataSource: WeatherDataSource) {
 
-    fun test() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val data = antistormService.getPaths("radar")
-            val c = data.size
-        }
+    suspend fun getImagesUrls(): Map<WeatherDataSource.ImageType, String> {
+        delay(250)
+        return weatherDataSource.getImagesUrls(0.0, 0.0)
     }
 }

@@ -1,6 +1,9 @@
 package com.darekbx.weather.di
 
 import com.darekbx.weather.BuildConfig
+import com.darekbx.weather.data.WeatherRepository
+import com.darekbx.weather.data.network.WeatherDataSource
+import com.darekbx.weather.data.network.antistorm.AntistormDataSource
 import com.darekbx.weather.data.network.antistorm.AntistormPathsConverted
 import com.darekbx.weather.data.network.antistorm.AntistormService
 import dagger.Module
@@ -16,6 +19,16 @@ import retrofit2.Retrofit
 class CommonModule {
 
     @Provides
+    fun provideWeatherRepository(weatherDataSource: WeatherDataSource): WeatherRepository {
+        return WeatherRepository(weatherDataSource)
+    }
+
+    @Provides
+    fun provideAntistormDataSource(antistormService: AntistormService): WeatherDataSource {
+        return AntistormDataSource(antistormService)
+    }
+
+    @Provides
     fun provideOkHttpClient() = OkHttpClient.Builder()
         .addInterceptor(
             HttpLoggingInterceptor().apply {
@@ -27,7 +40,7 @@ class CommonModule {
         .build()
 
     @Provides
-    fun provideAntistormPaths(okHttpClient: OkHttpClient): AntistormService {
+    fun provideAntistormService(okHttpClient: OkHttpClient): AntistormService {
         return Retrofit.Builder()
             .baseUrl(AntistormService.ANTISTORM_BASE_URL)
             .client(okHttpClient)

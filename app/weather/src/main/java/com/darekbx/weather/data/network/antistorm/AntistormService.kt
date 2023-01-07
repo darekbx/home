@@ -4,7 +4,6 @@ import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
 import java.lang.reflect.Type
 
@@ -18,6 +17,11 @@ interface AntistormService {
     companion object {
         const val ANTISTORM_BASE_URL = "https://antistorm.eu"
     }
+}
+
+enum class DirType(val label: String) {
+    TYPE_RADAR("radar"),
+    TYPE_STORM("storm")
 }
 
 enum class PathsType(val prefix: String) {

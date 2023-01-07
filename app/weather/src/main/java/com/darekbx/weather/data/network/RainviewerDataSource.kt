@@ -4,7 +4,11 @@ import android.graphics.Bitmap
 
 class RainviewerDataSource: WeatherDataSource {
 
-    override suspend fun getRainprediction(lat: Double, lng: Double): Bitmap {
+    override suspend fun getImagesUrls(
+        lat: Double,
+        lng: Double
+    ): Map<WeatherDataSource.ImageType, String> {
         TODO("Not yet implemented")
     }
+
 }
