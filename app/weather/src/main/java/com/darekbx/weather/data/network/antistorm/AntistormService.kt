@@ -30,7 +30,7 @@ enum class PathsType(val prefix: String) {
     FILES_FRONT_NAME("nazwa_pliku_front")
 }
 
-class AntistormPathsConverted : Converter.Factory() {
+class AntistormPathsConverter : Converter.Factory() {
 
     override fun responseBodyConverter(
         type: Type,

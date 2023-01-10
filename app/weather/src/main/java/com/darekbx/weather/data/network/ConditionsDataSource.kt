@@ -1,6 +1,6 @@
 package com.darekbx.weather.data.network
 
-interface WeatherDataSource {
+interface ConditionsDataSource {
 
     enum class ImageType {
         MAP,

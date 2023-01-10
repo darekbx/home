@@ -1,26 +1,26 @@
 package com.darekbx.weather.data.network.antistorm
 
-import com.darekbx.weather.data.network.WeatherDataSource
+import com.darekbx.weather.data.network.ConditionsDataSource
 import com.darekbx.weather.data.network.antistorm.AntistormService.Companion.ANTISTORM_BASE_URL
 import javax.inject.Inject
 
 class AntistormDataSource @Inject constructor(
     val antistormService: AntistormService
-) : WeatherDataSource {
+) : ConditionsDataSource {
 
     override suspend fun getImagesUrls(
         lat: Double,
         lng: Double
-    ): Map<WeatherDataSource.ImageType, String> {
+    ): Map<ConditionsDataSource.ImageType, String> {
 
         val radarData = antistormService.getPaths(DirType.TYPE_RADAR.label)
         val stormData = antistormService.getPaths(DirType.TYPE_STORM.label)
 
         return mapOf(
-            WeatherDataSource.ImageType.MAP to mapUrl(),
-            WeatherDataSource.ImageType.RAIN to rainUrl(radarData),
-            WeatherDataSource.ImageType.PROBABILITIES to probabilitiesUrl(radarData),
-            WeatherDataSource.ImageType.STORM to stormUrl(stormData)
+            ConditionsDataSource.ImageType.MAP to mapUrl(),
+            ConditionsDataSource.ImageType.RAIN to rainUrl(radarData),
+            ConditionsDataSource.ImageType.PROBABILITIES to probabilitiesUrl(radarData),
+            ConditionsDataSource.ImageType.STORM to stormUrl(stormData)
         )
     }
 
