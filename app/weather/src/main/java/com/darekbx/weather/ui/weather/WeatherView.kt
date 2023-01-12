@@ -1,16 +1,20 @@
 package com.darekbx.weather.ui.weather
 
 import android.util.Log
+import android.widget.Space
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,9 +34,43 @@ import com.darekbx.weather.BuildConfig
 import com.darekbx.weather.data.network.ConditionsDataSource
 import com.darekbx.weather.data.network.airly.Measurements
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WeatherScreen(
+    weatherViewModel: WeatherViewModel = hiltViewModel(),
+    openSettings: () -> Unit
+) {
+    Scaffold(
+        floatingActionButton = {
+            Column {
+                FloatingActionButton(
+                    onClick = openSettings,
+                    shape = RoundedCornerShape(50)
+                ) {
+                    Icon(Icons.Default.Settings, contentDescription = "settings")
+                }
+                Spacer(modifier = Modifier.padding(8.dp))
+                FloatingActionButton(
+                    onClick = weatherViewModel::updateState,
+                    shape = RoundedCornerShape(50)
+                ) {
+                    Icon(Icons.Default.Refresh, contentDescription = "refresh")
+                }
+            }
+        },
+        content = { innerPadding ->
+            WeatherView(
+                modifier = Modifier.padding(innerPadding),
+                weatherViewModel
+            )
+        }
+    )
+}
+
 @Composable
 fun WeatherView(
-    weatherViewModel: WeatherViewModel = hiltViewModel()
+    modifier: Modifier,
+    weatherViewModel: WeatherViewModel
 ) {    // To define/redefine points, open emulator, enable map and
     // click to log point location, then add/update points below
     val points = listOf(
@@ -47,9 +85,11 @@ fun WeatherView(
     }
 
     Column(
-        Modifier.fillMaxSize(),
+        modifier
+            .fillMaxSize()
+            .background(Color.Black),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
+        verticalArrangement = Arrangement.Top
     ) {
         /**
          * To manually recompose a view, let's define a state
@@ -58,25 +98,20 @@ fun WeatherView(
          */
         val stateHolder by remember { weatherViewModel.stateHolder }
         key(stateHolder) {
-            // Air quality
-            val measurements = weatherViewModel.measurementsList
-            //if (measurements.isNotEmpty()) {
-                AirQualityView(measurements)
-            //}
-
             // Weather conditions
             val data by weatherViewModel.weatherConditions.collectAsState(initial = emptyMap())
             Box(
                 modifier = Modifier
-                    .fillMaxSize(0.9f)
+                    .fillMaxWidth(0.9f)
+                    .fillMaxHeight(0.5f)
                     .scale(1.3F),
                 contentAlignment = Alignment.Center
             ) {
                 WeatherBox(data, points)
             }
-        }
-        Button(onClick = weatherViewModel::updateState) {
-            Text(text = "Refresh")
+            // Air quality
+            val measurements = weatherViewModel.measurementsList
+            AirQualityView(measurements)
         }
     }
 }
@@ -113,7 +148,9 @@ private fun AirQualityView(measurements: List<Measurements>) {
                 )
                 Text(
                     text = measurement.installation?.address?.toString() ?: "",
-                    modifier = Modifier.padding(start = 8.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .fillMaxWidth(),
                     color = Color.White,
                     fontSize = 10.sp
                 )

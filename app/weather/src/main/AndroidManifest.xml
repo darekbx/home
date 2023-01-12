@@ -6,7 +6,7 @@
 
     <application>
         <activity
-            android:name=".ui.WeatherActivity"
+            android:name=".WeatherActivity"
             android:exported="true"
             android:label="@string/weather_app_name"
             android:clearTaskOnLaunch="true"

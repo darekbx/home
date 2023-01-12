@@ -8,12 +8,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.weather.data.WeatherRepository
 import com.darekbx.weather.data.network.airly.Measurements
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -28,11 +30,15 @@ class WeatherViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
 
+    val maxResults = dataStore.data.map { preferences ->
+        if (preferences.contains(MAX_RESULTS)) preferences[MAX_RESULTS] ?: DEFAULT_MAX_RESULTS
+        else DEFAULT_MAX_RESULTS
+    }
 
-    // Move to settings!
-    val maxResults = 5
-    val maxDistance = 10.0
-
+    val maxDistance = dataStore.data.map { preferences ->
+        if (preferences.contains(MAX_DISTANCE)) preferences[MAX_DISTANCE] ?: DEFAULT_MAX_DISTANCE
+        else DEFAULT_MAX_DISTANCE
+    }
 
     var measurementsList = mutableStateListOf<Measurements>()
 
@@ -43,41 +49,58 @@ class WeatherViewModel @Inject constructor(
         emit(data)
     }
 
+    fun saveMaxDistance(value: Double) {
+        runInIO {
+            dataStore.edit { preferences ->
+                preferences[MAX_DISTANCE] = value
+            }
+        }
+    }
+
+    fun saveMaxResults(value: Int) {
+        runInIO {
+            dataStore.edit { preferences ->
+                preferences[MAX_RESULTS] = value
+            }
+        }
+    }
+
     fun updateState() {
         stateHolder.value = Random.nextDouble()
     }
 
     fun loadAirQuality() {
         measurementsList.clear()
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                Log.v(TAG, "Load Air Quality")
-                var currentLocation = locationProvider.currentLocation()
+        runInIO {
+            val maxDistance = maxDistance.first()
+            val maxResults = maxResults.first()
 
-                if (currentLocation == null) {
-                    Log.v(TAG, "Current location is null, load last location")
-                    currentLocation = loadLastLocation()
-                }
+            Log.v(TAG, "Load Air Quality")
+            var currentLocation = locationProvider.currentLocation()
 
-                if (currentLocation != null) {
-                    Log.w(TAG, "Load data for: $currentLocation")
-                    val installations = weatherRepository.readInstallations(
-                        currentLocation.latitude, currentLocation.longitude,
-                        maxDistance, maxResults
-                    )
-                    val installationsIds = installations.map { it.id }
-                    weatherRepository.readMeasurements(installationsIds) { measurement ->
-                        if (measurement.temperature.isNotBlank()) {
-                            measurement.installation = installations
-                                .firstOrNull { it.id == measurement.installationId }
-                            measurementsList.add(measurement)
-                        }
+            if (currentLocation == null) {
+                Log.v(TAG, "Current location is null, load last location")
+                currentLocation = loadLastLocation()
+            }
+
+            if (currentLocation != null) {
+                Log.w(TAG, "Load data for: $currentLocation")
+                val installations = weatherRepository.readInstallations(
+                    currentLocation.latitude, currentLocation.longitude,
+                    maxDistance, maxResults
+                )
+                val installationsIds = installations.map { it.id }
+                weatherRepository.readMeasurements(installationsIds) { measurement ->
+                    if (measurement.temperature.isNotBlank()) {
+                        measurement.installation = installations
+                            .firstOrNull { it.id == measurement.installationId }
+                        measurementsList.add(measurement)
                     }
-
-                    persistCurrentLocation(currentLocation)
-                } else {
-                    Log.w(TAG, "Location is not available")
                 }
+
+                persistCurrentLocation(currentLocation)
+            } else {
+                Log.w(TAG, "Location is not available")
             }
         }
     }
@@ -103,9 +126,22 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
-    private companion object {
-        const val TAG = "WeatherViewModel"
-        val LAST_LOCATION_LAT = doublePreferencesKey("last_location_lat")
-        val LAST_LOCATION_LNG = doublePreferencesKey("last_location_lng")
+    private fun runInIO(block: suspend () -> Unit) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                block()
+            }
+        }
+    }
+
+    companion object {
+        private const val TAG = "WeatherViewModel"
+        private val LAST_LOCATION_LAT = doublePreferencesKey("last_location_lat")
+        private val LAST_LOCATION_LNG = doublePreferencesKey("last_location_lng")
+        private val MAX_DISTANCE = doublePreferencesKey("max_distance")
+        private val MAX_RESULTS = intPreferencesKey("max_results")
+
+        val DEFAULT_MAX_RESULTS = 5
+        val DEFAULT_MAX_DISTANCE = 5.0
     }
 }
