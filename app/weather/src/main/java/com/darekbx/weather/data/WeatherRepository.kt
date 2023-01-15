@@ -5,11 +5,14 @@ import com.darekbx.weather.data.network.AirQualityDataSource
 import com.darekbx.weather.data.network.ConditionsDataSource
 import com.darekbx.weather.data.network.airly.Installation
 import com.darekbx.weather.data.network.airly.Measurements
+import com.darekbx.weather.data.network.antistorm.AntistormDataSource
+import com.darekbx.weather.data.network.rainviewer.RainViewerDataSource
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class WeatherRepository @Inject constructor(
-    private val conditionsDataSource: ConditionsDataSource,
+    private val antistormDataSource: AntistormDataSource,
+    private val rainViewerDataSource: RainViewerDataSource,
     private val airQualityDataSource: AirQualityDataSource
 ) {
 
@@ -42,11 +45,20 @@ class WeatherRepository @Inject constructor(
         }
     }
 
-    suspend fun getImagesUrls(): Map<ConditionsDataSource.ImageType, String> {
+    suspend fun getImagesUrls(
+        useAntistorm: Boolean,
+        lat: Double,
+        lng: Double
+    ): Map<ConditionsDataSource.ImageType, String> {
         // Used to show loading progress
         delay(250)
+
         return try {
-            conditionsDataSource.getImagesUrls(0.0, 0.0)
+            if (useAntistorm) {
+                antistormDataSource.getImagesUrls(0.0, 0.0 /* Not used for Antistorm */)
+            } else {
+                rainViewerDataSource.getImagesUrls(lat, lng)
+            }
         } catch (e: Exception) {
             if (BuildConfig.DEBUG) {
                 e.printStackTrace()

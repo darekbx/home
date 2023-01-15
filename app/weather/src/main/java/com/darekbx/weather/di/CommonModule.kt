@@ -13,6 +13,8 @@ import com.darekbx.weather.data.network.airly.AirlyService
 import com.darekbx.weather.data.network.antistorm.AntistormDataSource
 import com.darekbx.weather.data.network.antistorm.AntistormPathsConverter
 import com.darekbx.weather.data.network.antistorm.AntistormService
+import com.darekbx.weather.data.network.rainviewer.RainViewerDataSource
+import com.darekbx.weather.data.network.rainviewer.RainViewerService
 import com.darekbx.weather.ui.weather.LocationProvider
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -49,15 +51,21 @@ class CommonModule {
 
     @Provides
     fun provideWeatherRepository(
-        conditionsDataSource: ConditionsDataSource,
+        antistormDataSource: AntistormDataSource,
+        rainViewerDataSource: RainViewerDataSource,
         airQualityDataSource: AirQualityDataSource
     ): WeatherRepository {
-        return WeatherRepository(conditionsDataSource, airQualityDataSource)
+        return WeatherRepository(antistormDataSource, rainViewerDataSource, airQualityDataSource)
     }
 
     @Provides
     fun provideAntistormDataSource(antistormService: AntistormService): ConditionsDataSource {
         return AntistormDataSource(antistormService)
+    }
+
+    @Provides
+    fun provideRainViewerDataSource(rainViewerService: RainViewerService): RainViewerDataSource {
+        return RainViewerDataSource(rainViewerService)
     }
 
     @Provides
@@ -94,5 +102,15 @@ class CommonModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(AirlyService::class.java)
+    }
+
+    @Provides
+    fun provideRainViewerService(okHttpClient: OkHttpClient): RainViewerService {
+        return Retrofit.Builder()
+            .baseUrl(RainViewerService.RAIN_VIEWER_BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(RainViewerService::class.java)
     }
 }

@@ -1,11 +1,9 @@
 package com.darekbx.weather.ui.weather
 
 import android.util.Log
-import android.widget.Space
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -71,7 +70,8 @@ fun WeatherScreen(
 fun WeatherView(
     modifier: Modifier,
     weatherViewModel: WeatherViewModel
-) {    // To define/redefine points, open emulator, enable map and
+) {
+    // To define/redefine points, open emulator, enable map and
     // click to log point location, then add/update points below
     val points = listOf(
         Offset(518.9475F, 315.917F), // Wwa
@@ -102,8 +102,8 @@ fun WeatherView(
             val data by weatherViewModel.weatherConditions.collectAsState(initial = emptyMap())
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .fillMaxHeight(0.5f)
+                    .fillMaxWidth(0.8f)
+                    .fillMaxHeight(0.7f)
                     .scale(1.3F),
                 contentAlignment = Alignment.Center
             ) {
@@ -125,34 +125,16 @@ private fun AirQualityView(measurements: List<Measurements>) {
                     .padding(start = 16.dp, end = 16.dp, bottom = 2.dp)
                     .fillMaxWidth()
             ) {
-                Text(
-                    text = measurement.temperature,
-                    modifier = Modifier.width(34.dp),
-                    textAlign = TextAlign.Right,
-                    color = Color.White,
-                    fontSize = 10.sp
+                AirTextField(value = measurement.temperature)
+                AirTextField(
+                    value = measurement.averagePMNorm,
+                    color = Color(android.graphics.Color.parseColor(measurement.airlyIndex.color))
                 )
-                Text(
-                    text = measurement.averagePMNorm,
-                    color = Color(android.graphics.Color.parseColor(measurement.airlyIndex.color)),
-                    modifier = Modifier.width(34.dp),
-                    textAlign = TextAlign.Right,
-                    fontSize = 10.sp
-                )
-                Text(
-                    text = measurement.humidity,
-                    modifier = Modifier.width(34.dp),
-                    color = Color.White,
-                    textAlign = TextAlign.Right,
-                    fontSize = 10.sp
-                )
-                Text(
-                    text = measurement.installation?.address?.toString() ?: "",
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .fillMaxWidth(),
-                    color = Color.White,
-                    fontSize = 10.sp
+                AirTextField(value = measurement.humidity)
+                AirTextField(
+                    Modifier.fillMaxWidth().padding(start = 8.dp),
+                    value = measurement.installation?.address?.toString() ?: "",
+                    textAlign = TextAlign.Left
                 )
             }
         }
@@ -161,19 +143,36 @@ private fun AirQualityView(measurements: List<Measurements>) {
     measurements.lastOrNull()?.rateLimits?.run {
         Text(
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 4.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp)
                 .fillMaxWidth(),
             text = "Limits: $dayLimit/$dayRemaining, $minuteLimit/$minuteRemaining",
             color = Color.Gray,
             textAlign = TextAlign.Right,
-            fontSize = 9.sp
+            fontSize = 10.sp
         )
     }
 }
 
+@Preview
+@Composable
+private fun AirTextField(
+    modifier: Modifier = Modifier.width(34.dp),
+    value: String = "54",
+    color: Color = Color.White,
+    textAlign: TextAlign = TextAlign.Right
+) {
+    val fontSize = 12.sp
+    Text(
+        text = value,
+        modifier = modifier,
+        color = color,
+        textAlign = textAlign,
+        fontSize = fontSize
+    )
+}
+
 @Composable
 private fun WeatherBox(data: Map<ConditionsDataSource.ImageType, String>, points: List<Offset>) {
-    val showMap = false
     val size = 300.dp
 
     Box(
@@ -185,20 +184,40 @@ private fun WeatherBox(data: Map<ConditionsDataSource.ImageType, String>, points
         if (data.isEmpty()) {
             CircularProgressIndicator(modifier = Modifier.size(50.dp))
         } else {
-
-            points.forEach {
-                DrawPoint(position = it)
-            }
-
-            WeatherImage(data[ConditionsDataSource.ImageType.PROBABILITIES], alpha = 0.1F)
-            WeatherImage(data[ConditionsDataSource.ImageType.STORM])
-            WeatherImage(data[ConditionsDataSource.ImageType.RAIN])
-
-            if (showMap) {
-                WeatherImage(data[ConditionsDataSource.ImageType.MAP])
+            if (data.size == 1) {
+                // RainViewer contains one image
+                DisplayRainViewer(data)
+            } else {
+                DisplayAntistorm(points, data)
             }
         }
     }
+}
+
+@Composable
+private fun DisplayRainViewer(data: Map<ConditionsDataSource.ImageType, String>) {
+    WeatherImage(data[ConditionsDataSource.ImageType.RAIN])
+    DrawCenterPoint()
+}
+
+@Composable
+private fun DisplayAntistorm(
+    points: List<Offset>,
+    data: Map<ConditionsDataSource.ImageType, String>
+) {
+    val showMap = false
+    data
+        .filterValues { it.isNotEmpty() }
+        .forEach {
+            if (!showMap && it.key == ConditionsDataSource.ImageType.MAP) {
+                return@forEach
+            }
+            val alpha =
+                if (it.key == ConditionsDataSource.ImageType.PROBABILITIES) 0.1F
+                else 1F
+            WeatherImage(it.value, alpha)
+        }
+    points.forEach { DrawPoint(position = it) }
 }
 
 @Composable
@@ -228,5 +247,12 @@ private fun DrawPoint(position: Offset) {
     Canvas(modifier = Modifier.fillMaxSize()) {
         drawCircle(Color.White, radius = 3.5F, center = position)
         drawCircle(Color.Black, radius = 2.0F, center = position)
+    }
+}
+
+@Composable
+private fun DrawCenterPoint() {
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        drawCircle(Color.White, radius = 3.5F, center = Offset(size.width / 2, size.height / 2))
     }
 }

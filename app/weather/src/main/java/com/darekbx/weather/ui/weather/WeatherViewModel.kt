@@ -5,10 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.doublePreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.weather.data.WeatherRepository
@@ -40,13 +37,36 @@ class WeatherViewModel @Inject constructor(
         else DEFAULT_MAX_DISTANCE
     }
 
+    val antistormEnabled = dataStore.data.map { preferences ->
+        preferences[ANTISTORM_ENABLED] ?: true
+    }
+
     var measurementsList = mutableStateListOf<Measurements>()
 
     var stateHolder = mutableStateOf(0.0)
 
     val weatherConditions = flow {
-        val data = weatherRepository.getImagesUrls()
-        emit(data)
+        if (antistormEnabled.first()) {
+            Log.v(TAG, "Load antistorm weather conditions")
+            // Antistorm is not using location
+            val data = weatherRepository.getImagesUrls(useAntistorm = true, 0.0, 0.0)
+            emit(data)
+        } else {
+            Log.v(TAG, "Load rain viewer weather conditions")
+            var currentLocation = locationProvider.currentLocation()
+            if (currentLocation == null) {
+                Log.v(TAG, "Current location is null, load last location")
+                currentLocation = loadLastLocation()
+            }
+            if (currentLocation != null) {
+                val lat = currentLocation.latitude
+                val lng = currentLocation.longitude
+                val data = weatherRepository.getImagesUrls(useAntistorm = false, lat, lng)
+                emit(data)
+            } else {
+                Log.w(TAG, "Location is not available")
+            }
+        }
     }
 
     fun saveMaxDistance(value: Double) {
@@ -61,6 +81,14 @@ class WeatherViewModel @Inject constructor(
         runInIO {
             dataStore.edit { preferences ->
                 preferences[MAX_RESULTS] = value
+            }
+        }
+    }
+
+    fun saveAntistormEnabled(value: Boolean) {
+        runInIO {
+            dataStore.edit { preferences ->
+                preferences[ANTISTORM_ENABLED] = value
             }
         }
     }
@@ -140,8 +168,9 @@ class WeatherViewModel @Inject constructor(
         private val LAST_LOCATION_LNG = doublePreferencesKey("last_location_lng")
         private val MAX_DISTANCE = doublePreferencesKey("max_distance")
         private val MAX_RESULTS = intPreferencesKey("max_results")
+        private val ANTISTORM_ENABLED = booleanPreferencesKey("antistorm_enabled")
 
-        val DEFAULT_MAX_RESULTS = 5
-        val DEFAULT_MAX_DISTANCE = 5.0
+        const val DEFAULT_MAX_RESULTS = 5
+        const val DEFAULT_MAX_DISTANCE = 5.0
     }
 }
