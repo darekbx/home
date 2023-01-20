@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:previewLayout="@bool/glance_appwidget_available"
     android:description="@string/stocks_usd_pln"
     android:minWidth="20dp"
     android:minHeight="20dp"

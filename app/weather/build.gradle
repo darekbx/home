@@ -57,6 +57,9 @@ dependencies {
 
     implementation project(':app:common')
 
+    // To remove
+    implementation "com.github.skydoves:cloudy:0.1.1"
+
     implementation google.gms_location
     implementation other.coil
     implementation other.retrofit

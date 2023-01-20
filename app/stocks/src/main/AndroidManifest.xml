@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application>
         <activity
             android:name=".StocksActivity"
             android:exported="true"
             android:clearTaskOnLaunch="true"
             android:label="@string/stocks_app_name"
-            android:icon="@android:drawable/btn_dialog"
+            android:icon="@drawable/ic_monetization"
             android:theme="@style/Theme.Home"
             android:launchMode="singleTask"
+            android:usesCleartextTraffic="true"
+            android:networkSecurityConfig="@xml/network_security_config"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,18 +24,19 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-
+<!--
+Widget is disabled
         <receiver
             android:name=".widget.StocksWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/stocks_widget_info" />
         </receiver>
+-->
     </application>
 
 </manifest>

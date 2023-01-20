@@ -43,6 +43,12 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+    buildTypes.all { type ->
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        def currenciesBaseUrl = properties.getProperty('currencies.baseUrl')
+        buildConfigField 'String', 'CURRENCIES_BASE_URL', "\"${currenciesBaseUrl}\""
+    }
 }
 
 useCompose()
@@ -52,12 +58,19 @@ useHilt()
 dependencies {
 
     implementation project(':app:common')
+    implementation project(':app:storage')
 
     implementation other.kotlinx_serialization
+
+    implementation other.retrofit
+    implementation other.retrofit_scalars
+    implementation other.okhttp
+    implementation other.okhttp_logging_interceptor
 
     implementation androidx.work
     implementation androidx.core_ktx
     implementation androidx.lifecycle_runtime_ktx
+    implementation androidx.compose_navigation
 
     testImplementation other.junit
 }

@@ -16,8 +16,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val context = applicationContext
-
         setContent {
             HomeTheme(isDarkTheme = true) {
                 // A surface container using the 'background' color from the theme
