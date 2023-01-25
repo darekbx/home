@@ -2,7 +2,7 @@ package com.darekbx.stocks.data
 
 import android.util.Log
 import com.darekbx.stocks.BuildConfig
-import com.darekbx.stocks.data.network.CurrencyService
+import com.darekbx.stocks.data.remote.CurrencyService
 import com.darekbx.stocks.widget.StocksInfo
 import com.darekbx.storage.stocks.CurrencyDto
 import com.darekbx.storage.stocks.RateDto
@@ -19,19 +19,17 @@ class StocksRepository @Inject constructor(
         private val TAG = "StocksRepository"
     }
 
-    suspend fun refreshCurrencies() {
-        currencies().forEach { currency ->
-            try {
-                val response = currencyService.getCurrencyInfo(currency.queryParam)
-                val value = responseParser.parseResponse(response)
-                if (value != null) {
-                    Log.v(TAG, "${currency.label}: $value")
-                    stocksDao.add(RateDto(currencyId = currency.id!!, value = value))
-                }
-            } catch (e: Exception) {
-                if (BuildConfig.DEBUG) {
-                    e.printStackTrace()
-                }
+    suspend fun refreshCurrency(currency: CurrencyDto) {
+        try {
+            val response = currencyService.getCurrencyInfo(currency.queryParam)
+            val value = responseParser.parseResponse(response)
+            if (value != null) {
+                Log.v(TAG, "${currency.label}: $value")
+                stocksDao.add(RateDto(currencyId = currency.id!!, value = value))
+            }
+        } catch (e: Exception) {
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace()
             }
         }
     }

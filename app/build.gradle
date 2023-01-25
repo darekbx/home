@@ -55,6 +55,9 @@ useHilt()
 dependencies {
 
     implementation project(':app:common')
+
+    // To change which app should be run at first, move to top correct one:
+    implementation project(':app:hejto')
     implementation project(':app:weather')
     implementation project(':app:stocks')
 

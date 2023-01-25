@@ -22,6 +22,6 @@ interface StocksDao {
     @Insert
     suspend fun add(currencyDto: CurrencyDto) : Long
 
-    @Query("SELECT * FROM currency")
+    @Query("SELECT * FROM currency ORDER BY id DESC")
     suspend fun getCurrencies(): List<CurrencyDto>
 }

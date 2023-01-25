@@ -1,20 +1,17 @@
 package com.darekbx.weather.di
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import com.darekbx.weather.BuildConfig
 import com.darekbx.weather.data.WeatherRepository
-import com.darekbx.weather.data.network.AirQualityDataSource
-import com.darekbx.weather.data.network.ConditionsDataSource
-import com.darekbx.weather.data.network.airly.AirlyDataSource
-import com.darekbx.weather.data.network.airly.AirlyService
-import com.darekbx.weather.data.network.antistorm.AntistormDataSource
-import com.darekbx.weather.data.network.antistorm.AntistormPathsConverter
-import com.darekbx.weather.data.network.antistorm.AntistormService
-import com.darekbx.weather.data.network.rainviewer.RainViewerDataSource
-import com.darekbx.weather.data.network.rainviewer.RainViewerService
+import com.darekbx.weather.data.remote.AirQualityDataSource
+import com.darekbx.weather.data.remote.ConditionsDataSource
+import com.darekbx.weather.data.remote.airly.AirlyDataSource
+import com.darekbx.weather.data.remote.airly.AirlyService
+import com.darekbx.weather.data.remote.antistorm.AntistormDataSource
+import com.darekbx.weather.data.remote.antistorm.AntistormPathsConverter
+import com.darekbx.weather.data.remote.antistorm.AntistormService
+import com.darekbx.weather.data.remote.rainviewer.RainViewerDataSource
+import com.darekbx.weather.data.remote.rainviewer.RainViewerService
 import com.darekbx.weather.ui.weather.LocationProvider
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -28,16 +25,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
 @Module
 @InstallIn(SingletonComponent::class)
 class CommonModule {
-
-    @Provides
-    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
-        return context.dataStore
-    }
 
     @Provides
     fun provideLocationProvider(fusedLocationProviderClient: FusedLocationProviderClient): LocationProvider {

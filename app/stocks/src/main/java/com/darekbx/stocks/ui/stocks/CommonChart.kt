@@ -11,11 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.vector.VectorProperty
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
@@ -51,9 +52,16 @@ fun CommonChart(
                 .fillMaxWidth()
                 .padding(top = 12.dp, bottom = 0.dp),
             textAlign = TextAlign.Center,
-            text = label,
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append(label)
+                }
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
+                    append(" (${data.size} entries)")
+                }
+            },
             style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold
+            color = Color.LightGray
         )
 
         Canvas(modifier = modifier
@@ -114,9 +122,9 @@ private fun DrawLegend(
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         val color = when (status) {
-            Status.EQUAL -> Color.Black
+            Status.EQUAL -> Color.White
             Status.PLUS -> Color(56, 142, 60)
-            Status.MINUS -> Color(211, 47, 47)
+            Status.MINUS -> Color(229, 115, 115)
         }
 
         Text(
@@ -128,12 +136,14 @@ private fun DrawLegend(
         Text(
             text = "Min: %.2fzł".format(minValue),
             style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Normal
+            fontWeight = FontWeight.Normal,
+            color = Color.White
         )
         Text(
             text = "Max: %.2fzł".format(maxValue),
             style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Normal
+            fontWeight = FontWeight.Normal,
+            color = Color.White
         )
     }
 }

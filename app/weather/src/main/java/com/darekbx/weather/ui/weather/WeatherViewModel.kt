@@ -9,7 +9,7 @@ import androidx.datastore.preferences.core.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.weather.data.WeatherRepository
-import com.darekbx.weather.data.network.airly.Measurements
+import com.darekbx.weather.data.remote.airly.Measurements
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first

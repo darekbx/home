@@ -1,12 +1,12 @@
 package com.darekbx.weather.data
 
 import com.darekbx.weather.BuildConfig
-import com.darekbx.weather.data.network.AirQualityDataSource
-import com.darekbx.weather.data.network.ConditionsDataSource
-import com.darekbx.weather.data.network.airly.Installation
-import com.darekbx.weather.data.network.airly.Measurements
-import com.darekbx.weather.data.network.antistorm.AntistormDataSource
-import com.darekbx.weather.data.network.rainviewer.RainViewerDataSource
+import com.darekbx.weather.data.remote.AirQualityDataSource
+import com.darekbx.weather.data.remote.ConditionsDataSource
+import com.darekbx.weather.data.remote.airly.Installation
+import com.darekbx.weather.data.remote.airly.Measurements
+import com.darekbx.weather.data.remote.antistorm.AntistormDataSource
+import com.darekbx.weather.data.remote.rainviewer.RainViewerDataSource
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 

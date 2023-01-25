@@ -37,8 +37,9 @@ useHilt()
 useRoom()
 
 dependencies {
-
+    
     implementation androidx.core_ktx
+    implementation androidx.data_store
 
     testImplementation other.junit
 }

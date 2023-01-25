@@ -75,14 +75,14 @@ private fun ChartCard(
         TestData.PLN_USD,
         "PLN/USD",
         0.025F,
-        Color.Blue,
-        Status.MINUS
+        Color(41, 182, 246),
+        Status.PLUS
     )
 ) {
     Card(
         modifier = modifier.padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = Color(0xFF101111)
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp

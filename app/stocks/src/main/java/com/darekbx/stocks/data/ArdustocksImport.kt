@@ -20,6 +20,13 @@ class ArdustocksImport(
         )
     }
 
+    /**
+     * To import data from ArduStocks, place those files in assets/ directory:
+     *  - pln_usd.txt
+     *  - pln_eur.txt
+     *  - btc.txt
+     *  - gold.txt
+     */
     suspend fun importFromArdustocks() {
         stocksRepository.clearDataForImport()
         for (source in SOURCES) {

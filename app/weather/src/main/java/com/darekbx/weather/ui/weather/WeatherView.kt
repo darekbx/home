@@ -30,8 +30,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.darekbx.weather.BuildConfig
-import com.darekbx.weather.data.network.ConditionsDataSource
-import com.darekbx.weather.data.network.airly.Measurements
+import com.darekbx.weather.data.remote.ConditionsDataSource
+import com.darekbx.weather.data.remote.airly.Measurements
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,11 +73,18 @@ fun WeatherView(
 ) {
     // To define/redefine points, open emulator, enable map and
     // click to log point location, then add/update points below
-    val points = listOf(
+    val points6A = listOf(
         Offset(518.9475F, 315.917F), // Wwa
         Offset(618.94507F, 321.92285F), // BP
         Offset(470.95923F, 512.9385F), // Zako
         Offset(379.95947F, 105.93164F), // Debki
+    )
+
+    val points2XL = listOf(
+        Offset(691.11334F, 414.17078F), // Wwa
+        Offset(511.10657F, 132.65027F), // Debki
+        Offset(824.9437F, 424.9204F), // BP
+        Offset(616.50775F, 682.6428F), // Zako
     )
 
     LaunchedEffect(Unit) {
@@ -107,7 +114,7 @@ fun WeatherView(
                     .scale(1.3F),
                 contentAlignment = Alignment.Center
             ) {
-                WeatherBox(data, points)
+                WeatherBox(data, points2XL)
             }
             // Air quality
             val measurements = weatherViewModel.measurementsList
@@ -118,6 +125,18 @@ fun WeatherView(
 
 @Composable
 private fun AirQualityView(measurements: List<Measurements>) {
+
+    measurements.lastOrNull()?.rateLimits?.run {
+        Text(
+            modifier = Modifier
+                .padding(start = 16.dp, end = 16.dp, bottom = 4.dp)
+                .fillMaxWidth(),
+            text = "Limits: $dayLimit/$dayRemaining, $minuteLimit/$minuteRemaining",
+            color = Color.Gray,
+            textAlign = TextAlign.Left,
+            fontSize = 10.sp
+        )
+    }
     LazyColumn {
         items(measurements, key = { it.installationId }) { measurement ->
             Row(
@@ -132,24 +151,14 @@ private fun AirQualityView(measurements: List<Measurements>) {
                 )
                 AirTextField(value = measurement.humidity)
                 AirTextField(
-                    Modifier.fillMaxWidth().padding(start = 8.dp),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp),
                     value = measurement.installation?.address?.toString() ?: "",
                     textAlign = TextAlign.Left
                 )
             }
         }
-    }
-
-    measurements.lastOrNull()?.rateLimits?.run {
-        Text(
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 8.dp)
-                .fillMaxWidth(),
-            text = "Limits: $dayLimit/$dayRemaining, $minuteLimit/$minuteRemaining",
-            color = Color.Gray,
-            textAlign = TextAlign.Right,
-            fontSize = 10.sp
-        )
     }
 }
 
@@ -161,7 +170,7 @@ private fun AirTextField(
     color: Color = Color.White,
     textAlign: TextAlign = TextAlign.Right
 ) {
-    val fontSize = 12.sp
+    val fontSize = 11.sp
     Text(
         text = value,
         modifier = modifier,
