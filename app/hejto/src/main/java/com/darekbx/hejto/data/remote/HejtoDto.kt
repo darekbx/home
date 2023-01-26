@@ -1,7 +1,17 @@
 package com.darekbx.hejto.data.remote
 
+import android.text.format.DateUtils
+import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import com.darekbx.hejto.utils.LinkParser
 import com.google.gson.annotations.SerializedName
+import java.text.SimpleDateFormat
+import java.util.*
+
+// Format for 2023-01-25T21:40:14+01:00
+val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+val displayFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
 data class ResponseWrapper<T>(
     val page: Int,
@@ -37,14 +47,23 @@ data class Stats(
 data class PostComment(
     val content: String,
     val author: Author,
-    val images: List<Image>,
+    val images: List<RemoteImage>,
     @SerializedName("num_likes")
     val likesCount: Int,
     @SerializedName("num_reports")
     val reportsCount: Int,
     @SerializedName("created_at")
     val createdAt: String
-)
+) {
+    fun dateAgo(): String {
+        val date = inputFormat.parse(createdAt)
+        return DateUtils.getRelativeTimeSpanString(
+            date.getTime(),
+            Calendar.getInstance().getTimeInMillis(),
+            DateUtils.MINUTE_IN_MILLIS
+        ).toString()
+    }
+}
 
 data class PostDetails(
     val type: String,
@@ -52,7 +71,7 @@ data class PostDetails(
     val slug: String,
     val content: String,
     val hot: Boolean,
-    val images: List<Image>,
+    val images: List<RemoteImage>,
     val tags: List<Tag>,
     val author: Author,
     val nsfw: Boolean,
@@ -62,15 +81,31 @@ data class PostDetails(
     @SerializedName("num_comments")
     val commentsCount: Int,
     @SerializedName("created_at")
-    val createdAt: String
+    val createdAt: String,
+    val community: CommunityCategory,
+    val link: String?
 ) {
 
-    val links by lazy {  LinkParser.extractLinks(content) }
+    val links by lazy { LinkParser.extractLinks(content) }
 
     val cleanContent by lazy {
         var result = content
         links.forEach { link -> result = result.replace(link.source, link.label) }
         result
+    }
+
+    fun dateAgo(): String {
+        val date = inputFormat.parse(createdAt)
+        return DateUtils.getRelativeTimeSpanString(
+            date.getTime(),
+            Calendar.getInstance().getTimeInMillis(),
+            DateUtils.MINUTE_IN_MILLIS
+        ).toString()
+    }
+
+    fun displayDate(): String {
+        val date = inputFormat.parse(createdAt)
+        return displayFormat.format(date)
     }
 }
 
@@ -81,15 +116,17 @@ data class Author(
     val rank: String,
     @SerializedName("current_color")
     val rankColor: String,
-    val avatar: Image
-)
+    val avatar: RemoteImage?
+) {
+    val color = Color(android.graphics.Color.parseColor(rankColor))
+}
 
-data class Image(
-    val urls: Map<String, String>
+data class RemoteImage(
+    val urls: Map<String, String>?
 ) {
     override fun toString(): String {
         return urls
-            .toList()
-            .joinToString(", ") { "${it.first}: ${it.second}" }
+            ?.toList()
+            ?.joinToString(", ") { "${it.first}: ${it.second}" } ?: ""
     }
 }

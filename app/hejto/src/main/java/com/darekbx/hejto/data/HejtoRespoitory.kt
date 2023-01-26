@@ -1,6 +1,7 @@
 package com.darekbx.hejto.data
 
 import com.darekbx.hejto.data.remote.HejtoService
+import com.darekbx.hejto.data.remote.PostComment
 import com.darekbx.hejto.data.remote.PostDetails
 import com.darekbx.hejto.data.remote.ResponseWrapper
 import com.darekbx.hejto.ui.posts.viemodel.Order
@@ -11,11 +12,9 @@ class HejtoRespoitory @Inject constructor(
     private val hejtoService: HejtoService
 ) {
 
-    suspend fun getCommunityCategories(page: Int) =
-        hejtoService.getCommunityCategories(page)
-
-    suspend fun getCommunityPosts(community: String, page: Int) =
-        hejtoService.getPosts(null, null, null, null, null, page)
+    suspend fun getPostComments(page: Int, slug: String): ResponseWrapper<PostComment> {
+        return hejtoService.getPostComments(slug, page)
+    }
 
     suspend fun getPosts(
         page: Int,

@@ -55,6 +55,8 @@ dependencies {
     implementation other.retrofit_gson
     implementation other.okhttp
     implementation other.okhttp_logging_interceptor
+    implementation other.markdown
+    implementation other.coil
 
     implementation androidx.data_store
     implementation androidx.core_ktx

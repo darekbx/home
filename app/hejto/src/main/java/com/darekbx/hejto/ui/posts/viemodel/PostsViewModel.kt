@@ -1,5 +1,6 @@
 package com.darekbx.hejto.ui.posts.viemodel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -7,13 +8,15 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
+import androidx.paging.*
 import com.darekbx.hejto.data.CommonPagingSource
 import com.darekbx.hejto.data.HejtoRespoitory
 import com.darekbx.hejto.data.remote.HejtoService
+import com.darekbx.hejto.data.remote.PostComment
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,12 +30,25 @@ class PostsViewModel @Inject constructor(
 
     var postsStateHolder = mutableStateOf(0.0)
 
-    var posts =
+    val posts =
         Pager(PagingConfig(pageSize = HejtoService.PAGE_SIZE)) {
             CommonPagingSource { page ->
                 hejtoRespoitory.getPosts(page, periodFilter.first(), postsOrder.first())
             }
         }.flow
+
+    fun post(slug: String) = flow {
+        emit(hejtoRespoitory.getPostDetails(slug))
+    }
+
+    fun postComments(slug: String): Flow<PagingData<PostComment>> {
+      Log.v("--------", "call")
+      return  Pager(PagingConfig(pageSize = HejtoService.PAGE_SIZE)) {
+            CommonPagingSource { page ->
+                hejtoRespoitory.getPostComments(page, slug)
+            }
+        }.flow
+    }
 
     val periodFilter = dataStore.data.map { preferences ->
         val value = preferences[PERIOD_FILTER]
