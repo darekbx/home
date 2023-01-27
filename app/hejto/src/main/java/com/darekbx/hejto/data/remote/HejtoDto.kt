@@ -35,7 +35,9 @@ data class Tag(
     val name: String,
     @SerializedName("stats")
     val statistics: Stats = Stats(0, 0)
-)
+) {
+    var isFavourite = false
+}
 
 data class Stats(
     @SerializedName("num_posts")

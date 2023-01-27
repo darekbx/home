@@ -175,7 +175,7 @@ fun CommunityInfo(post: PostDetails, ago: String) {
     Text(
         text = buildAnnotatedString {
             withStyle(style = SpanStyle(fontWeight = FontWeight.W200)) {
-                append("w")
+                append("in")
             }
             append(" ${post.community.name} ")
             withStyle(style = SpanStyle(fontWeight = FontWeight.W200)) {

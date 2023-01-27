@@ -1,5 +1,6 @@
 package com.darekbx.hejto.ui.posts
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.darekbx.hejto.data.remote.*
@@ -30,10 +32,14 @@ import com.darekbx.hejto.ui.posts.viemodel.PeriodFilter
 import com.darekbx.hejto.ui.posts.viemodel.PostsViewModel
 
 @Composable
-fun PostsScreen(
+fun PostsScreen2(
     postsViewModel: PostsViewModel = hiltViewModel(),
+    tag: String,
     openPost: (slug: String) -> Unit = { }
 ) {
+    postsViewModel.tag = tag
+    val posts = postsViewModel.posts.collectAsLazyPagingItems()
+
     Column(modifier = Modifier.fillMaxSize()) {
         val activePeriod by postsViewModel.periodFilter.collectAsState(initial = PeriodFilter.`6H`)
         val activeOrder by postsViewModel.postsOrder.collectAsState(initial = Order.NEWEST)
@@ -47,17 +53,42 @@ fun PostsScreen(
 
         val postsStateHolder by remember { postsViewModel.postsStateHolder }
         key(postsStateHolder) {
-            PostsList(postsViewModel, openPost = openPost)
+            PostsList(posts, openPost = openPost)
+        }
+    }
+}
+
+@Composable
+fun PostsScreen(
+    postsViewModel: PostsViewModel = hiltViewModel(),
+    openPost: (slug: String) -> Unit = { }
+) {
+    postsViewModel.tag = null
+    val posts = postsViewModel.posts.collectAsLazyPagingItems()
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        val activePeriod by postsViewModel.periodFilter.collectAsState(initial = PeriodFilter.`6H`)
+        val activeOrder by postsViewModel.postsOrder.collectAsState(initial = Order.NEWEST)
+
+        FilterView(
+            activePeriod,
+            activeOrder,
+            onPeriodChanged = postsViewModel::periodChanged,
+            onOrderChanged = postsViewModel::orderChanged
+        )
+
+        val postsStateHolder by remember { postsViewModel.postsStateHolder }
+        key(postsStateHolder) {
+            PostsList(posts, openPost = openPost)
         }
     }
 }
 
 @Composable
 private fun PostsList(
-    postsViewModel: PostsViewModel,
+    posts: LazyPagingItems<PostDetails>,
     openPost: (slug: String) -> Unit = { }
 ) {
-    val posts = postsViewModel.posts.collectAsLazyPagingItems()
     Box(
         modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
@@ -65,7 +96,7 @@ private fun PostsList(
             is LoadState.Loading -> LoadingProgress()
             is LoadState.Error -> ErrorIcon()
             else -> {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                LazyColumn() {
                     items(items = posts, key = { it.slug }) { item ->
                         item?.let {
                             PostView(it, openPost = openPost)
@@ -112,7 +143,7 @@ fun PostFooter(post: PostDetails) {
     ) {
         Text(
             text = buildAnnotatedString {
-                append("Komentarzy: ")
+                append("Comments: ")
                 withStyle(style = SpanStyle(fontWeight = FontWeight.W600)) {
                     append("${post.commentsCount}")
                 }
@@ -126,7 +157,7 @@ fun PostFooter(post: PostDetails) {
                 modifier = Modifier.clickable {
                     localUriHandler.openUri(post.link)
                 },
-                text = "Otworz link",
+                text = "Open link",
                 style = MaterialTheme.typography.titleSmall.copy(letterSpacing = 0.6.sp),
                 color = MaterialTheme.colorScheme.primary,
                 textDecoration = TextDecoration.Underline

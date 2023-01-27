@@ -6,8 +6,13 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.darekbx.hejto.ui.communities.CommunitesScreen
 import com.darekbx.hejto.ui.posts.PostScreen
 import com.darekbx.hejto.ui.posts.PostsScreen
+import com.darekbx.hejto.ui.posts.PostsScreen2
+import com.darekbx.hejto.ui.settings.SettingsScreen
+import com.darekbx.hejto.ui.tags.FavouriteTagsScreen
+import com.darekbx.hejto.ui.tags.TagsListScreen
 
 @Composable
 fun HejtoNavHost(
@@ -26,12 +31,44 @@ fun HejtoNavHost(
         }
 
         composable(
+            route = BoardByTag.routeWithArgs,
+            arguments = BoardByTag.arguments
+        ) { navBackStackEntry ->
+            navBackStackEntry.arguments?.getString(BoardByTag.tagArg)?.let { tag ->
+                PostsScreen2(tag = tag) { postSlug ->
+                    navController.navigate("${Post.route}?${Post.slugArg}=$postSlug")
+                }
+            }
+        }
+
+        composable(
             route = Post.routeWithArgs,
             arguments = Post.arguments
         ) { navBackStackEntry ->
             navBackStackEntry.arguments?.getString(Post.slugArg)?.let { postSlug ->
                 PostScreen(postSlug)
             }
+        }
+
+        composable(route = FavouriteTags.route) {
+            FavouriteTagsScreen(
+                openTagsList = { navController.navigateSingleTopTo(TagList.route) },
+                openTag = { tag ->
+                    navController.navigate("${BoardByTag.route}?${BoardByTag.tagArg}=$tag")
+                }
+            )
+        }
+
+        composable(route = TagList.route) {
+            TagsListScreen()
+        }
+
+        composable(route = Settings.route) {
+            SettingsScreen()
+        }
+
+        composable(route = Communities.route) {
+            CommunitesScreen()
         }
     }
 }

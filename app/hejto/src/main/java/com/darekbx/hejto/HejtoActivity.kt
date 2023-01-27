@@ -1,18 +1,28 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.darekbx.hejto
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.darekbx.common.ui.NoInternetView
 import com.darekbx.common.utils.ConnectionUtils
-import com.darekbx.hejto.navigation.HejtoNavHost
+import com.darekbx.hejto.navigation.*
 import com.darekbx.hejto.ui.HejtoTheme
-import com.darekbx.hejto.ui.posts.PostsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -55,12 +65,71 @@ class HejtoActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     if (ConnectionUtils.isInternetConnected(LocalContext.current)) {
-                        HejtoNavHost(navController = navController)
+                        Scaffold(
+                            content = { innerPadding ->
+                                HejtoNavHost(
+                                    modifier = Modifier.padding(
+                                        innerPadding
+                                    ), navController = navController
+                                )
+                            },
+                            bottomBar = { BottomMenu(navController) }
+                        )
+
                     } else {
                         NoInternetView(Modifier.fillMaxSize())
                     }
                 }
             }
         }
+    }
+
+    @Composable
+    private fun BottomMenu(navController: NavHostController) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            MenuItem(
+                modifier = Modifier.clickable { navController.navigateSingleTopTo("${FavouriteTags.route}") },
+                label = "Tags",
+                icon = painterResource(id = R.drawable.ic_label)
+            )
+            MenuItem(
+                modifier = Modifier.clickable { navController.navigateSingleTopTo("${Communities.route}") },
+                label = "Communities",
+                icon = painterResource(id = R.drawable.ic_communities)
+            )
+            MenuItem(
+                modifier = Modifier.clickable { navController.navigateSingleTopTo("${Settings.route}") },
+                label = "Settings",
+                icon = painterResource(id = R.drawable.ic_settings)
+            )
+        }
+    }
+}
+
+@Composable
+private fun MenuItem(modifier: Modifier = Modifier, label: String, icon: Painter) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            painter = icon,
+            contentDescription = label,
+            tint = Color.White
+        )
+        Text(
+            text = label,
+            modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontWeight = FontWeight.W200
+        )
     }
 }

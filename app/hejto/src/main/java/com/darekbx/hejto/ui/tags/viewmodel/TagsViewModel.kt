@@ -1,0 +1,83 @@
+package com.darekbx.hejto.ui.tags.viewmodel
+
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import com.darekbx.hejto.data.CommonPagingSource
+import com.darekbx.hejto.data.HejtoRespoitory
+import com.darekbx.hejto.data.local.model.FavouriteTag
+import com.darekbx.hejto.data.remote.HejtoService
+import com.darekbx.hejto.data.remote.Tag
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.math.max
+
+@HiltViewModel
+class TagsViewModel @Inject constructor(
+    private val hejtoRespoitory: HejtoRespoitory
+) : ViewModel() {
+
+    val favouriteTags = mutableStateListOf<FavouriteTag>()
+    val isLoading = mutableStateOf(false)
+
+    fun getFavouriteTags() = flow {
+        emit(hejtoRespoitory.getFavouriteTags())
+    }
+
+    fun markOpenedTag(name: String, entriesCount: Int) {
+        viewModelScope.launch {
+            hejtoRespoitory.updateEntriesCount(name, entriesCount)
+        }
+    }
+
+    fun addRemoveFavouriteTag(name: String) {
+        viewModelScope.launch {
+            hejtoRespoitory.addRemoveFavouriteTag(name)
+        }
+    }
+
+    fun loadFavouritesTags() {
+        viewModelScope.launch {
+            isLoading.value = true
+            // TODO:
+            // temporary solution is to fetch first 150 tags
+            // remove when stats.num_posts will work
+            val remoteTags = mutableListOf<Tag>()
+            for (i in 1..3) {
+                remoteTags.addAll(hejtoRespoitory.getTags(i, 50).contents.items)
+            }
+
+            hejtoRespoitory.getFavouriteTags().forEach { localTag ->
+
+                // TODO:
+                // /tags/{name} is bronek, stats.num_posts returns always 0
+                // Temporary fix is to list all tags
+                //val remoteTag = hejtoRespoitory.getTag(localTag.name)
+
+                remoteTags
+                    .firstOrNull { it.name == localTag.name }
+                    ?.let { remoteTag ->
+                        localTag.newEntriesCount =
+                            max(0, remoteTag.statistics.postsCount - localTag.entriesCount)
+                    }
+
+                favouriteTags.add(localTag)
+            }
+
+            isLoading.value = false
+        }
+    }
+
+    val tags =
+        Pager(PagingConfig(pageSize = HejtoService.PAGE_SIZE)) {
+            CommonPagingSource { page ->
+                hejtoRespoitory.getTags(page, HejtoService.PAGE_SIZE)
+            }
+        }.flow
+}

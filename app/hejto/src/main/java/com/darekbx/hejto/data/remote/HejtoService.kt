@@ -13,8 +13,14 @@ interface HejtoService {
 
     @GET("tags")
     suspend fun getTags(
-        @Query("page") page: Int
+        @Query("page") page: Int,
+        @Query("limit") limit: Int = PAGE_SIZE
     ): ResponseWrapper<Tag>
+
+    @GET("tags/{name}")
+    suspend fun getTag(
+        @Path("name") name: String
+    ): Tag
 
     @GET("posts")
     suspend fun getPosts(
