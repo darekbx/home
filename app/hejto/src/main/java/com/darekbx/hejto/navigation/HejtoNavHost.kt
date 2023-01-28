@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import com.darekbx.hejto.ui.communities.CommunitesScreen
 import com.darekbx.hejto.ui.posts.PostScreen
 import com.darekbx.hejto.ui.posts.PostsScreen
-import com.darekbx.hejto.ui.posts.PostsScreen2
 import com.darekbx.hejto.ui.settings.SettingsScreen
 import com.darekbx.hejto.ui.tags.FavouriteTagsScreen
 import com.darekbx.hejto.ui.tags.TagsListScreen
@@ -21,7 +20,7 @@ fun HejtoNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Board.route,
+        startDestination = FavouriteTags.route,
         modifier = modifier
     ) {
         composable(route = Board.route) {
@@ -35,7 +34,7 @@ fun HejtoNavHost(
             arguments = BoardByTag.arguments
         ) { navBackStackEntry ->
             navBackStackEntry.arguments?.getString(BoardByTag.tagArg)?.let { tag ->
-                PostsScreen2(tag = tag) { postSlug ->
+                PostsScreen(tag = tag) { postSlug ->
                     navController.navigate("${Post.route}?${Post.slugArg}=$postSlug")
                 }
             }

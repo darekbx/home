@@ -1,16 +1,21 @@
 package com.darekbx.hejto.ui.posts
 
-import android.util.Log
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -31,41 +36,50 @@ import com.darekbx.hejto.ui.posts.viemodel.Order
 import com.darekbx.hejto.ui.posts.viemodel.PeriodFilter
 import com.darekbx.hejto.ui.posts.viemodel.PostsViewModel
 
+fun LazyListState.isScrolledToEnd() =
+    layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
+
 @Composable
-fun PostsScreen2(
+fun PostsScreen(
     postsViewModel: PostsViewModel = hiltViewModel(),
     tag: String,
     openPost: (slug: String) -> Unit = { }
 ) {
-    postsViewModel.tag = tag
-    val posts = postsViewModel.posts.collectAsLazyPagingItems()
+    var page by remember { mutableStateOf(1) }
+    val posts = postsViewModel.postsList
+    val state = rememberLazyListState()
+    val isAtBottom = state.isScrolledToEnd()
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        val activePeriod by postsViewModel.periodFilter.collectAsState(initial = PeriodFilter.`6H`)
-        val activeOrder by postsViewModel.postsOrder.collectAsState(initial = Order.NEWEST)
+    LaunchedEffect(tag) {
+        postsViewModel.loadPosts(tag, page)
+    }
 
-        FilterView(
-            activePeriod,
-            activeOrder,
-            onPeriodChanged = postsViewModel::periodChanged,
-            onOrderChanged = postsViewModel::orderChanged
-        )
+    LaunchedEffect(isAtBottom) {
+        if (isAtBottom && postsViewModel.hasNextPage) {
+            page += 1
+            postsViewModel.loadPosts(tag, page)
+        }
+    }
 
-        val postsStateHolder by remember { postsViewModel.postsStateHolder }
-        key(postsStateHolder) {
-            PostsList(posts, openPost = openPost)
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        LazyColumn(state = state) {
+            items(items = posts, key = { it.slug }) { item ->
+                PostView(item, openPost = openPost)
+            }
+        }
+        if (postsViewModel.isLoading.value) {
+            LoadingProgress()
         }
     }
 }
+
+// ---------------------- Jetpack Paging version
 
 @Composable
 fun PostsScreen(
     postsViewModel: PostsViewModel = hiltViewModel(),
     openPost: (slug: String) -> Unit = { }
 ) {
-    postsViewModel.tag = null
-    val posts = postsViewModel.posts.collectAsLazyPagingItems()
-
     Column(modifier = Modifier.fillMaxSize()) {
         val activePeriod by postsViewModel.periodFilter.collectAsState(initial = PeriodFilter.`6H`)
         val activeOrder by postsViewModel.postsOrder.collectAsState(initial = Order.NEWEST)
@@ -79,6 +93,7 @@ fun PostsScreen(
 
         val postsStateHolder by remember { postsViewModel.postsStateHolder }
         key(postsStateHolder) {
+            val posts = postsViewModel.posts.collectAsLazyPagingItems()
             PostsList(posts, openPost = openPost)
         }
     }
@@ -89,14 +104,12 @@ private fun PostsList(
     posts: LazyPagingItems<PostDetails>,
     openPost: (slug: String) -> Unit = { }
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-    ) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (posts.loadState.refresh) {
             is LoadState.Loading -> LoadingProgress()
             is LoadState.Error -> ErrorIcon()
             else -> {
-                LazyColumn() {
+                LazyColumn {
                     items(items = posts, key = { it.slug }) { item ->
                         item?.let {
                             PostView(it, openPost = openPost)
@@ -123,7 +136,9 @@ private fun PostView(
     ) {
         PostHeader(post)
         PostContent(post, openPost)
-        CommonImage(post.images)
+        post.images.forEach { remoteImage ->
+            CommonImage(remoteImage)
+        }
         PostFooter(post)
     }
 }
@@ -152,10 +167,10 @@ fun PostFooter(post: PostDetails) {
             color = MaterialTheme.colorScheme.onPrimary
         )
         if (post.link != null) {
-            val localUriHandler = LocalUriHandler.current
+            val context = LocalContext.current
             Text(
                 modifier = Modifier.clickable {
-                    localUriHandler.openUri(post.link)
+                    CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(post.link))
                 },
                 text = "Open link",
                 style = MaterialTheme.typography.titleSmall.copy(letterSpacing = 0.6.sp),

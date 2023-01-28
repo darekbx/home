@@ -13,7 +13,7 @@ interface HejtoDao {
     @Query("DELETE FROM favourite_tag WHERE name = :name")
     suspend fun remove(name: String)
 
-    @Query("UPDATE favourite_tag SET entries_Count = :entriesCount WHERE name = :name")
+    @Query("UPDATE favourite_tag SET entries_count = :entriesCount WHERE name = :name")
     suspend fun update(name: String, entriesCount: Int)
 
     @Query("SELECT * FROM favourite_tag")

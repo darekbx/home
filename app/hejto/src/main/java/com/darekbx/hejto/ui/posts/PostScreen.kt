@@ -72,7 +72,9 @@ private fun PostDetails(post: PostDetails?) {
             ) {
                 PostHeader(it)
                 PostContent(it)
-                CommonImage(it.images)
+                it.images.forEach { remoteImage ->
+                    CommonImage(remoteImage)
+                }
             }
         } ?: run {
             LoadingProgress()
@@ -92,7 +94,9 @@ private fun CommentView(comment: PostComment = COMMENT) {
     ) {
         CommentHeader(comment)
         CommentContent(comment)
-        CommonImage(comment.images)
+        comment.images.forEach { remoteImage ->
+            CommonImage(remoteImage)
+        }
     }
 }
 

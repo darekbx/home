@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +25,7 @@ import com.darekbx.hejto.data.local.model.FavouriteTag
 import com.darekbx.hejto.ui.HejtoTheme
 import com.darekbx.hejto.ui.posts.LoadingProgress
 import com.darekbx.hejto.ui.tags.viewmodel.TagsViewModel
+import com.darekbx.hejto.ui.tags.viewmodel.UiState
 
 @Composable
 fun FavouriteTagsScreen(
@@ -59,17 +61,20 @@ private fun FavouriteTagsList(
     tags: List<FavouriteTag>,
     openTag: (String, Int) -> Unit
 ) {
+    val uiState by tagsViewModel.uiState
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        if (tagsViewModel.isLoading.value) {
-            LoadingProgress()
-        } else {
-            LazyColumn(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(top = 4.dp, bottom = 4.dp)
-            ) {
-                items(items = tags) { item ->
-                    FavouriteTagView(item, openTag)
+        when (uiState) {
+            is UiState.InProgress -> LoadingProgress()
+            is UiState.Error -> { }
+            is UiState.Idle -> {
+                LazyColumn(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(top = 4.dp, bottom = 4.dp)
+                ) {
+                    items(items = tags) { item ->
+                        FavouriteTagView(item, openTag)
+                    }
                 }
             }
         }
@@ -82,18 +87,15 @@ private fun FavouriteTagView(tag: FavouriteTag, openTag: (String, Int) -> Unit) 
         modifier = Modifier
             .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
             .fillMaxWidth()
-            .background(
-                MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp)
-            )
+            .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
             .padding(8.dp)
-            .clickable { openTag(tag.name, tag.newEntriesCount) },
+            .clickable { openTag(tag.name, tag.entriesCount) },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = "#${tag.name}",
-            modifier = Modifier
-                .padding(start = 8.dp),
+            modifier = Modifier.padding(start = 8.dp),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onPrimary,
             maxLines = 1,
@@ -104,9 +106,9 @@ private fun FavouriteTagView(tag: FavouriteTag, openTag: (String, Int) -> Unit) 
                 text = "${tag.newEntriesCount} new entries",
                 modifier = Modifier
                     .padding(start = 8.dp, end = 8.dp),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.W900
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.W700
             )
         } else {
             Text(
@@ -114,7 +116,7 @@ private fun FavouriteTagView(tag: FavouriteTag, openTag: (String, Int) -> Unit) 
                 modifier = Modifier
                     .padding(start = 8.dp, end = 8.dp),
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }

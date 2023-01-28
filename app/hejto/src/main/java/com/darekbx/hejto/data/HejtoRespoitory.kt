@@ -1,5 +1,6 @@
 package com.darekbx.hejto.data
 
+import android.util.Log
 import com.darekbx.hejto.data.local.model.FavouriteTag
 import com.darekbx.hejto.data.remote.HejtoService
 import com.darekbx.hejto.data.remote.PostComment

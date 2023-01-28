@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
 class FavouriteTagDto(
     @PrimaryKey(autoGenerate = true) val id: Long? = null,
     @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "entries_Count") val entriesCount: Int = 0
+    @ColumnInfo(name = "entries_count") val entriesCount: Int = 0
 )

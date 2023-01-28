@@ -46,28 +46,30 @@ fun PostContent(
 }
 
 @Composable
-fun CommonImage(images: List<RemoteImage>) {
+fun CommonImage(remoteImage: RemoteImage) {
     var maxImageHeight by remember { mutableStateOf(400.dp) }
     val localUriHandler = LocalUriHandler.current
-    if (images.isNotEmpty()) {
-        val image = images.first().urls?.values?.last()
-        Image(
-            contentScale = ContentScale.FillHeight,
-            modifier = Modifier
-                .padding(top = 8.dp, bottom = 8.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .fillMaxWidth()
-                .height(maxImageHeight)
-                .padding(8.dp)
-                .clickable { image?.let { localUriHandler.openUri(it) } },
-            painter = rememberAsyncImagePainter(
-                image,
-                onError = { maxImageHeight = 32.dp },
-                error = painterResource(id = R.drawable.ic_error)
-            ),
-            contentDescription = "image"
-        )
-    }
+    val image = remoteImage.urls?.values?.last()
+    Image(
+        contentScale = ContentScale.FillWidth,
+        modifier = Modifier
+            .padding(top = 8.dp, bottom = 8.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .fillMaxWidth()
+            .height(maxImageHeight)
+            .padding(8.dp)
+            .clickable {
+                image?.let {
+                    localUriHandler.openUri(it)
+                }
+            },
+        painter = rememberAsyncImagePainter(
+            image,
+            onError = { maxImageHeight = 32.dp },
+            error = painterResource(id = R.drawable.ic_error)
+        ),
+        contentDescription = "image"
+    )
 }
 
 @Composable
@@ -78,9 +80,7 @@ fun PostHeader(post: PostDetails) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp)
-            )
+            .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween

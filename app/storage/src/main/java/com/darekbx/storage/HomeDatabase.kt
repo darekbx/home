@@ -33,13 +33,12 @@ abstract class HomeDatabase : RoomDatabase() {
                 database.execSQL(
                     """CREATE TABLE `favourite_tag`(
                         `name` TEXT NOT NULL, 
-                        `entries_Count` INTEGER NOT NULL, 
+                        `entries_count` INTEGER NOT NULL, 
                         `id` INTEGER NULL, 
                          PRIMARY KEY(`id`)
                        )"""
                 )
             }
         }
-
     }
 }

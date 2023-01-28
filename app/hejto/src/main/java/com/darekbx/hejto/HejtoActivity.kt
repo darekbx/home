@@ -23,6 +23,7 @@ import com.darekbx.common.ui.NoInternetView
 import com.darekbx.common.utils.ConnectionUtils
 import com.darekbx.hejto.navigation.*
 import com.darekbx.hejto.ui.HejtoTheme
+import com.darekbx.hejto.ui.posts.viemodel.Bambilotto
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -65,7 +66,7 @@ class HejtoActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     if (ConnectionUtils.isInternetConnected(LocalContext.current)) {
-                        Scaffold(
+                       Scaffold(
                             content = { innerPadding ->
                                 HejtoNavHost(
                                     modifier = Modifier.padding(
@@ -75,7 +76,6 @@ class HejtoActivity : ComponentActivity() {
                             },
                             bottomBar = { BottomMenu(navController) }
                         )
-
                     } else {
                         NoInternetView(Modifier.fillMaxSize())
                     }
@@ -94,17 +94,22 @@ class HejtoActivity : ComponentActivity() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             MenuItem(
-                modifier = Modifier.clickable { navController.navigateSingleTopTo("${FavouriteTags.route}") },
+                modifier = Modifier.clickable { navController.navigateSingleTopTo(FavouriteTags.route) },
                 label = "Tags",
                 icon = painterResource(id = R.drawable.ic_label)
             )
             MenuItem(
-                modifier = Modifier.clickable { navController.navigateSingleTopTo("${Communities.route}") },
+                modifier = Modifier.clickable { navController.navigateSingleTopTo(Communities.route) },
                 label = "Communities",
                 icon = painterResource(id = R.drawable.ic_communities)
             )
             MenuItem(
-                modifier = Modifier.clickable { navController.navigateSingleTopTo("${Settings.route}") },
+                modifier = Modifier.clickable { navController.navigateSingleTopTo(Board.route) },
+                label = "Board",
+                icon = painterResource(id = R.drawable.ic_board)
+            )
+            MenuItem(
+                modifier = Modifier.clickable { navController.navigateSingleTopTo(Settings.route) },
                 label = "Settings",
                 icon = painterResource(id = R.drawable.ic_settings)
             )
