@@ -87,7 +87,6 @@ data class PostDetails(
     val community: CommunityCategory,
     val link: String?
 ) {
-
     val links by lazy { LinkParser.extractLinks(content) }
 
     val cleanContent by lazy {

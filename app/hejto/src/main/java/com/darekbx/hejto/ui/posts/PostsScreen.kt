@@ -1,7 +1,5 @@
 package com.darekbx.hejto.ui.posts
 
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -35,6 +32,7 @@ import com.darekbx.hejto.ui.HejtoTheme
 import com.darekbx.hejto.ui.posts.viemodel.Order
 import com.darekbx.hejto.ui.posts.viemodel.PeriodFilter
 import com.darekbx.hejto.ui.posts.viemodel.PostsViewModel
+import com.darekbx.hejto.ui.posts.viemodel.UiState
 
 fun LazyListState.isScrolledToEnd() =
     layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
@@ -49,6 +47,7 @@ fun PostsScreen(
     val posts = postsViewModel.postsList
     val state = rememberLazyListState()
     val isAtBottom = state.isScrolledToEnd()
+    val uiState by postsViewModel.uiState
 
     LaunchedEffect(tag) {
         postsViewModel.loadPosts(tag, page)
@@ -63,12 +62,14 @@ fun PostsScreen(
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         LazyColumn(state = state) {
-            items(items = posts, key = { it.slug }) { item ->
+            items(items = posts) { item ->
                 PostView(item, openPost = openPost)
             }
         }
-        if (postsViewModel.isLoading.value) {
-            LoadingProgress()
+        when (uiState) {
+            is UiState.InProgress -> LoadingProgress()
+            is UiState.Error -> ErrorMessage((uiState as UiState.Error).message)
+            is UiState.Idle -> { /* Do nothing */ }
         }
     }
 }
@@ -94,7 +95,7 @@ fun PostsScreen(
         val postsStateHolder by remember { postsViewModel.postsStateHolder }
         key(postsStateHolder) {
             val posts = postsViewModel.posts.collectAsLazyPagingItems()
-            PostsList(posts, openPost = openPost)
+            PostsList(posts, openPost)
         }
     }
 }
@@ -110,9 +111,9 @@ private fun PostsList(
             is LoadState.Error -> ErrorIcon()
             else -> {
                 LazyColumn {
-                    items(items = posts, key = { it.slug }) { item ->
+                    items(items = posts) { item ->
                         item?.let {
-                            PostView(it, openPost = openPost)
+                            PostView(it, openPost)
                         }
                     }
                 }
@@ -132,19 +133,23 @@ private fun PostView(
             .padding(start = 8.dp, end = 8.dp, bottom = 4.dp, top = 4.dp)
             .background(
                 MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp)
-            )
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         PostHeader(post)
-        PostContent(post, openPost)
+        PostContent(post)
         post.images.forEach { remoteImage ->
-            CommonImage(remoteImage)
+            CommonImage(remoteImage, post.nsfw)
         }
-        PostFooter(post)
+        PostFooter(post, openPost)
     }
 }
 
 @Composable
-fun PostFooter(post: PostDetails) {
+fun PostFooter(
+    post: PostDetails,
+    openPost: (slug: String) -> Unit = { }
+) {
     Row(
         modifier = Modifier
             .padding(top = 4.dp)
@@ -157,21 +162,21 @@ fun PostFooter(post: PostDetails) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
+            modifier = Modifier.clickable { openPost(post.slug) },
             text = buildAnnotatedString {
                 append("Comments: ")
                 withStyle(style = SpanStyle(fontWeight = FontWeight.W600)) {
                     append("${post.commentsCount}")
                 }
             },
-            style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 0.6.sp),
-            color = MaterialTheme.colorScheme.onPrimary
+            style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.6.sp),
+            color = MaterialTheme.colorScheme.onPrimary,
+            textDecoration = if (post.commentsCount > 0) TextDecoration.Underline else TextDecoration.None
         )
         if (post.link != null) {
-            val context = LocalContext.current
+            val localUriHandler = LocalUriHandler.current
             Text(
-                modifier = Modifier.clickable {
-                    CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(post.link))
-                },
+                modifier = Modifier.clickable { localUriHandler.openUri(post.link) },
                 text = "Open link",
                 style = MaterialTheme.typography.titleSmall.copy(letterSpacing = 0.6.sp),
                 color = MaterialTheme.colorScheme.primary,

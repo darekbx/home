@@ -24,7 +24,10 @@ import com.darekbx.hejto.ui.posts.viemodel.PostsViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
-fun PostScreen(slug: String, postsViewModel: PostsViewModel = hiltViewModel()) {
+fun PostScreen(
+    slug: String,
+    postsViewModel: PostsViewModel = hiltViewModel()
+) {
     val comments = postsViewModel.postComments(slug).collectAsLazyPagingItems()
     val post by postsViewModel.post(slug).collectAsState(initial = null)
     post?.let {
@@ -33,7 +36,10 @@ fun PostScreen(slug: String, postsViewModel: PostsViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun PostComments(post: PostDetails, comments: LazyPagingItems<PostComment>) {
+private fun PostComments(
+    post: PostDetails,
+    comments: LazyPagingItems<PostComment>
+) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (comments.loadState.refresh) {
             is LoadState.Loading -> LoadingProgress()
@@ -73,7 +79,7 @@ private fun PostDetails(post: PostDetails?) {
                 PostHeader(it)
                 PostContent(it)
                 it.images.forEach { remoteImage ->
-                    CommonImage(remoteImage)
+                    CommonImage(remoteImage, it.nsfw)
                 }
             }
         } ?: run {
@@ -83,7 +89,9 @@ private fun PostDetails(post: PostDetails?) {
 }
 
 @Composable
-private fun CommentView(comment: PostComment = COMMENT) {
+private fun CommentView(
+    comment: PostComment = COMMENT
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -95,7 +103,7 @@ private fun CommentView(comment: PostComment = COMMENT) {
         CommentHeader(comment)
         CommentContent(comment)
         comment.images.forEach { remoteImage ->
-            CommonImage(remoteImage)
+            CommonImage(remoteImage, isNsfw = false)
         }
     }
 }

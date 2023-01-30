@@ -48,7 +48,8 @@ class HejtoRespoitory @Inject constructor(
         val period = periodFilter.filter
         val orderQuery = order.order
         val tags = tag?.let { listOf(it) }
-        return hejtoService.getPosts(tags = tags, period = period, orderBy = orderQuery, page = page)
+        return hejtoService
+            .getPosts(tags = tags, period = period, orderBy = orderQuery, page = page)
     }
 
     suspend fun getTag(name: String) =

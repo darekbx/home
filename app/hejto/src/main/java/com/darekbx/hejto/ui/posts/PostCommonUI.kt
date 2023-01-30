@@ -1,5 +1,6 @@
 package com.darekbx.hejto.ui.posts
 
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,9 +15,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -26,19 +30,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
 import com.darekbx.hejto.R
 import com.darekbx.hejto.data.remote.*
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
-fun PostContent(
-    post: PostDetails,
-    openPost: (slug: String) -> Unit = { }
-) {
+fun PostContent(post: PostDetails) {
     MarkdownText(
-        modifier = Modifier
-            .padding(8.dp),
-        onClick = { openPost(post.slug) },
+        modifier = Modifier.padding(8.dp),
         markdown = post.content,
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.onSurface
@@ -46,26 +47,45 @@ fun PostContent(
 }
 
 @Composable
-fun CommonImage(remoteImage: RemoteImage) {
-    var maxImageHeight by remember { mutableStateOf(400.dp) }
+fun CommonImage(remoteImage: RemoteImage, isNsfw: Boolean) {
+    var errorWidthFraction by remember { mutableStateOf(1F) }
+    var imageBlur by remember { mutableStateOf(100.dp) }
+    var imageAlpha by remember { mutableStateOf(0.025F) }
     val localUriHandler = LocalUriHandler.current
     val image = remoteImage.urls?.values?.last()
-    Image(
-        contentScale = ContentScale.FillWidth,
-        modifier = Modifier
-            .padding(top = 8.dp, bottom = 8.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .fillMaxWidth()
-            .height(maxImageHeight)
-            .padding(8.dp)
-            .clickable {
+    var modifier = Modifier
+        .padding(top = 8.dp, bottom = 8.dp)
+        .clip(RoundedCornerShape(8.dp))
+        .fillMaxWidth(errorWidthFraction)
+        .padding(8.dp)
+        .clickable {
+            if (isNsfw && (imageBlur > 0.dp || imageAlpha < 0.5F)) {
+                imageBlur = 0.dp
+                imageAlpha = 1F
+            } else {
                 image?.let {
                     localUriHandler.openUri(it)
                 }
-            },
+            }
+        }
+
+    if (isNsfw) {
+        modifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            modifier.then(Modifier.blur(imageBlur))
+        } else {
+            modifier.then(Modifier.alpha(imageAlpha))
+        }
+    }
+
+    Image(
+        contentScale = ContentScale.FillWidth,
+        modifier = modifier,
         painter = rememberAsyncImagePainter(
-            image,
-            onError = { maxImageHeight = 32.dp },
+            ImageRequest.Builder(LocalContext.current)
+                .data(image)
+                .size(Size.ORIGINAL)
+                .build(),
+            onError = { errorWidthFraction = 0.1F },
             error = painterResource(id = R.drawable.ic_error)
         ),
         contentDescription = "image"
@@ -207,6 +227,20 @@ fun LoadingProgress() {
         modifier = Modifier
             .background(
                 MaterialTheme.colorScheme.primaryContainer, CircleShape
+            )
+            .padding(8.dp)
+    )
+}
+
+@Composable
+fun ErrorMessage(error: String) {
+    Text(
+        text = error,
+        color = Color.Red,
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier
+            .background(
+                MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(4.dp)
             )
             .padding(8.dp)
     )

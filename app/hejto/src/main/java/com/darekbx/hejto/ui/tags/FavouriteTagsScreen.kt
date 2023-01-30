@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.hejto.data.local.model.FavouriteTag
 import com.darekbx.hejto.ui.HejtoTheme
+import com.darekbx.hejto.ui.posts.ErrorMessage
 import com.darekbx.hejto.ui.posts.LoadingProgress
 import com.darekbx.hejto.ui.tags.viewmodel.TagsViewModel
 import com.darekbx.hejto.ui.tags.viewmodel.UiState
@@ -65,7 +66,7 @@ private fun FavouriteTagsList(
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (uiState) {
             is UiState.InProgress -> LoadingProgress()
-            is UiState.Error -> { }
+            is UiState.Error -> ErrorMessage((uiState as UiState.Error).message)
             is UiState.Idle -> {
                 LazyColumn(
                     modifier = modifier

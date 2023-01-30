@@ -7,9 +7,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -31,6 +29,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
+import com.darekbx.hejto.BuildConfig
 import com.darekbx.hejto.data.CommonPagingSource
 import com.darekbx.hejto.data.HejtoRespoitory
 import com.darekbx.hejto.data.remote.HejtoService
@@ -110,50 +109,55 @@ fun Bambilotto() {
     }
 }
 
+sealed class UiState {
+    object InProgress : UiState()
+    object Idle : UiState()
+    class Error(val message: String) : UiState()
+}
+
 @HiltViewModel
 class PostsViewModel @Inject constructor(
     private val hejtoRespoitory: HejtoRespoitory,
     private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
 
+    private val _uiState = mutableStateOf<UiState>(UiState.Idle)
+    val uiState: State<UiState>
+        get() = _uiState
+
     var postsStateHolder = mutableStateOf(0.0)
 
-    /*
-    TODO try to refactor to UIState
-
-sealed class UiState {
-    object InProgress : UiState()
-    object Idle : UiState()
-}
-
-     */
-
     var postsList = mutableStateListOf<PostDetails>()
-    var isLoading = mutableStateOf(false)
     var hasNextPage = true
 
     fun loadPosts(tag: String?, page: Int) {
         viewModelScope.launch {
-            isLoading.value = true
+            try {
+                _uiState.value = UiState.InProgress
+                val data = hejtoRespoitory.getPosts(
+                    page = page,
+                    tag = tag,
+                    PeriodFilter.ALL,
+                    Order.NEWEST
+                )
 
-            val data = hejtoRespoitory.getPosts(
-                page = page,
-                tag = tag,
-                PeriodFilter.ALL,
-                Order.NEWEST
-            )
+                hasNextPage = data.page < data.pages
 
-            hasNextPage = data.page < data.pages
-
-            isLoading.value = false
-            postsList.addAll(data.contents.items)
+                postsList.addAll(data.contents.items)
+            } catch (e: Exception) {
+                if (BuildConfig.DEBUG) {
+                    e.printStackTrace()
+                }
+                _uiState.value = UiState.Error(e.message ?: "Unknown error")
+            } finally {
+                _uiState.value = UiState.Idle
+            }
         }
     }
 
     val posts =
         Pager(PagingConfig(pageSize = HejtoService.PAGE_SIZE)) {
             CommonPagingSource { page ->
-                Log.v("--------", "Load page: $page")
                 hejtoRespoitory.getPosts(
                     page = page,
                     tag = null,

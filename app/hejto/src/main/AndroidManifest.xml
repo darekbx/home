@@ -8,11 +8,8 @@
             android:name=".HejtoActivity"
             android:exported="true"
             android:label="@string/hejto_app_name"
-            android:clearTaskOnLaunch="true"
             android:icon="@drawable/ic_scaled_hejto_logo"
-            android:theme="@style/Theme.Home"
-            android:launchMode="singleTask"
-            android:noHistory="true">
+            android:theme="@style/Theme.Home">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

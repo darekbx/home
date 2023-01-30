@@ -24,9 +24,11 @@ fun HejtoNavHost(
         modifier = modifier
     ) {
         composable(route = Board.route) {
-            PostsScreen { postSlug ->
-                navController.navigateSingleTopTo("${Post.route}?${Post.slugArg}=$postSlug")
-            }
+            PostsScreen(
+                openPost = { postSlug ->
+                    navController.navigate("${Post.route}?${Post.slugArg}=$postSlug")
+                }
+            )
         }
 
         composable(
@@ -51,7 +53,7 @@ fun HejtoNavHost(
 
         composable(route = FavouriteTags.route) {
             FavouriteTagsScreen(
-                openTagsList = { navController.navigateSingleTopTo(TagList.route) },
+                openTagsList = { navController.navigate(TagList.route) },
                 openTag = { tag ->
                     navController.navigate("${BoardByTag.route}?${BoardByTag.tagArg}=$tag")
                 }

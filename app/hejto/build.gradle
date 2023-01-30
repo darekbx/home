@@ -62,7 +62,6 @@ dependencies {
     implementation androidx.core_ktx
     implementation androidx.lifecycle_runtime_ktx
     implementation androidx.compose_navigation
-    implementation 'androidx.browser:browser:1.4.0'
 
     testImplementation other.junit
 }
