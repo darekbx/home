@@ -1,8 +1,6 @@
 package com.darekbx.hejto.data.remote
 
 import android.text.format.DateUtils
-import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.darekbx.hejto.utils.LinkParser
 import com.google.gson.annotations.SerializedName
@@ -24,27 +22,25 @@ data class Items<T>(
     val items: List<T>
 )
 
-data class CommunityCategory(
+data class Community(
     val name: String,
     val slug: String,
+    val status: String,
+    val avatar: RemoteImage?,
     @SerializedName("num_posts")
     val postsCount: Int
 )
 
 data class Tag(
     val name: String,
-    @SerializedName("stats")
-    val statistics: Stats = Stats(0, 0)
-) {
-    var isFavourite = false
-}
-
-data class Stats(
     @SerializedName("num_posts")
     val postsCount: Int,
     @SerializedName("num_follows")
     val followsCount: Int
-)
+) {
+    var isFavourite = false
+}
+
 
 data class PostComment(
     val content: String,
@@ -84,10 +80,10 @@ data class PostDetails(
     val commentsCount: Int,
     @SerializedName("created_at")
     val createdAt: String,
-    val community: CommunityCategory,
+    val community: Community,
     val link: String?
 ) {
-    val links by lazy { LinkParser.extractLinks(content) }
+    private val links by lazy { LinkParser.extractLinks(content) }
 
     val cleanContent by lazy {
         var result = content

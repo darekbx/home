@@ -24,6 +24,19 @@ object BoardByTag : HejtoDestination {
     )
 }
 
+object BoardByCommunity : HejtoDestination {
+    override val route = "boardCommunity"
+    const val slugArg = "slug"
+    val routeWithArgs = "${route}?$slugArg={${slugArg}}"
+    val arguments = listOf(
+        navArgument(slugArg) {
+            nullable = true
+            defaultValue = null
+            type = NavType.StringType
+        }
+    )
+}
+
 object TagList : HejtoDestination {
     override val route = "tag_list"
 }
@@ -34,6 +47,10 @@ object FavouriteTags : HejtoDestination {
 
 object Settings : HejtoDestination {
     override val route = "settings"
+}
+
+object Saved : HejtoDestination {
+    override val route = "saved"
 }
 
 object Communities : HejtoDestination {

@@ -1,6 +1,5 @@
 package com.darekbx.hejto.ui.tags
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,7 +23,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.darekbx.hejto.R
-import com.darekbx.hejto.data.remote.Stats
 import com.darekbx.hejto.data.remote.Tag
 import com.darekbx.hejto.ui.HejtoTheme
 import com.darekbx.hejto.ui.posts.ErrorIcon
@@ -87,7 +85,7 @@ private fun TagView(tag: Tag, onFavouriteClick: (name: String) -> Unit = { }) {
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = "${tag.statistics.postsCount} entries",
+                text = "${tag.postsCount} entries",
                 modifier = Modifier
                     .padding(start = 8.dp, end = 16.dp, top = 4.dp),
                 style = MaterialTheme.typography.labelSmall,
@@ -96,7 +94,7 @@ private fun TagView(tag: Tag, onFavouriteClick: (name: String) -> Unit = { }) {
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = "${tag.statistics.followsCount}",
+                text = "${tag.followsCount}",
                 modifier = Modifier
                     .padding(end = 4.dp, top = 4.dp),
                 style = MaterialTheme.typography.labelSmall,
@@ -133,6 +131,6 @@ private fun TagView(tag: Tag, onFavouriteClick: (name: String) -> Unit = { }) {
 @Composable
 private fun TagViewPreview() {
     HejtoTheme {
-        TagView(tag = Tag("motoryzacja", Stats(512, 21)))
+        TagView(tag = Tag("motoryzacja", 512, 21))
     }
 }

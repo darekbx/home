@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.darekbx.hejto.ui.posts
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -76,8 +79,8 @@ private fun PostDetails(post: PostDetails?) {
                         RoundedCornerShape(8.dp)
                     )
             ) {
-                PostHeader(it)
-                PostContent(it)
+                PostHeader(it, onLongClick = { /* Do nothing for post view */ })
+                PostContent(it.content)
                 it.images.forEach { remoteImage ->
                     CommonImage(remoteImage, it.nsfw)
                 }
@@ -124,10 +127,10 @@ fun CommentHeader(postComment: PostComment) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            AuthorAvatar(postComment.author)
+            AuthorAvatar(postComment.author.avatar)
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    AuthorName(postComment.author)
+                    AuthorName(postComment.author.userName)
                     AuthorRank(postComment.author)
                 }
                 CommentDate(ago)

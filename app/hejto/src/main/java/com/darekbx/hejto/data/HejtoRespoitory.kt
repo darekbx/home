@@ -2,6 +2,7 @@ package com.darekbx.hejto.data
 
 import android.util.Log
 import com.darekbx.hejto.data.local.model.FavouriteTag
+import com.darekbx.hejto.data.local.model.SavedSlug
 import com.darekbx.hejto.data.remote.HejtoService
 import com.darekbx.hejto.data.remote.PostComment
 import com.darekbx.hejto.data.remote.PostDetails
@@ -10,12 +11,29 @@ import com.darekbx.hejto.ui.posts.viemodel.Order
 import com.darekbx.hejto.ui.posts.viemodel.PeriodFilter
 import com.darekbx.storage.hejto.FavouriteTagDto
 import com.darekbx.storage.hejto.HejtoDao
+import com.darekbx.storage.hejto.SavedSlugDto
 import javax.inject.Inject
 
 class HejtoRespoitory @Inject constructor(
     private val hejtoService: HejtoService,
     private val hejtoDao: HejtoDao
 ) {
+
+    suspend fun getSavedSlugs(): List<SavedSlug> {
+        return hejtoDao.listSavedSlugs().map {
+            SavedSlug(it.slug, it.title, it.content)
+        }
+    }
+
+    suspend fun saveSlug(savedSlug: SavedSlug) {
+        with(savedSlug) {
+            hejtoDao.add(SavedSlugDto(null, slug, title, contents))
+        }
+    }
+
+    suspend fun removeSlug(slug: String) {
+        hejtoDao.removeSavedSlug(slug)
+    }
 
     suspend fun updateEntriesCount(name: String, entriesCount: Int) {
         hejtoDao.update(name, entriesCount)
@@ -42,6 +60,7 @@ class HejtoRespoitory @Inject constructor(
     suspend fun getPosts(
         page: Int,
         tag: String? = null,
+        communitySlug: String? = null,
         periodFilter: PeriodFilter,
         order: Order
     ): ResponseWrapper<PostDetails> {
@@ -49,7 +68,13 @@ class HejtoRespoitory @Inject constructor(
         val orderQuery = order.order
         val tags = tag?.let { listOf(it) }
         return hejtoService
-            .getPosts(tags = tags, period = period, orderBy = orderQuery, page = page)
+            .getPosts(
+                tags = tags,
+                community = communitySlug,
+                period = period,
+                orderBy = orderQuery,
+                page = page
+            )
     }
 
     suspend fun getTag(name: String) =
@@ -60,4 +85,7 @@ class HejtoRespoitory @Inject constructor(
 
     suspend fun getPostDetails(slug: String) =
         hejtoService.getPostDetails(slug)
+
+    suspend fun getCommunities(page: Int) =
+        hejtoService.getCommunities(page, orderBy = "numPosts")
 }

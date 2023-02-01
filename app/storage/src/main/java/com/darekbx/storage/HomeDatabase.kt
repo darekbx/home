@@ -6,6 +6,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.darekbx.storage.hejto.FavouriteTagDto
 import com.darekbx.storage.hejto.HejtoDao
+import com.darekbx.storage.hejto.SavedSlugDto
 import com.darekbx.storage.stocks.CurrencyDto
 import com.darekbx.storage.stocks.StocksDao
 import com.darekbx.storage.stocks.RateDto
@@ -15,9 +16,10 @@ import com.darekbx.storage.stocks.RateDto
         CurrencyDto::class,
         RateDto::class,
         FavouriteTagDto::class,
+        SavedSlugDto::class
     ],
-    exportSchema = false,
-    version = 2
+    exportSchema = true,
+    version = 3
 )
 abstract class HomeDatabase : RoomDatabase() {
 
@@ -37,6 +39,19 @@ abstract class HomeDatabase : RoomDatabase() {
                         `id` INTEGER NULL, 
                          PRIMARY KEY(`id`)
                        )"""
+                )
+            }
+        }
+
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    """CREATE TABLE IF NOT EXISTS `saved_slug` (
+                        |`id` INTEGER PRIMARY KEY AUTOINCREMENT, 
+                        |`slug` TEXT NOT NULL, 
+                        |`title` TEXT NOT NULL, 
+                        |`content` TEXT NOT NULL
+                        |)""".trimMargin()
                 )
             }
         }

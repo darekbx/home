@@ -12,7 +12,6 @@ import com.darekbx.hejto.data.CommonPagingSource
 import com.darekbx.hejto.data.HejtoRespoitory
 import com.darekbx.hejto.data.local.model.FavouriteTag
 import com.darekbx.hejto.data.remote.HejtoService
-import com.darekbx.hejto.data.remote.Tag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -36,6 +35,13 @@ class TagsViewModel @Inject constructor(
 
     val favouriteTags = mutableStateListOf<FavouriteTag>()
 
+    fun removeFavouriteTag(name: String) {
+        viewModelScope.launch {
+            hejtoRespoitory.addRemoveFavouriteTag(name)
+            favouriteTags.removeIf { it.name == name }
+        }
+    }
+
     fun getFavouriteTags() = flow {
         emit(hejtoRespoitory.getFavouriteTags())
     }
@@ -57,30 +63,11 @@ class TagsViewModel @Inject constructor(
             _uiState.value = UiState.InProgress
             favouriteTags.clear()
             try {
-                // TODO:
-                // temporary solution is to fetch first 150 tags
-                // remove when stats.num_posts will work
-                val remoteTags = mutableListOf<Tag>()
-                for (i in 1..3) {
-                    remoteTags.addAll(hejtoRespoitory.getTags(i, 50).contents.items)
-                }
-
                 hejtoRespoitory.getFavouriteTags().forEach { localTag ->
-
-                    // TODO:
-                    // /tags/{name} is bronek, stats.num_posts returns always 0
-                    // Temporary fix is to list all tags
-                    //val remoteTag = hejtoRespoitory.getTag(localTag.name)
-
-                    remoteTags
-                        .firstOrNull { it.name == localTag.name }
-                        ?.let { remoteTag ->
-                            val remotePostsCount = remoteTag.statistics.postsCount
-                            localTag.newEntriesCount =
-                                max(0, remotePostsCount - localTag.entriesCount)
-                            localTag.entriesCount = remoteTag.statistics.postsCount
-                        }
-
+                    val remoteTag = hejtoRespoitory.getTag(localTag.name)
+                    val remotePostsCount = remoteTag.postsCount
+                    localTag.newEntriesCount =  max(0, remotePostsCount - localTag.entriesCount)
+                    localTag.entriesCount = remoteTag.postsCount
                     favouriteTags.add(localTag)
                 }
             } catch (e: Exception) {

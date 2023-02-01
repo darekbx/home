@@ -6,10 +6,11 @@ import retrofit2.http.Query
 
 interface HejtoService {
 
-    @GET("community-categories")
-    suspend fun getCommunityCategories(
-        @Query("page") page: Int
-    ): ResponseWrapper<CommunityCategory>
+    @GET("communities")
+    suspend fun getCommunities(
+        @Query("page") page: Int,
+        @Query("orderBy") orderBy: String
+    ): ResponseWrapper<Community>
 
     @GET("tags")
     suspend fun getTags(

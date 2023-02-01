@@ -1,10 +1,7 @@
 package com.darekbx.hejto.ui.posts
 
 import android.os.Build
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,10 +34,10 @@ import com.darekbx.hejto.data.remote.*
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
-fun PostContent(post: PostDetails) {
+fun PostContent(content: String) {
     MarkdownText(
         modifier = Modifier.padding(8.dp),
-        markdown = post.content,
+        markdown = content,
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.onSurface
     )
@@ -50,7 +47,7 @@ fun PostContent(post: PostDetails) {
 fun CommonImage(remoteImage: RemoteImage, isNsfw: Boolean) {
     var errorWidthFraction by remember { mutableStateOf(1F) }
     var imageBlur by remember { mutableStateOf(100.dp) }
-    var imageAlpha by remember { mutableStateOf(0.025F) }
+    var imageAlpha by remember { mutableStateOf(0.1F) }
     val localUriHandler = LocalUriHandler.current
     val image = remoteImage.urls?.values?.last()
     var modifier = Modifier
@@ -92,8 +89,9 @@ fun CommonImage(remoteImage: RemoteImage, isNsfw: Boolean) {
     )
 }
 
+@ExperimentalFoundationApi
 @Composable
-fun PostHeader(post: PostDetails) {
+fun PostHeader(post: PostDetails, onLongClick: (String) -> Unit) {
     val ago by remember {
         derivedStateOf { post.dateAgo() }
     }
@@ -101,15 +99,19 @@ fun PostHeader(post: PostDetails) {
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
-            .padding(8.dp),
+            .padding(8.dp)
+            .combinedClickable(
+                onClick = { },
+                onLongClick = { onLongClick(post.slug) },
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            AuthorAvatar(post.author)
+            AuthorAvatar(post.author.avatar)
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    AuthorName(post.author)
+                    AuthorName(post.author.userName)
                     AuthorRank(post.author)
                 }
                 CommunityInfo(post, ago)
@@ -136,17 +138,17 @@ fun PostLikesInfo(likesCount: Int) {
 }
 
 @Composable
-fun AuthorAvatar(author: Author) {
+fun AuthorAvatar(remoteImage: RemoteImage?) {
     val avatarSize = 32.dp
-    if (author.avatar != null) {
-        val image = author.avatar.urls?.values?.first()
+    if (remoteImage != null) {
+        val image = remoteImage.urls?.values?.first()
         Image(
             modifier = Modifier
                 .size(avatarSize)
                 .clip(CircleShape)
                 .border(1.dp, Color.White, CircleShape),
             painter = rememberAsyncImagePainter(image),
-            contentDescription = author.userName
+            contentDescription = "avatar"
         )
     } else {
         // Placeholder
@@ -161,9 +163,9 @@ fun AuthorAvatar(author: Author) {
 }
 
 @Composable
-fun AuthorName(author: Author) {
+fun AuthorName(name: String) {
     Text(
-        text = author.userName,
+        text = name,
         modifier = Modifier
             .padding(start = 8.dp)
             .widthIn(0.dp, 180.dp),
@@ -256,7 +258,7 @@ object MockData {
         listOf(
             RemoteImage(urls = mapOf("500x500" to "https://hejto-media.s3.e…35a112e5faaed57114a2.jpg"))
         ),
-        tags = listOf(Tag("pieniadze"), Tag("budownictwo")),
+        tags = listOf(Tag("pieniadze", 33, 21), Tag("budownictwo", 1, 22)),
         author = Author(
             "GregSummer LongAvatar name", "Kompan", "#7c5292", RemoteImage(
                 mapOf(
@@ -269,7 +271,7 @@ object MockData {
         likesCount = 7,
         commentsCount = 3,
         createdAt = "2023-01-20T20:21:18+01:00",
-        community = CommunityCategory("Wiadomosci", "wiadomosci", 21),
+        community = Community("Wiadomosci", "wiadomosci", "", null, 1),
         link = "https://streamable.com/gqsn7x"
     )
     val COMMENT = PostComment(

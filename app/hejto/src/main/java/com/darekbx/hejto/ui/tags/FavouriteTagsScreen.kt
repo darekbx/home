@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
 package com.darekbx.hejto.ui.tags
 
@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,7 +48,11 @@ fun FavouriteTagsScreen(
             }
         },
         content = { innerPadding ->
-            FavouriteTagsList(tagsViewModel, Modifier.padding(innerPadding), favouriteTags) { name, entriesCount ->
+            FavouriteTagsList(
+                tagsViewModel,
+                Modifier.padding(innerPadding),
+                favouriteTags
+            ) { name, entriesCount ->
                 tagsViewModel.markOpenedTag(name, entriesCount)
                 openTag(name)
             }
@@ -67,23 +72,27 @@ private fun FavouriteTagsList(
         when (uiState) {
             is UiState.InProgress -> LoadingProgress()
             is UiState.Error -> ErrorMessage((uiState as UiState.Error).message)
-            is UiState.Idle -> {
-                LazyColumn(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(top = 4.dp, bottom = 4.dp)
-                ) {
-                    items(items = tags) { item ->
-                        FavouriteTagView(item, openTag)
-                    }
-                }
+            is UiState.Idle -> { /* Do nothing */
+            }
+        }
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(top = 4.dp, bottom = 4.dp)
+        ) {
+            items(items = tags) { item ->
+                FavouriteTagView(item, openTag, tagsViewModel::removeFavouriteTag)
             }
         }
     }
 }
 
 @Composable
-private fun FavouriteTagView(tag: FavouriteTag, openTag: (String, Int) -> Unit) {
+private fun FavouriteTagView(
+    tag: FavouriteTag,
+    openTag: (String, Int) -> Unit,
+    removeTag: (String) -> Unit
+) {
     Row(
         modifier = Modifier
             .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
@@ -102,22 +111,32 @@ private fun FavouriteTagView(tag: FavouriteTag, openTag: (String, Int) -> Unit) 
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-        if (tag.hasNewEntries()) {
-            Text(
-                text = "${tag.newEntriesCount} new entries",
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (tag.hasNewEntries()) {
+                Text(
+                    text = "${tag.newEntriesCount} new entries",
+                    modifier = Modifier
+                        .padding(start = 8.dp, end = 8.dp),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.W700
+                )
+            } else {
+                Text(
+                    text = "${tag.entriesCount} entries",
+                    modifier = Modifier
+                        .padding(start = 8.dp, end = 8.dp),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Icon(
                 modifier = Modifier
-                    .padding(start = 8.dp, end = 8.dp),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.W700
-            )
-        } else {
-            Text(
-                text = "${tag.entriesCount} entries",
-                modifier = Modifier
-                    .padding(start = 8.dp, end = 8.dp),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                    .width(32.dp)
+                    .clickable { removeTag(tag.name) },
+                imageVector = Icons.Default.Favorite,
+                contentDescription = "favourite",
+                tint = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -127,6 +146,6 @@ private fun FavouriteTagView(tag: FavouriteTag, openTag: (String, Int) -> Unit) 
 @Composable
 private fun TagViewPreview() {
     HejtoTheme {
-        FavouriteTagView(tag = FavouriteTag("motoryzacja", 512, 21)) { _, _ -> }
+        FavouriteTagView(tag = FavouriteTag("motoryzacja", 512, 21), { _, _ -> }, { })
     }
 }

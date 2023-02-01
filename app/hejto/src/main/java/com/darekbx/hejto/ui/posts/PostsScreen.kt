@@ -1,5 +1,10 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.darekbx.hejto.ui.posts
 
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -33,6 +39,7 @@ import com.darekbx.hejto.ui.posts.viemodel.Order
 import com.darekbx.hejto.ui.posts.viemodel.PeriodFilter
 import com.darekbx.hejto.ui.posts.viemodel.PostsViewModel
 import com.darekbx.hejto.ui.posts.viemodel.UiState
+import com.darekbx.hejto.ui.saved.viewmodel.SavedViewModel
 
 fun LazyListState.isScrolledToEnd() =
     layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
@@ -40,30 +47,42 @@ fun LazyListState.isScrolledToEnd() =
 @Composable
 fun PostsScreen(
     postsViewModel: PostsViewModel = hiltViewModel(),
-    tag: String,
+    savedViewModel: SavedViewModel = hiltViewModel(),
+    tag: String?,
+    communitySlug: String?,
     openPost: (slug: String) -> Unit = { }
 ) {
+    val localContext = LocalContext.current
     var page by remember { mutableStateOf(1) }
     val posts = postsViewModel.postsList
     val state = rememberLazyListState()
     val isAtBottom = state.isScrolledToEnd()
     val uiState by postsViewModel.uiState
 
-    LaunchedEffect(tag) {
-        postsViewModel.loadPosts(tag, page)
+    if (tag != null) {
+        LaunchedEffect(tag) {
+            postsViewModel.loadPosts(tag = tag, communitySlug = null, page)
+        }
+    } else if (communitySlug != null) {
+        LaunchedEffect(communitySlug) {
+            postsViewModel.loadPosts(tag = null, communitySlug = communitySlug, page)
+        }
     }
 
     LaunchedEffect(isAtBottom) {
         if (isAtBottom && postsViewModel.hasNextPage) {
             page += 1
-            postsViewModel.loadPosts(tag, page)
+            postsViewModel.loadPosts(tag = tag, communitySlug = communitySlug, page)
         }
     }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         LazyColumn(state = state) {
             items(items = posts) { item ->
-                PostView(item, openPost = openPost)
+                PostView(item, openPost = openPost, onLongClick = {
+                    savedViewModel.addSlug(item)
+                    postAddedToast(localContext)
+                })
             }
         }
         when (uiState) {
@@ -79,8 +98,10 @@ fun PostsScreen(
 @Composable
 fun PostsScreen(
     postsViewModel: PostsViewModel = hiltViewModel(),
+    savedViewModel: SavedViewModel = hiltViewModel(),
     openPost: (slug: String) -> Unit = { }
 ) {
+    val localContext = LocalContext.current
     Column(modifier = Modifier.fillMaxSize()) {
         val activePeriod by postsViewModel.periodFilter.collectAsState(initial = PeriodFilter.`6H`)
         val activeOrder by postsViewModel.postsOrder.collectAsState(initial = Order.NEWEST)
@@ -95,7 +116,10 @@ fun PostsScreen(
         val postsStateHolder by remember { postsViewModel.postsStateHolder }
         key(postsStateHolder) {
             val posts = postsViewModel.posts.collectAsLazyPagingItems()
-            PostsList(posts, openPost)
+            PostsList(posts, openPost, onLongClick = {
+                savedViewModel.addSlug(it)
+                postAddedToast(localContext)
+            })
         }
     }
 }
@@ -103,7 +127,8 @@ fun PostsScreen(
 @Composable
 private fun PostsList(
     posts: LazyPagingItems<PostDetails>,
-    openPost: (slug: String) -> Unit = { }
+    openPost: (slug: String) -> Unit = { },
+    onLongClick: (PostDetails) -> Unit = { }
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (posts.loadState.refresh) {
@@ -113,7 +138,7 @@ private fun PostsList(
                 LazyColumn {
                     items(items = posts) { item ->
                         item?.let {
-                            PostView(it, openPost)
+                            PostView(it, openPost, onLongClick = { onLongClick(item) })
                         }
                     }
                 }
@@ -122,22 +147,22 @@ private fun PostsList(
     }
 }
 
+@ExperimentalFoundationApi
 @Composable
 private fun PostView(
     post: PostDetails = MockData.POST,
-    openPost: (slug: String) -> Unit = { }
+    openPost: (slug: String) -> Unit = { },
+    onLongClick: (String) -> Unit = { }
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 8.dp, end = 8.dp, bottom = 4.dp, top = 4.dp)
-            .background(
-                MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp)
-            ),
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        PostHeader(post)
-        PostContent(post)
+        PostHeader(post, onLongClick)
+        PostContent(post.content)
         post.images.forEach { remoteImage ->
             CommonImage(remoteImage, post.nsfw)
         }
@@ -191,10 +216,15 @@ fun PostFooter(
     }
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 private fun PostViewPreview() {
     HejtoTheme {
-        PostView()
+        PostView { }
     }
+}
+
+private fun postAddedToast(localContext: Context) {
+    Toast.makeText(localContext, "Added", Toast.LENGTH_SHORT).show()
 }

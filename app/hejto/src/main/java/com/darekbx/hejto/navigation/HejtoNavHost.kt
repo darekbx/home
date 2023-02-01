@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.darekbx.hejto.ui.communities.CommunitesScreen
 import com.darekbx.hejto.ui.posts.PostScreen
 import com.darekbx.hejto.ui.posts.PostsScreen
+import com.darekbx.hejto.ui.saved.SavedScreen
 import com.darekbx.hejto.ui.settings.SettingsScreen
 import com.darekbx.hejto.ui.tags.FavouriteTagsScreen
 import com.darekbx.hejto.ui.tags.TagsListScreen
@@ -36,7 +37,18 @@ fun HejtoNavHost(
             arguments = BoardByTag.arguments
         ) { navBackStackEntry ->
             navBackStackEntry.arguments?.getString(BoardByTag.tagArg)?.let { tag ->
-                PostsScreen(tag = tag) { postSlug ->
+                PostsScreen(tag = tag, communitySlug = null) { postSlug ->
+                    navController.navigate("${Post.route}?${Post.slugArg}=$postSlug")
+                }
+            }
+        }
+
+        composable(
+            route = BoardByCommunity.routeWithArgs,
+            arguments = BoardByCommunity.arguments
+        ) { navBackStackEntry ->
+            navBackStackEntry.arguments?.getString(BoardByCommunity.slugArg)?.let { slug ->
+                PostsScreen(tag = null, communitySlug = slug) { postSlug ->
                     navController.navigate("${Post.route}?${Post.slugArg}=$postSlug")
                 }
             }
@@ -64,12 +76,20 @@ fun HejtoNavHost(
             TagsListScreen()
         }
 
+        composable(route = Saved.route) {
+            SavedScreen { slug ->
+                navController.navigate("${Post.route}?${Post.slugArg}=$slug")
+            }
+        }
+
         composable(route = Settings.route) {
             SettingsScreen()
         }
 
         composable(route = Communities.route) {
-            CommunitesScreen()
+            CommunitesScreen { slug ->
+                navController.navigate("${BoardByCommunity.route}?${BoardByCommunity.slugArg}=$slug")
+            }
         }
     }
 }

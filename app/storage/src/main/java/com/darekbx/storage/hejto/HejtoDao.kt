@@ -8,6 +8,15 @@ import androidx.room.Query
 interface HejtoDao {
 
     @Insert
+    suspend fun add(savedSlugDto: SavedSlugDto)
+
+    @Query("DELETE FROM saved_slug WHERE slug = :slug")
+    suspend fun removeSavedSlug(slug: String)
+
+    @Query("SELECT * FROM saved_slug")
+    suspend fun listSavedSlugs(): List<SavedSlugDto>
+
+    @Insert
     suspend fun add(favouriteTagDto: FavouriteTagDto)
 
     @Query("DELETE FROM favourite_tag WHERE name = :name")
