@@ -1,6 +1,5 @@
 package com.darekbx.hejto.data
 
-import android.util.Log
 import com.darekbx.hejto.data.local.model.FavouriteTag
 import com.darekbx.hejto.data.local.model.SavedSlug
 import com.darekbx.hejto.data.remote.HejtoService
@@ -9,6 +8,7 @@ import com.darekbx.hejto.data.remote.PostDetails
 import com.darekbx.hejto.data.remote.ResponseWrapper
 import com.darekbx.hejto.ui.posts.viemodel.Order
 import com.darekbx.hejto.ui.posts.viemodel.PeriodFilter
+import com.darekbx.storage.hejto.CommunityInfoDto
 import com.darekbx.storage.hejto.FavouriteTagDto
 import com.darekbx.storage.hejto.HejtoDao
 import com.darekbx.storage.hejto.SavedSlugDto
@@ -18,6 +18,21 @@ class HejtoRespoitory @Inject constructor(
     private val hejtoService: HejtoService,
     private val hejtoDao: HejtoDao
 ) {
+
+    suspend fun clearCommunityInfo() {
+        hejtoDao.clearCommunityInfo()
+    }
+
+    suspend fun getCommunityPosts(slug: String)
+        = hejtoDao.getCommunityInfoPosts(slug)
+
+    suspend fun updateCommunityInfo(slug: String, postsCount: Int) {
+        if (hejtoDao.containsComunityInfo(slug) != 0) {
+            hejtoDao.updateCommunityInfo(slug, postsCount)
+        } else {
+            hejtoDao.addCommunityInfo(CommunityInfoDto(null, slug, postsCount))
+        }
+    }
 
     suspend fun getSavedSlugs(): List<SavedSlug> {
         return hejtoDao.listSavedSlugs().map {

@@ -29,7 +29,9 @@ data class Community(
     val avatar: RemoteImage?,
     @SerializedName("num_posts")
     val postsCount: Int
-)
+) {
+    var previousPostsCount = 0
+}
 
 data class Tag(
     val name: String,
@@ -46,6 +48,8 @@ data class PostComment(
     val content: String,
     val author: Author,
     val images: List<RemoteImage>,
+    @SerializedName("content_links")
+    val contentLinks: List<ContentLink>,
     @SerializedName("num_likes")
     val likesCount: Int,
     @SerializedName("num_reports")
@@ -70,6 +74,8 @@ data class PostDetails(
     val content: String,
     val hot: Boolean,
     val images: List<RemoteImage>,
+    @SerializedName("content_links")
+    val contentLinks: List<ContentLink>,
     val tags: List<Tag>,
     val author: Author,
     val nsfw: Boolean,
@@ -84,6 +90,8 @@ data class PostDetails(
     val link: String?
 ) {
     private val links by lazy { LinkParser.extractLinks(content) }
+
+    val hasContentVideo = contentLinks.any { it.type == "video" }
 
     val cleanContent by lazy {
         var result = content
@@ -127,3 +135,7 @@ data class RemoteImage(
             ?.joinToString(", ") { "${it.first}: ${it.second}" } ?: ""
     }
 }
+
+data class ContentLink(val url: String, val type: String, val images: List<LinkImage>)
+
+data class LinkImage(val url: String)

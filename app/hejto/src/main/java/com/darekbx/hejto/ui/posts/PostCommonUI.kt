@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -44,7 +45,33 @@ fun PostContent(content: String) {
 }
 
 @Composable
-fun CommonImage(remoteImage: RemoteImage, isNsfw: Boolean) {
+fun ContentLinkView(contentLink: ContentLink, isNsfw: Boolean) {
+    Box(modifier = Modifier) {
+        contentLink.images.firstOrNull()?.let { image ->
+            val remoteImage = RemoteImage(mapOf("url" to image.url))
+            val localUriHandler = LocalUriHandler.current
+            CommonImage(remoteImage, isNsfw) {
+                localUriHandler.openUri(contentLink.url)
+            }
+        }
+        Box(modifier = Modifier, contentAlignment = Alignment.Center) {
+            Icon(
+                modifier = Modifier.scale(1.05F),
+                painter = painterResource(id = R.drawable.ic_movie),
+                contentDescription = "play",
+                tint = Color.Black
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.ic_movie),
+                contentDescription = "play",
+                tint = Color.White
+            )
+        }
+    }
+}
+
+@Composable
+fun CommonImage(remoteImage: RemoteImage, isNsfw: Boolean, onClick: (() -> Unit)? = null) {
     var errorWidthFraction by remember { mutableStateOf(1F) }
     var imageBlur by remember { mutableStateOf(100.dp) }
     var imageAlpha by remember { mutableStateOf(0.1F) }
@@ -61,7 +88,11 @@ fun CommonImage(remoteImage: RemoteImage, isNsfw: Boolean) {
                 imageAlpha = 1F
             } else {
                 image?.let {
-                    localUriHandler.openUri(it)
+                    if (onClick == null) {
+                        localUriHandler.openUri(it)
+                    } else {
+                        onClick()
+                    }
                 }
             }
         }
@@ -258,6 +289,9 @@ object MockData {
         listOf(
             RemoteImage(urls = mapOf("500x500" to "https://hejto-media.s3.e…35a112e5faaed57114a2.jpg"))
         ),
+        listOf(
+            ContentLink("", "", emptyList())
+        ),
         tags = listOf(Tag("pieniadze", 33, 21), Tag("budownictwo", 1, 22)),
         author = Author(
             "GregSummer LongAvatar name", "Kompan", "#7c5292", RemoteImage(
@@ -285,6 +319,9 @@ object MockData {
         ),
         images = listOf(
             RemoteImage(urls = mapOf("500x500" to "https://hejto-media.s3.e…35a112e5faaed57114a2.jpg"))
+        ),
+        listOf(
+            ContentLink("", "", emptyList())
         ),
         likesCount = 7,
         reportsCount = 2,

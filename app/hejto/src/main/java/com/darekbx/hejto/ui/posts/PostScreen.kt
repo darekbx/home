@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -108,6 +109,9 @@ private fun CommentView(
         comment.images.forEach { remoteImage ->
             CommonImage(remoteImage, isNsfw = false)
         }
+        comment.contentLinks.forEach { contentLink ->
+            ContentLinkView(contentLink, isNsfw = false)
+        }
     }
 }
 
@@ -141,13 +145,17 @@ fun CommentHeader(postComment: PostComment) {
 }
 
 @Composable
-fun CommentDate(ago: String) {
+fun CommentDate(
+    ago: String,
+    weight: FontWeight = FontWeight.W200,
+    color: Color = MaterialTheme.colorScheme.onPrimary
+) {
     Text(
         text = ago,
         modifier = Modifier.padding(start = 8.dp),
         style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.onPrimary,
-        fontWeight = FontWeight.W200
+        color = color,
+        fontWeight = weight
     )
 }
 

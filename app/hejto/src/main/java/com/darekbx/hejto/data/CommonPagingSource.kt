@@ -9,6 +9,8 @@ class CommonPagingSource<T : Any>(
     private val source: suspend (page: Int) -> ResponseWrapper<T>
 ) : PagingSource<Int, T>() {
 
+    override val keyReuseSupported: Boolean = true
+
     override fun getRefreshKey(state: PagingState<Int, T>): Int =
         ((state.anchorPosition ?: 0) - state.config.initialLoadSize / 2)
             .coerceAtLeast(0)

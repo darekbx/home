@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
@@ -37,7 +38,10 @@ fun CommunitesScreen(
                 ) {
                     items(items = communities) { item ->
                         item?.let {
-                            CommunityView(item, openCommunity)
+                            CommunityView(item) {
+                                communitesViewModel.updateCommunityInfo(item.slug, item.postsCount)
+                                openCommunity(item.slug)
+                            }
                         }
                     }
                 }
@@ -47,14 +51,14 @@ fun CommunitesScreen(
 }
 
 @Composable
-private fun CommunityView(community: Community, openCommunity: (String) -> Unit) {
+private fun CommunityView(community: Community, openCommunity: () -> Unit) {
     Row(
         modifier = Modifier
             .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
             .padding(8.dp)
-            .clickable { openCommunity(community.slug) },
+            .clickable { openCommunity() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
@@ -62,7 +66,15 @@ private fun CommunityView(community: Community, openCommunity: (String) -> Unit)
         Column {
             AuthorName(community.name)
             Spacer(modifier = Modifier.height(4.dp))
-            CommentDate("Posts: ${community.postsCount}")
+            if (community.previousPostsCount == community.postsCount) {
+                CommentDate("Posts: ${community.postsCount}")
+            } else {
+                CommentDate(
+                    "New posts: ${community.postsCount - community.previousPostsCount}",
+                    FontWeight.W700,
+                    MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }

@@ -88,7 +88,8 @@ fun PostsScreen(
         when (uiState) {
             is UiState.InProgress -> LoadingProgress()
             is UiState.Error -> ErrorMessage((uiState as UiState.Error).message)
-            is UiState.Idle -> { /* Do nothing */ }
+            is UiState.Idle -> { /* Do nothing */
+            }
         }
     }
 }
@@ -165,6 +166,11 @@ private fun PostView(
         PostContent(post.content)
         post.images.forEach { remoteImage ->
             CommonImage(remoteImage, post.nsfw)
+        }
+        if (post.hasContentVideo) {
+            post.contentLinks.forEach { contentLink ->
+                ContentLinkView(contentLink, post.nsfw)
+            }
         }
         PostFooter(post, openPost)
     }

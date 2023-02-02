@@ -8,6 +8,21 @@ import androidx.room.Query
 interface HejtoDao {
 
     @Insert
+    suspend fun addCommunityInfo(communityInfoDto: CommunityInfoDto)
+
+    @Query("UPDATE community_info SET posts_count = :postsCount WHERE slug = :slug")
+    suspend fun updateCommunityInfo(slug: String, postsCount: Int)
+
+    @Query("SELECT posts_count FROM community_info WHERE slug = :slug LIMIT 1")
+    suspend fun getCommunityInfoPosts(slug: String): Int?
+
+    @Query("SELECT COUNT(id) FROM community_info WHERE slug = :slug")
+    suspend fun containsComunityInfo(slug: String): Int
+
+    @Query("DELETE FROM community_info")
+    suspend fun clearCommunityInfo()
+
+    @Insert
     suspend fun add(savedSlugDto: SavedSlugDto)
 
     @Query("DELETE FROM saved_slug WHERE slug = :slug")
