@@ -1,26 +1,20 @@
 plugins {
-    id 'com.android.application'
+    id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
 }
 
-apply from: '../dependencies.gradle'
+apply from: '../../dependencies.gradle'
 
 android {
-    namespace 'com.darekbx.home'
+    namespace 'com.darekbx.backup'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.darekbx.home"
         minSdk 30
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
-
-        vectorDrawables {
-            useSupportLibrary true
-        }
+        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
@@ -55,15 +49,12 @@ useHilt()
 dependencies {
 
     implementation project(':app:common')
+    implementation project(':app:storage')
 
-    // To change which app should be run at first, move to top correct one:
-    implementation project(':app:backup')
-    implementation project(':app:hejto')
-    implementation project(':app:weather')
-    implementation project(':app:stocks')
-
+    implementation androidx.data_store
     implementation androidx.core_ktx
     implementation androidx.lifecycle_runtime_ktx
+    implementation androidx.compose_navigation
 
     testImplementation other.junit
 }

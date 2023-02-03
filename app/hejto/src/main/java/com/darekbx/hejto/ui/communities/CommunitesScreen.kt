@@ -7,16 +7,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.darekbx.hejto.data.remote.Community
 import com.darekbx.hejto.ui.communities.viewmodel.CommunitesViewModel
+import com.darekbx.hejto.ui.communities.viewmodel.UiState
 import com.darekbx.hejto.ui.posts.*
 
 @Composable
@@ -25,27 +26,27 @@ fun CommunitesScreen(
     openCommunity: (String) -> Unit
 ) {
     val communities = communitesViewModel.communities.collectAsLazyPagingItems()
+    val state by communitesViewModel.uiState
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        when (communities.loadState.refresh) {
-            is LoadState.Loading -> LoadingProgress()
-            is LoadState.Error -> ErrorIcon()
-            else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 4.dp, bottom = 4.dp)
-                ) {
-                    items(items = communities) { item ->
-                        item?.let {
-                            CommunityView(item) {
-                                communitesViewModel.updateCommunityInfo(item.slug, item.postsCount)
-                                openCommunity(item.slug)
-                            }
-                        }
+        LazyColumn(
+            modifier = Modifier
+                .padding(top = 4.dp, bottom = 4.dp)
+        ) {
+            items(items = communities) { item ->
+                item?.let {
+                    CommunityView(item) {
+                        communitesViewModel.updateCommunityInfo(item.slug, item.postsCount)
+                        openCommunity(item.slug)
                     }
                 }
             }
+        }
+
+        when (state) {
+            is UiState.InProgress -> LoadingProgress()
+            is UiState.Error -> ErrorIcon()
+            else -> { /* Do nothing */ }
         }
     }
 }
