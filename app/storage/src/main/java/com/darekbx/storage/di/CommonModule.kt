@@ -9,7 +9,11 @@ import com.darekbx.storage.HomeDatabase
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_1_2
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_2_3
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_3_4
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_4_5
 import com.darekbx.storage.hejto.HejtoDao
+import com.darekbx.storage.lifetimememo.BackupDao
+import com.darekbx.storage.lifetimememo.MemoDao
+import com.darekbx.storage.lifetimememo.SearchDao
 import com.darekbx.storage.stocks.StocksDao
 import dagger.Module
 import dagger.Provides
@@ -39,6 +43,21 @@ class CommonModule {
     }
 
     @Provides
+    fun provideMemoDao(database: HomeDatabase): MemoDao {
+        return database.memoDao()
+    }
+
+    @Provides
+    fun provideSearchDao(database: HomeDatabase): SearchDao {
+        return database.searchDao()
+    }
+
+    @Provides
+    fun provideBackupDao(database: HomeDatabase): BackupDao {
+        return database.backupDao()
+    }
+
+    @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): HomeDatabase {
         return Room
             .databaseBuilder(
@@ -49,6 +68,7 @@ class CommonModule {
             .addMigrations(MIGRATION_1_2)
             .addMigrations(MIGRATION_2_3)
             .addMigrations(MIGRATION_3_4)
+            .addMigrations(MIGRATION_4_5)
             .build()
     }
 }
