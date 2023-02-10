@@ -5,7 +5,6 @@ import android.os.ParcelFileDescriptor
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,8 +27,8 @@ class BackupViewModel @Inject constructor(
     fun makeBackup(pfd: ParcelFileDescriptor) {
         viewModelScope.launch {
             FileOutputStream(pfd.fileDescriptor).use { outputStream ->
-                val localDatabaseFile = context.getDatabasePath(context.databaseList().get(0))
-                localDatabaseFile.inputStream()?.use { input ->
+                val localDatabaseFile = context.getDatabasePath(context.databaseList()[0])
+                localDatabaseFile.inputStream().use { input ->
                     input.copyTo(outputStream)
                 }
                 updateLastBackupDate()

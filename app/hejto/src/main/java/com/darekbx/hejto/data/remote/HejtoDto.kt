@@ -75,7 +75,7 @@ data class PostDetails(
     val hot: Boolean,
     val images: List<RemoteImage>,
     @SerializedName("content_links")
-    val contentLinks: List<ContentLink>,
+    val contentLinks: Any,
     val tags: List<Tag>,
     val author: Author,
     val nsfw: Boolean,
@@ -91,7 +91,7 @@ data class PostDetails(
 ) {
     private val links by lazy { LinkParser.extractLinks(content) }
 
-    val hasContentVideo = contentLinks.any { it.type == "video" }
+    val hasContentVideo = true;// contentLinks.any { it.type == "video" }
 
     val cleanContent by lazy {
         var result = content

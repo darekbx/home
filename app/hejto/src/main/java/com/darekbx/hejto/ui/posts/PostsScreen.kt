@@ -168,9 +168,9 @@ private fun PostView(
             CommonImage(remoteImage, post.nsfw)
         }
         if (post.hasContentVideo) {
-            post.contentLinks.forEach { contentLink ->
-                ContentLinkView(contentLink, post.nsfw)
-            }
+           // post.contentLinks.forEach { contentLink ->
+           //     ContentLinkView(contentLink, post.nsfw)
+           // }
         }
         PostFooter(post, openPost)
     }
