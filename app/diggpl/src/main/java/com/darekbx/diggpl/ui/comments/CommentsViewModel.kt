@@ -1,4 +1,4 @@
-package com.darekbx.diggpl.ui
+package com.darekbx.diggpl.ui.comments
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
@@ -6,20 +6,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.diggpl.data.WykopRepository
+import com.darekbx.diggpl.data.remote.Comment
 import com.darekbx.diggpl.data.remote.ResponseResult
-import com.darekbx.diggpl.data.remote.Tag
+import com.darekbx.diggpl.ui.homepage.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class UiState {
-    object InProgress : UiState()
-    object Idle : UiState()
-    class Error(val message: String) : UiState()
-}
-
 @HiltViewModel
-class AuthViewModel @Inject constructor(
+class CommentsViewModel @Inject constructor(
     private val wykopRepository: WykopRepository
 ) : ViewModel() {
 
@@ -27,22 +22,25 @@ class AuthViewModel @Inject constructor(
     val uiState: State<UiState>
         get() = _uiState
 
-    var tagStream = mutableStateListOf<Tag>()
+    var commentItems = mutableStateListOf<Comment>()
     var hasNextPage = true
 
-    /**
-     * @return True if next page is available
-     */
-    fun loadTags(tagName: String, page: Int = 1) {
+    fun loadComments(linkId: Int? = null, entryId: Int? = null, page: Int = 1) {
         viewModelScope.launch {
             _uiState.value = UiState.InProgress
-            val result = wykopRepository.getTags(tagName, page)
+
+            val result = when {
+                linkId != null -> wykopRepository.getLinkComments(linkId, page = page)
+                entryId != null -> wykopRepository.getEntryComments(entryId, page = page)
+                else -> return@launch
+            }
+
             when (result) {
                 is ResponseResult.Success -> {
                     val pagination = result.data.pagination
                     val items = result.data.data
                     hasNextPage = page < pagination.total
-                    tagStream.addAll(items)
+                    commentItems.addAll(items)
                     _uiState.value = UiState.Idle
                 }
                 is ResponseResult.Failure -> {

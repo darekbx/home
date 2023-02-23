@@ -1,0 +1,97 @@
+package com.darekbx.diggpl.ui.link
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.darekbx.diggpl.data.remote.*
+import com.darekbx.diggpl.ui.*
+import com.darekbx.diggpl.ui.comments.CommentsLazyList
+
+@Composable
+fun LinkScreen(
+    linkId: Int,
+    modifier: Modifier = Modifier,
+    linkViewModel: LinkViewModel = hiltViewModel()
+) {
+    val link by linkViewModel.loadLink(linkId).collectAsState(initial = null)
+    val releated by linkViewModel.loadLinkRelated(linkId).collectAsState(initial = null)
+
+    CommentsLazyList(linkId = linkId, header = {
+        LinkContentHeader(link, releated)
+    })
+}
+
+@Composable
+private fun LinkContentHeader(
+    link: ResponseResult<DataWrapper<StreamItem>>?,
+    releated: ResponseResult<DataWrapper<List<Related>>>?
+) {
+    Column {
+        link?.let { result ->
+            when (result) {
+                is ResponseResult.Success -> LinkContent(result.data.data)
+                is ResponseResult.Failure -> ErrorMessage(
+                    result.error.message ?: "Unknown error"
+                )
+            }
+        } ?: LoadingView()
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        releated?.let { result ->
+            when (result) {
+                is ResponseResult.Success -> RelatedView(result.data.data)
+                is ResponseResult.Failure -> ErrorMessage(
+                    result.error.message ?: "Unknown error"
+                )
+            }
+        } ?: LoadingView()
+
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+@Composable
+private fun LoadingView() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) { LoadingProgress() }
+}
+
+@Composable
+private fun LinkContent(link: StreamItem) {
+    Column(modifier = Modifier.padding(4.dp)) {
+        val localUriHandler = LocalUriHandler.current
+        Text(
+            modifier = Modifier.clickable {
+                link.source?.url?.let {
+                    localUriHandler.openUri(it)
+                }
+            },
+            text = link.title,
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.secondary
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        MarkdownContent(link.description)
+        Spacer(modifier = Modifier.height(8.dp))
+        link.media.survey?.let {
+            SurveyView(survey = it)
+        }
+        LinkImages(link)
+        LinkSource(link)
+    }
+}
+
+@Composable
+private fun RelatedView(relatedItems:List<Related>) {
+
+    // TODO related view
+    Text(text = "Related items: ${relatedItems.size}")
+}

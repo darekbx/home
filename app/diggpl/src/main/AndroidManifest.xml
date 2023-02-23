@@ -5,7 +5,7 @@
 
     <application>
         <activity
-            android:name=".BackupActivity"
+            android:name=".DiggActivity"
             android:exported="true"
             android:label="@string/digg_app_name"
             android:icon="@drawable/w_icon"

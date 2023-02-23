@@ -177,6 +177,32 @@ private fun PostView(
 }
 
 @Composable
+fun PostSimpleFooter(post: PostDetails) {
+    Row(
+        modifier = Modifier
+            .padding(top = 4.dp)
+            .fillMaxWidth()
+            .background(
+                MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp)
+            )
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        if (post.link != null) {
+            val localUriHandler = LocalUriHandler.current
+            Text(
+                modifier = Modifier.clickable { localUriHandler.openUri(post.link) },
+                text = "Open link",
+                style = MaterialTheme.typography.titleSmall.copy(letterSpacing = 0.6.sp),
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline
+            )
+        }
+    }
+}
+
+@Composable
 fun PostFooter(
     post: PostDetails,
     openPost: (slug: String) -> Unit = { }

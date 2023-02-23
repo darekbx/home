@@ -105,19 +105,30 @@ fun CommonImage(remoteImage: RemoteImage, isNsfw: Boolean, onClick: (() -> Unit)
         }
     }
 
-    Image(
-        contentScale = ContentScale.FillWidth,
-        modifier = modifier,
-        painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current)
-                .data(image)
-                .size(Size.ORIGINAL)
-                .build(),
-            onError = { errorWidthFraction = 0.1F },
-            error = painterResource(id = R.drawable.ic_error)
-        ),
-        contentDescription = "image"
-    )
+    Box(
+        modifier = Modifier.defaultMinSize(100.dp, 100.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        var isLoading by remember { mutableStateOf(true) }
+        Image(
+            contentScale = ContentScale.FillWidth,
+            modifier = modifier,
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(image)
+                    .size(Size.ORIGINAL)
+                    .build(),
+                onLoading = { isLoading = true },
+                onSuccess = { isLoading = false },
+                onError = { errorWidthFraction = 0.1F },
+                error = painterResource(id = R.drawable.ic_error)
+            ),
+            contentDescription = "image"
+        )
+        if (isLoading) {
+            LoadingProgress()
+        }
+    }
 }
 
 @ExperimentalFoundationApi
@@ -246,6 +257,7 @@ fun ErrorIcon() {
     Icon(
         painterResource(id = R.drawable.ic_error),
         contentDescription = "error",
+        tint = Color.Red,
         modifier = Modifier
             .background(
                 MaterialTheme.colorScheme.primaryContainer, CircleShape

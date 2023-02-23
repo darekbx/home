@@ -85,6 +85,7 @@ private fun PostDetails(post: PostDetails?) {
                 it.images.forEach { remoteImage ->
                     CommonImage(remoteImage, it.nsfw)
                 }
+                PostSimpleFooter(it)
             }
         } ?: run {
             LoadingProgress()
