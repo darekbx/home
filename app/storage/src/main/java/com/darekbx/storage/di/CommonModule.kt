@@ -10,6 +10,8 @@ import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_1_2
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_2_3
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_3_4
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_4_5
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_5_6
+import com.darekbx.storage.diggpl.DiggDao
 import com.darekbx.storage.hejto.HejtoDao
 import com.darekbx.storage.lifetimememo.BackupDao
 import com.darekbx.storage.lifetimememo.MemoDao
@@ -57,6 +59,12 @@ class CommonModule {
         return database.backupDao()
     }
 
+
+    @Provides
+    fun provideDiggDao(database: HomeDatabase): DiggDao {
+        return database.diggDao()
+    }
+
     @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): HomeDatabase {
         return Room
@@ -69,6 +77,7 @@ class CommonModule {
             .addMigrations(MIGRATION_2_3)
             .addMigrations(MIGRATION_3_4)
             .addMigrations(MIGRATION_4_5)
+            .addMigrations(MIGRATION_5_6)
             .build()
     }
 }

@@ -6,6 +6,18 @@ import retrofit2.http.Query
 
 interface WykopService {
 
+    @GET("tags/autocomplete")
+    suspend fun tagAutocomplete(
+        @Query("query") query: String
+    ): ListWrapper<List<TagAutocomplete>>
+
+    @GET("tags/{tagName}/newer")
+    suspend fun tagNewCount(
+        @Path("tagName") tagName: String,
+        @Query("sort") sort: String,
+        @Query("date") lastId: String,
+    ): DataWrapper<TagNewCount>
+
     @GET("tags/{tagName}/stream")
     suspend fun tags(
         @Path("tagName") tagName: String,

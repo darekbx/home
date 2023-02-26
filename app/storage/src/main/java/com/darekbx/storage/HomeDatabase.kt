@@ -8,6 +8,10 @@ import com.darekbx.storage.lifetimememo.BackupDao
 import com.darekbx.storage.lifetimememo.MemoDao
 import com.darekbx.storage.lifetimememo.CategoryDto
 import com.darekbx.lifetimememo.data.dto.ContainerDto
+import com.darekbx.storage.diggpl.DiggDao
+import com.darekbx.storage.diggpl.SavedEntryDto
+import com.darekbx.storage.diggpl.SavedLinkDto
+import com.darekbx.storage.diggpl.SavedTagDto
 import com.darekbx.storage.lifetimememo.LocationDto
 import com.darekbx.storage.lifetimememo.MemoDto
 import com.darekbx.storage.hejto.CommunityInfoDto
@@ -29,10 +33,13 @@ import com.darekbx.storage.stocks.RateDto
         CategoryDto::class,
         LocationDto::class,
         MemoDto::class,
-        ContainerDto::class
+        ContainerDto::class,
+        SavedEntryDto::class,
+        SavedLinkDto::class,
+        SavedTagDto::class
     ],
     exportSchema = true,
-    version = 5
+    version = 6
 )
 abstract class HomeDatabase : RoomDatabase() {
 
@@ -45,6 +52,8 @@ abstract class HomeDatabase : RoomDatabase() {
     abstract fun searchDao(): SearchDao
 
     abstract fun backupDao(): BackupDao
+
+    abstract fun diggDao(): DiggDao
 
     companion object {
         val DB_NAME = "home_db"
@@ -93,6 +102,14 @@ abstract class HomeDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `container` (`uid` TEXT NOT NULL, `parent_uid` TEXT, `title` TEXT NOT NULL, `subtitle` TEXT, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`uid`))")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `location` (`uid` TEXT NOT NULL, `memo_id` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, PRIMARY KEY(`uid`))")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `memo` (`uid` TEXT NOT NULL, `container_uid` TEXT, `title` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `category_uid` TEXT NOT NULL, `subtitle` TEXT, `description` TEXT, `link` TEXT, `date_time` INTEGER, `flag` INTEGER, `reminder` INTEGER, PRIMARY KEY(`uid`))")
+            }
+        }
+
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `saved_entry` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `entry_id` INTEGER NOT NULL, `title` TEXT NOT NULL, `content` TEXT NOT NULL)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `saved_link` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `link_id` INTEGER NOT NULL, `title` TEXT NOT NULL, `content` TEXT NOT NULL)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `saved_tag` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `last_date` TEXT NOT NULL)")
             }
         }
     }

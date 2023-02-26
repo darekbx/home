@@ -24,6 +24,10 @@ data class Data(val key: String, val secret: String)
 
 data class AuthToken(val token: String)
 
+data class TagNewCount(val count: Int)
+
+data class TagAutocomplete(val name: String)
+
 data class StreamItem(
     val id: Int,
     val title: String,

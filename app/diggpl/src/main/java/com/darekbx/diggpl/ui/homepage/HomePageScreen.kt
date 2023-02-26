@@ -8,19 +8,22 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.diggpl.data.remote.StreamItem
 import com.darekbx.diggpl.ui.ErrorMessage
 import com.darekbx.diggpl.ui.LoadingProgress
 import com.darekbx.diggpl.ui.StreamView
+import com.darekbx.diggpl.ui.saved.SavedViewModel
+import com.darekbx.diggpl.ui.showAddedToast
 
 @Composable
 fun HomePageScreen(
     modifier: Modifier = Modifier,
     homePageViewModel: HomePageViewModel = hiltViewModel(),
+    savedViewModel: SavedViewModel = hiltViewModel(),
     openStreamItem: (StreamItem) -> Unit = { }
 ) {
-
     fun LazyListState.isScrolledToEnd() =
         layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
 
@@ -42,9 +45,17 @@ fun HomePageScreen(
     }
 
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        val context = LocalContext.current
         LazyColumn(state = state) {
             items(items = tagStream) { item ->
-                StreamView(item) { openStreamItem(it) }
+                StreamView(
+                    item,
+                    openStreamItem = { openStreamItem(it) },
+                    onLongClick = {
+                        savedViewModel.add(it)
+                        showAddedToast(context)
+                    }
+                )
             }
         }
         when (uiState) {

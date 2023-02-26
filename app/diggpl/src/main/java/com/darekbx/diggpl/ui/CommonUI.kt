@@ -2,11 +2,11 @@
 
 package com.darekbx.diggpl.ui
 
+import android.content.Context
 import android.os.Build
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,13 +30,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.size.Size
+import coil.size.Dimension
 import com.darekbx.diggpl.R
 import com.darekbx.diggpl.data.remote.*
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
-fun StreamView(streamItem: StreamItem, openStreamItem: (StreamItem) -> Unit = { }) {
+fun StreamView(
+    streamItem: StreamItem,
+    openStreamItem: (StreamItem) -> Unit = { },
+    onLongClick: (StreamItem) -> Unit = { }
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -45,8 +49,19 @@ fun StreamView(streamItem: StreamItem, openStreamItem: (StreamItem) -> Unit = { 
             .padding(4.dp)
     ) {
         when (streamItem.resource) {
-            ResourceType.ENTRY.type -> EntryView(streamItem) { openStreamItem(streamItem) }
-            ResourceType.LINK.type -> LinkView(streamItem) { openStreamItem(streamItem) }
+            ResourceType.ENTRY.type -> {
+                EntryView(
+                    streamItem,
+                    onClick = { openStreamItem(streamItem) },
+                    onLongClick = { onLongClick(streamItem) }
+                )
+            }
+            ResourceType.LINK.type -> {
+                LinkView(
+                    streamItem,
+                    onClick = { openStreamItem(streamItem) },
+                    onLongClick = { onLongClick(streamItem) })
+            }
             ResourceType.ENTRY_COMMENT.type -> Text(
                 text = streamItem.resource,
                 color = MaterialTheme.colorScheme.onSurface
@@ -56,20 +71,14 @@ fun StreamView(streamItem: StreamItem, openStreamItem: (StreamItem) -> Unit = { 
 }
 
 @Composable
-fun LinkView(streamItem: StreamItem, onClick: () -> Unit = { }) {
+fun LinkView(
+    streamItem: StreamItem,
+    onClick: () -> Unit = { },
+    onLongClick: () -> Unit = { }
+) {
     Box(Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(4.dp)) {
-            val localUriHandler = LocalUriHandler.current
-            Text(
-                modifier = Modifier.clickable {
-                    streamItem.source?.url?.let {
-                        localUriHandler.openUri(it)
-                    }
-                },
-                text = streamItem.title,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
+            LinkTitle(streamItem.title, streamItem.source)
             Spacer(modifier = Modifier.height(8.dp))
             MarkdownContent(streamItem.description)
             Spacer(modifier = Modifier.height(8.dp))
@@ -79,7 +88,7 @@ fun LinkView(streamItem: StreamItem, onClick: () -> Unit = { }) {
             LinkImages(streamItem)
             LinkSource(streamItem)
             Spacer(modifier = Modifier.height(8.dp))
-            LinkFooter(streamItem) { onClick() }
+            LinkFooter(streamItem, onClick, onLongClick)
         }
         if (streamItem.hot) {
             Row(
@@ -98,11 +107,33 @@ fun LinkView(streamItem: StreamItem, onClick: () -> Unit = { }) {
 }
 
 @Composable
-private fun LinkFooter(streamItem: StreamItem, onClick: () -> Unit = { }) {
+fun LinkTitle(title: String, source: Source?) {
+    val localUriHandler = LocalUriHandler.current
+    Text(
+        modifier = Modifier.clickable {
+            source?.url?.let {
+                localUriHandler.openUri(it)
+            }
+        },
+        text = title,
+        style = MaterialTheme.typography.headlineMedium,
+        color = MaterialTheme.colorScheme.secondary
+    )
+}
+
+@Composable
+private fun LinkFooter(
+    streamItem: StreamItem,
+    onClick: () -> Unit = { },
+    onLongClick: () -> Unit = { }
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .combinedClickable(
+                onClick = { onClick() },
+                onLongClick = { onLongClick() },
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -181,7 +212,11 @@ fun LinkSource(streamItem: StreamItem) {
 }
 
 @Composable
-fun EntryView(streamItem: StreamItem, onClick: () -> Unit = { }) {
+fun EntryView(
+    streamItem: StreamItem,
+    onClick: () -> Unit = { },
+    onLongClick: () -> Unit = { }
+) {
     val localUriHandler = LocalUriHandler.current
     Box(Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(4.dp)) {
@@ -232,9 +267,7 @@ fun EntryView(streamItem: StreamItem, onClick: () -> Unit = { }) {
                         )
                     }
                 }
-            EntryFooter(streamItem) {
-                onClick()
-            }
+            EntryFooter(streamItem, onClick, onLongClick)
         }
         if (streamItem.hot) {
             Row(
@@ -254,11 +287,18 @@ fun EntryView(streamItem: StreamItem, onClick: () -> Unit = { }) {
 }
 
 @Composable
-private fun EntryFooter(streamItem: StreamItem, onClick: () -> Unit = { }) {
+private fun EntryFooter(
+    streamItem: StreamItem,
+    onClick: () -> Unit = { },
+    onLongClick: () -> Unit = { }
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .combinedClickable(
+                onClick = { onClick() },
+                onLongClick = { onLongClick() },
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -354,6 +394,7 @@ fun MarkdownContent(content: String) {
 
 @Composable
 fun CommonImage(mediaPhoto: MediaPhoto, isNsfw: Boolean, onClick: (() -> Unit)? = null) {
+    val maxImageHeigth = 1920
     var errorWidthFraction by remember { mutableStateOf(1F) }
     var imageBlur by remember { mutableStateOf(100.dp) }
     var imageAlpha by remember { mutableStateOf(0.1F) }
@@ -396,7 +437,7 @@ fun CommonImage(mediaPhoto: MediaPhoto, isNsfw: Boolean, onClick: (() -> Unit)? 
             painter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
                     .data(image)
-                    .size(Size.ORIGINAL)
+                    .size(Dimension.Undefined, Dimension(maxImageHeigth))
                     .build(),
                 onLoading = { isLoading = true },
                 onSuccess = { isLoading = false },
@@ -449,31 +490,27 @@ fun AuthorView(author: Author) {
 
 @Composable
 fun SurveyView(survey: Survey) {
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(MaterialTheme.colorScheme.onBackground)
+            .background(MaterialTheme.colorScheme.primaryContainer)
     ) {
-        stickyHeader {
-            Column {
-                Text(
-                    modifier = Modifier.padding(4.dp),
-                    text = survey.question,
-                    fontWeight = FontWeight.W600,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 4.dp)
-                        .height(1.dp)
-                        .background(Color.White)
-                )
-            }
-        }
-        items(survey.answers) {
+        Text(
+            modifier = Modifier.padding(4.dp),
+            text = survey.question,
+            fontWeight = FontWeight.W600,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp)
+                .height(1.dp)
+                .background(Color.White)
+        )
+        survey.answers.forEach {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -506,24 +543,21 @@ fun SurveyView(survey: Survey) {
                 )
             }
         }
-        stickyHeader {
-            Column {
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                        .height(1.dp)
-                        .background(Color.White)
-                )
-                Text(
-                    modifier = Modifier.padding(4.dp),
-                    text = "Answers: ${survey.count}",
-                    fontWeight = FontWeight.W600,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-        }
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp)
+                .height(1.dp)
+                .background(Color.White)
+        )
+        Text(
+            modifier = Modifier.padding(4.dp),
+            text = "Answers: ${survey.count}",
+            fontWeight = FontWeight.W600,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+
     }
 }
 
@@ -565,3 +599,8 @@ fun ErrorMessage(error: String) {
             .padding(8.dp)
     )
 }
+
+fun showAddedToast(localContext: Context) {
+    Toast.makeText(localContext, "Added", Toast.LENGTH_SHORT).show()
+}
+

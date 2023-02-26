@@ -40,8 +40,14 @@ class StreamViewModel @Inject constructor(
             }
             _uiState.value = UiState.InProgress
             val result = wykopRepository.getTags(tagName, page = page)
+
             when (result) {
                 is ResponseResult.Success -> {
+                    // Mark tag as opened
+                    if (page == 1 && result.data.data.isNotEmpty()) {
+                        val newestDate = result.data.data.maxBy { it.date }.date
+                        markOpenedTag(tagName, newestDate)
+                    }
                     val pagination = result.data.pagination
                     val items = result.data.data
                     hasNextPage = page < pagination.total
@@ -54,4 +60,11 @@ class StreamViewModel @Inject constructor(
             }
         }
     }
+
+    private fun markOpenedTag(name: String, newestTagDate: String) {
+        viewModelScope.launch {
+            wykopRepository.updateTagLastId(name, newestTagDate)
+        }
+    }
+
 }

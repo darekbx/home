@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,16 +23,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.darekbx.common.ui.NoInternetView
 import com.darekbx.common.utils.ConnectionUtils
-import com.darekbx.diggpl.data.navigation.DiggNavHost
-import com.darekbx.diggpl.data.navigation.Homepage
-import com.darekbx.diggpl.data.navigation.Tags
-import com.darekbx.diggpl.data.navigation.navigateSingleTopTo
+import com.darekbx.diggpl.navigation.*
 import com.darekbx.diggpl.ui.DiggTheme
+import com.darekbx.diggpl.ui.saved.SavedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -69,9 +69,9 @@ class DiggActivity : ComponentActivity() {
 @Composable
 private fun BottomMenu(
     navController: NavHostController,
-    //savedViewModel: SavedViewModel = hiltViewModel()
+    savedViewModel: SavedViewModel = hiltViewModel()
 ) {
-   // val savedCount by savedViewModel.savedSlugs.collectAsState(initial = listOf())
+    val savedCount by savedViewModel.countSavedItems().collectAsState(initial = 0)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     Row(
         modifier = Modifier
@@ -92,14 +92,13 @@ private fun BottomMenu(
             icon = painterResource(id = R.drawable.ic_label),
             selected = navBackStackEntry?.destination?.route == Tags.route
         )
-        /*
         MenuItem(
-            modifier = Modifier.clickable { navController.navigateSingleTopTo(Saved.route) },
+            modifier = Modifier.clickable { navController.navigateSingleTopTo(SavedItems.route) },
             label = "  Saved  ",
             icon = painterResource(id = R.drawable.ic_save),
-            selected = navBackStackEntry?.destination?.route == Saved.route,
-            count = savedCount.count()
-        )*/
+            selected = navBackStackEntry?.destination?.route == SavedItems.route,
+            count = savedCount
+        )
     }
 }
 

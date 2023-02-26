@@ -70,7 +70,6 @@ fun LinkedText(
                 end = offset,
             ).firstOrNull()?.let { result ->
                 localUriHandler.openUri(result.item)
-                //Log.v("-------", annotatedString.substring(result.start, result.end))
             }
         }
     )

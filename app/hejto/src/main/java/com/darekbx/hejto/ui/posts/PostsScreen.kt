@@ -88,8 +88,7 @@ fun PostsScreen(
         when (uiState) {
             is UiState.InProgress -> LoadingProgress()
             is UiState.Error -> ErrorMessage((uiState as UiState.Error).message)
-            is UiState.Idle -> { /* Do nothing */
-            }
+            is UiState.Idle -> { /* Do nothing */ }
         }
     }
 }

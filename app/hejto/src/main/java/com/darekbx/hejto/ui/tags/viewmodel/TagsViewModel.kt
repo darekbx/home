@@ -66,7 +66,7 @@ class TagsViewModel @Inject constructor(
                 hejtoRespoitory.getFavouriteTags().forEach { localTag ->
                     val remoteTag = hejtoRespoitory.getTag(localTag.name)
                     val remotePostsCount = remoteTag.postsCount
-                    localTag.newEntriesCount =  max(0, remotePostsCount - localTag.entriesCount)
+                    localTag.newEntriesCount = max(0, remotePostsCount - localTag.entriesCount)
                     localTag.entriesCount = remoteTag.postsCount
                     favouriteTags.add(localTag)
                 }

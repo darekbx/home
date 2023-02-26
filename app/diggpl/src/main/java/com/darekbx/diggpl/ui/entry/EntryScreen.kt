@@ -5,7 +5,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.diggpl.data.remote.*
@@ -54,9 +53,7 @@ private fun LoadingView() {
 @Composable
 private fun EntryContent(entry: StreamItem) {
     Column(modifier = Modifier.padding(4.dp)) {
-        val localUriHandler = LocalUriHandler.current
         Row(verticalAlignment = Alignment.CenterVertically) {
-            // green, orange, burgundy
             AuthorView(entry.author)
             Spacer(modifier = Modifier.width(4.dp))
             Column {

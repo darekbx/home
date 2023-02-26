@@ -1,6 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.darekbx.hejto.ui.tags
+package com.darekbx.diggpl.ui.tags
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,23 +22,21 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.darekbx.hejto.data.local.model.FavouriteTag
-import com.darekbx.hejto.ui.HejtoTheme
-import com.darekbx.hejto.ui.posts.ErrorMessage
-import com.darekbx.hejto.ui.posts.LoadingProgress
-import com.darekbx.hejto.ui.tags.viewmodel.TagsViewModel
-import com.darekbx.hejto.ui.tags.viewmodel.UiState
+import com.darekbx.diggpl.data.local.model.SavedTag
+import com.darekbx.diggpl.ui.DiggTheme
+import com.darekbx.diggpl.ui.ErrorMessage
+import com.darekbx.diggpl.ui.LoadingProgress
 
 @Composable
-fun FavouriteTagsScreen(
-    tagsViewModel: TagsViewModel = hiltViewModel(),
+fun SavedTagsScreen(
+    savedTagsViewModel: SavedTagsViewModel = hiltViewModel(),
     openTagsList: () -> Unit = { },
     openTag: (name: String) -> Unit = { }
 ) {
-    val favouriteTags = tagsViewModel.favouriteTags
+    val favouriteTags = savedTagsViewModel.savedTags
 
     LaunchedEffect(Unit) {
-        tagsViewModel.loadFavouritesTags()
+        savedTagsViewModel.loadSavedTags()
     }
 
     Scaffold(
@@ -48,26 +46,25 @@ fun FavouriteTagsScreen(
             }
         },
         content = { innerPadding ->
-            FavouriteTagsList(
-                tagsViewModel,
+            SavedTagsList(
+                savedTagsViewModel,
                 Modifier.padding(innerPadding),
                 favouriteTags
-            ) { name, entriesCount ->
-                tagsViewModel.markOpenedTag(name, entriesCount)
-                openTag(name)
+            ) { savedTag ->
+                openTag(savedTag.name)
             }
         }
     )
 }
 
 @Composable
-private fun FavouriteTagsList(
-    tagsViewModel: TagsViewModel,
+private fun SavedTagsList(
+    savedTagsViewModel: SavedTagsViewModel,
     modifier: Modifier,
-    tags: List<FavouriteTag>,
-    openTag: (String, Int) -> Unit
+    tags: List<SavedTag>,
+    openTag: (SavedTag) -> Unit
 ) {
-    val uiState by tagsViewModel.uiState
+    val uiState by savedTagsViewModel.uiState
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (uiState) {
             is UiState.InProgress -> LoadingProgress()
@@ -80,16 +77,16 @@ private fun FavouriteTagsList(
                 .padding(top = 4.dp, bottom = 4.dp)
         ) {
             items(items = tags) { item ->
-                FavouriteTagView(item, openTag, tagsViewModel::removeFavouriteTag)
+                SavedTagView(item, openTag, savedTagsViewModel::removeSavedTag)
             }
         }
     }
 }
 
 @Composable
-private fun FavouriteTagView(
-    tag: FavouriteTag,
-    openTag: (String, Int) -> Unit,
+private fun SavedTagView(
+    tag: SavedTag,
+    openTag: (SavedTag) -> Unit,
     removeTag: (String) -> Unit
 ) {
     Row(
@@ -98,7 +95,7 @@ private fun FavouriteTagView(
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
             .padding(8.dp)
-            .clickable { openTag(tag.name, tag.entriesCount) },
+            .clickable { openTag(tag) },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -112,21 +109,17 @@ private fun FavouriteTagView(
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (tag.hasNewEntries()) {
+                val text = when {
+                    tag.newEntriesCount < 25 -> "${tag.newEntriesCount} new entries"
+                    else -> "more than ${tag.newEntriesCount} new entries"
+                }
                 Text(
-                    text = "${tag.newEntriesCount} new entries",
+                    text = text,
                     modifier = Modifier
                         .padding(start = 8.dp, end = 8.dp),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.W700
-                )
-            } else {
-                Text(
-                    text = "${tag.entriesCount} entries",
-                    modifier = Modifier
-                        .padding(start = 8.dp, end = 8.dp),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             Icon(
@@ -144,7 +137,7 @@ private fun FavouriteTagView(
 @Preview
 @Composable
 private fun TagViewPreview() {
-    HejtoTheme {
-        FavouriteTagView(tag = FavouriteTag("motoryzacja", 512, 21), { _, _ -> }, { })
+    DiggTheme {
+        SavedTagView(tag = SavedTag("motoryzacja", ""), { }, { })
     }
 }
