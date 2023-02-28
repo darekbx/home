@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,8 +22,7 @@ import javax.inject.Inject
 class BackupViewModel @Inject constructor(
     @ApplicationContext val context: Context,
     private val dataStore: DataStore<Preferences>
-) :
-    ViewModel() {
+) : ViewModel() {
 
     fun makeBackup(pfd: ParcelFileDescriptor) {
         viewModelScope.launch {
@@ -33,6 +33,16 @@ class BackupViewModel @Inject constructor(
                 }
                 updateLastBackupDate()
             }
+        }
+    }
+
+    fun restoreBackup(pfd: ParcelFileDescriptor, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            FileInputStream(pfd.fileDescriptor).use { inputStream ->
+                val localDatabaseFile = context.getDatabasePath(context.databaseList()[0])
+                localDatabaseFile.writeBytes(inputStream.readBytes())
+            }
+            onSuccess()
         }
     }
 

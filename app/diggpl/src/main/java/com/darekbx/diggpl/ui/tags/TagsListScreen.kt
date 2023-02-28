@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+
 package com.darekbx.diggpl.ui.tags
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,9 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.diggpl.ui.DiggTheme
+import com.darekbx.diggpl.ui.ErrorIcon
+import com.darekbx.diggpl.ui.LoadingProgress
 
 data class Tag(val name: String) {
     var isFavourite = false
@@ -28,20 +31,16 @@ data class Tag(val name: String) {
 @Composable
 fun TagsListScreen(savedTagsViewModel: SavedTagsViewModel = hiltViewModel()) {
     val favouriteTags by savedTagsViewModel.getSavedTags().collectAsState(initial = emptyList())
-    val tags = listOf(
-        Tag("motoryzacja"),
-        Tag("warszawa"),
-        Tag("lego"),
-        Tag("technologia"),
-        Tag("zegarki"),
-        Tag("usa"),
-        Tag("gravel"),
-        Tag("gruparatowaniapoziomu"),
-        Tag("nsfw"),
-        Tag("nsfwgif"),
-        Tag("wgw"),
-        Tag("dupeczkizprzypadku"),
-    )
+    val autocompleteTags = savedTagsViewModel.autocompleteTags
+
+    var text by remember { mutableStateOf("") }
+    val state by savedTagsViewModel.uiState
+
+    LaunchedEffect(text) {
+        if (text.length > 2) {
+            savedTagsViewModel.tagAutocomplete(text)
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         LazyColumn(
@@ -49,10 +48,24 @@ fun TagsListScreen(savedTagsViewModel: SavedTagsViewModel = hiltViewModel()) {
                 .fillMaxSize()
                 .padding(top = 4.dp, bottom = 4.dp)
         ) {
-            items(items = tags) { item ->
+            stickyHeader {
+                TextField(
+                    modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                    value = text,
+                    label = { Text("Enter tag name") },
+                    onValueChange = { text = it }
+                )
+            }
+            items(items = autocompleteTags) { item ->
                 item.isFavourite = favouriteTags.any { it.name == item.name }
                 TagView(item, savedTagsViewModel::addRemoveSavedTag)
             }
+        }
+
+        when (state) {
+            is UiState.InProgress -> LoadingProgress()
+            is UiState.Error -> ErrorIcon()
+            else -> { /* Do nothing */ }
         }
     }
 }

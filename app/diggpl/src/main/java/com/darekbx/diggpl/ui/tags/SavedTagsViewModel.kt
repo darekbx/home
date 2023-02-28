@@ -30,9 +30,25 @@ class SavedTagsViewModel @Inject constructor(
         get() = _uiState
 
     val savedTags = mutableStateListOf<SavedTag>()
+    val autocompleteTags = mutableStateListOf<Tag>()
 
-    fun tagAutocomplete(query: String) = flow {
-        emit(wykopRepository.tagAutocomplete(query))
+    fun tagAutocomplete(query: String) {
+        viewModelScope.launch {
+            _uiState.value = UiState.InProgress
+            autocompleteTags.clear()
+
+            val response = wykopRepository.tagAutocomplete(query)
+            when (response) {
+                is ResponseResult.Success -> {
+                    val tags = response.data.data.map { Tag(it.name) }
+                    autocompleteTags.addAll(tags)
+                    _uiState.value = UiState.Idle
+                }
+                is ResponseResult.Failure -> {
+                    _uiState.value = UiState.Error(response.error.message ?: "Unknown error")
+                }
+            }
+        }
     }
 
     fun removeSavedTag(name: String) {
@@ -58,7 +74,8 @@ class SavedTagsViewModel @Inject constructor(
             savedTags.clear()
             try {
                 wykopRepository.getSavedTags().forEach { localTag ->
-                    val remoteTagInfo = wykopRepository.getTagNewCount(localTag.name, localTag.lastDate)
+                    val remoteTagInfo =
+                        wykopRepository.getTagNewCount(localTag.name, localTag.lastDate)
                     if (remoteTagInfo is ResponseResult.Success) {
                         localTag.newEntriesCount = remoteTagInfo.data.data.count
                         savedTags.add(localTag)
