@@ -12,6 +12,8 @@ import com.darekbx.storage.diggpl.DiggDao
 import com.darekbx.storage.diggpl.SavedEntryDto
 import com.darekbx.storage.diggpl.SavedLinkDto
 import com.darekbx.storage.diggpl.SavedTagDto
+import com.darekbx.storage.fuel.FuelDao
+import com.darekbx.storage.fuel.FuelEntryDto
 import com.darekbx.storage.lifetimememo.LocationDto
 import com.darekbx.storage.lifetimememo.MemoDto
 import com.darekbx.storage.hejto.CommunityInfoDto
@@ -36,10 +38,11 @@ import com.darekbx.storage.stocks.RateDto
         ContainerDto::class,
         SavedEntryDto::class,
         SavedLinkDto::class,
-        SavedTagDto::class
+        SavedTagDto::class,
+        FuelEntryDto::class
     ],
     exportSchema = true,
-    version = 6
+    version = 7
 )
 abstract class HomeDatabase : RoomDatabase() {
 
@@ -54,6 +57,8 @@ abstract class HomeDatabase : RoomDatabase() {
     abstract fun backupDao(): BackupDao
 
     abstract fun diggDao(): DiggDao
+
+    abstract fun fuelDao(): FuelDao
 
     companion object {
         val DB_NAME = "home_db"
@@ -110,6 +115,12 @@ abstract class HomeDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `saved_entry` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `entry_id` INTEGER NOT NULL, `title` TEXT NOT NULL, `content` TEXT NOT NULL)")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `saved_link` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `link_id` INTEGER NOT NULL, `title` TEXT NOT NULL, `content` TEXT NOT NULL)")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `saved_tag` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `last_date` TEXT NOT NULL)")
+            }
+        }
+
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `fuel_entry` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `date` TEXT NOT NULL, `liters` REAL NOT NULL, `cost` REAL NOT NULL, `type` INTEGER NOT NULL)")
             }
         }
     }
