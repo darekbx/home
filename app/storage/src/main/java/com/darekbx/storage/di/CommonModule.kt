@@ -12,13 +12,16 @@ import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_3_4
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_4_5
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_5_6
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_6_7
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_7_8
 import com.darekbx.storage.diggpl.DiggDao
 import com.darekbx.storage.fuel.FuelDao
 import com.darekbx.storage.hejto.HejtoDao
+import com.darekbx.storage.legacy.OwnSpaceHelper
 import com.darekbx.storage.lifetimememo.BackupDao
 import com.darekbx.storage.lifetimememo.MemoDao
 import com.darekbx.storage.lifetimememo.SearchDao
 import com.darekbx.storage.stocks.StocksDao
+import com.darekbx.storage.task.TaskDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,6 +33,16 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ho
 @Module
 @InstallIn(SingletonComponent::class)
 class CommonModule {
+
+    @Provides
+    fun provideOwnSpaceHelper(@ApplicationContext context: Context): OwnSpaceHelper? {
+        return try {
+            OwnSpaceHelper(context)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
     @Provides
     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
@@ -71,6 +84,12 @@ class CommonModule {
         return database.fuelDao()
     }
 
+
+    @Provides
+    fun provideTaskDao(database: HomeDatabase): TaskDao {
+        return database.taskDao()
+    }
+
     @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): HomeDatabase {
         return Room
@@ -85,6 +104,7 @@ class CommonModule {
             .addMigrations(MIGRATION_4_5)
             .addMigrations(MIGRATION_5_6)
             .addMigrations(MIGRATION_6_7)
+            .addMigrations(MIGRATION_7_8)
             .build()
     }
 }

@@ -1,20 +1,24 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+
 package com.darekbx.hejto.ui.tags
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,6 +37,7 @@ import com.darekbx.hejto.ui.tags.viewmodel.TagsViewModel
 fun TagsListScreen(tagsViewModel: TagsViewModel = hiltViewModel()) {
     val favouriteTags by tagsViewModel.getFavouriteTags().collectAsState(initial = emptyList())
     val tags = tagsViewModel.tags.collectAsLazyPagingItems()
+    var tagName by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (tags.loadState.refresh) {
@@ -44,6 +49,18 @@ fun TagsListScreen(tagsViewModel: TagsViewModel = hiltViewModel()) {
                         .fillMaxSize()
                         .padding(top = 4.dp, bottom = 4.dp)
                 ) {
+                    stickyHeader {
+                        TextField(
+                            modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                            value = tagName,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                            keyboardActions = KeyboardActions(onSend = {
+                                tagsViewModel.addRemoveFavouriteTag(tagName)
+                            }),
+                            label = { Text("Enter tag name, without '#'") },
+                            onValueChange = { tagName = it }
+                        )
+                    }
                     items(items = tags) { item ->
                         item?.let {
                             item.isFavourite = favouriteTags.any { it.name == item.name }
