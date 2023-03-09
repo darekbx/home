@@ -72,6 +72,7 @@ private fun SavedTagsList(
             is UiState.Idle -> { /* Do nothing */ }
         }
         LazyColumn(
+            reverseLayout = true,
             modifier = modifier
                 .fillMaxSize()
                 .padding(top = 4.dp, bottom = 4.dp)

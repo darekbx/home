@@ -65,7 +65,7 @@ class HejtoRespoitory @Inject constructor(
     suspend fun getFavouriteTags(): List<FavouriteTag> {
         return hejtoDao.listAll().map {
             FavouriteTag(it.name, it.entriesCount, 0)
-        }
+        }.reversed()
     }
 
     suspend fun getPostComments(page: Int, slug: String): ResponseWrapper<PostComment> {

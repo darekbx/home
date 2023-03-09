@@ -133,6 +133,6 @@ class WykopRepository @Inject constructor(
     suspend fun getSavedTags(): List<SavedTag> {
         return diggDao.listAllTags().map {
             SavedTag(it.name, it.lastDate, 0)
-        }
+        }.reversed()
     }
 }

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
     <application>
         <activity
-            android:name=".TasksActivity"
+            android:name=".RssReaderActivity"
             android:exported="true"
             android:clearTaskOnLaunch="true"
-            android:label="@string/tasks_app_name"
-            android:icon="@drawable/ic_tasks"
+            android:label="@string/rss_app_name"
+            android:icon="@drawable/ic_rss_feed"
             android:theme="@style/Theme.Home"
             android:launchMode="singleTask"
             android:usesCleartextTraffic="true"
