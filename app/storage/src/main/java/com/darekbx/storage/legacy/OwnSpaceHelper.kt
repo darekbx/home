@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase.OPEN_READONLY
 import android.database.sqlite.SQLiteDatabase.OpenParams
 import android.database.sqlite.SQLiteOpenHelper
 import com.darekbx.storage.legacy.model.LegacyTask
+import com.darekbx.storage.legacy.model.LegacyWeightEntry
 import java.io.File
 import java.io.FileOutputStream
 
@@ -42,6 +43,35 @@ class OwnSpaceHelper(private val context: Context) : SQLiteOpenHelper(context, D
             }
         }
         return tasks
+    }
+
+    fun getNotes(): List<String> {
+        val notes = mutableListOf<String>()
+        database.rawQuery("SELECT * FROM notes ORDER BY `index`", emptyArray())?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                do {
+                    notes.add(cursor.getString(1))
+                } while (cursor.moveToNext())
+            }
+        }
+        return notes
+    }
+
+    fun getWeightEntries(): List<LegacyWeightEntry> {
+        val items = mutableListOf<LegacyWeightEntry>()
+        database.rawQuery("SELECT * FROM entries", emptyArray())?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                do {
+                    var date = cursor.getLong(1)
+                    // Fix timestamp in seconds
+                    if (date < 1600000000) {
+                       date *= 1000
+                    }
+                    items.add(LegacyWeightEntry(date, cursor.getDouble(2), cursor.getInt(3)))
+                } while (cursor.moveToNext())
+            }
+        }
+        return items
     }
 
     private fun copyLegacyDatabase() {

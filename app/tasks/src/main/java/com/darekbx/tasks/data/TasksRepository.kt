@@ -27,7 +27,7 @@ class TasksRepository @Inject constructor(
     suspend fun getTask(id: Long): Task {
         val taskDto = taskDao.getTask(id)
         return with(taskDto) {
-            Task(id!!, name, content, date)
+            Task(id, name, content, date)
         }
     }
 }

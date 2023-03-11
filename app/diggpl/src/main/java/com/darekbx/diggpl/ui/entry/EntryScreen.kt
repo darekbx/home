@@ -14,7 +14,6 @@ import com.darekbx.diggpl.ui.comments.CommentsLazyList
 @Composable
 fun EntryScreen(
     entryId: Int,
-    modifier: Modifier = Modifier,
     entryViewModel: EntryViewModel = hiltViewModel()
 ) {
     val entry by entryViewModel.loadEntry(entryId).collectAsState(initial = null)

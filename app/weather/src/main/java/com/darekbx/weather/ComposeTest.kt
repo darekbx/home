@@ -1,6 +1,5 @@
 package com.darekbx.weather
 
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -19,16 +18,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,7 +37,7 @@ import com.skydoves.cloudy.Cloudy
 @Composable
 fun BlurryLauncher(modifier: Modifier = Modifier) {
     val contentScale = 70
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier.fillMaxSize(contentScale / 100F),
             contentAlignment = Alignment.BottomCenter
@@ -107,7 +101,7 @@ fun BlurryLauncher(modifier: Modifier = Modifier) {
 @Composable
 fun Launcher(modifier: Modifier = Modifier) {
     val contentScale = 70
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier.fillMaxSize(contentScale / 100F),
             contentAlignment = Alignment.BottomCenter

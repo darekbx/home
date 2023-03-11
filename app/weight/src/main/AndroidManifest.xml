@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name=".WeightActivity"
+            android:exported="true"
+            android:clearTaskOnLaunch="true"
+            android:label="@string/weight_app_name"
+            android:icon="@drawable/ic_weight"
+            android:theme="@style/Theme.Home"
+            android:launchMode="singleTask"
+            android:usesCleartextTraffic="true"
+            android:windowSoftInputMode="adjustResize"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+    </application>
+</manifest>

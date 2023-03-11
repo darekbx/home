@@ -19,7 +19,6 @@ import com.darekbx.diggpl.ui.comments.CommentsLazyList
 @Composable
 fun LinkScreen(
     linkId: Int,
-    modifier: Modifier = Modifier,
     linkViewModel: LinkViewModel = hiltViewModel()
 ) {
     val link by linkViewModel.loadLink(linkId).collectAsState(initial = null)

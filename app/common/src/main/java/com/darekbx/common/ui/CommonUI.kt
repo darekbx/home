@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun NoInternetView(modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.Black),
         contentAlignment = Alignment.Center

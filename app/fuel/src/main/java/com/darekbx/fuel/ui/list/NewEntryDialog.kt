@@ -72,7 +72,7 @@ private fun TypeCheckbox(type: MutableState<FuelType>, kind: FuelType, label: St
         Checkbox(
             modifier = Modifier.padding(8.dp),
             checked = type.value == kind,
-            onCheckedChange = {})
+            onCheckedChange = { type.value = kind })
         Text(text = label, style = MaterialTheme.typography.titleSmall)
     }
 }

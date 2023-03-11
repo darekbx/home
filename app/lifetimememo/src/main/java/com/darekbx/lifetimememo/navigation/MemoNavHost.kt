@@ -36,7 +36,7 @@ fun MemoNavHost(
             StatisticsScreen()
         }
 
-        composable(route = Memos.route) { navBackStackEntry ->
+        composable(route = Memos.route) { _ ->
             with(navController) {
                 MemosScreen(
                     parentId = null,

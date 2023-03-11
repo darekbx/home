@@ -13,6 +13,8 @@ import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_4_5
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_5_6
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_6_7
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_7_8
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_8_9
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_9_10
 import com.darekbx.storage.diggpl.DiggDao
 import com.darekbx.storage.fuel.FuelDao
 import com.darekbx.storage.hejto.HejtoDao
@@ -21,7 +23,9 @@ import com.darekbx.storage.lifetimememo.BackupDao
 import com.darekbx.storage.lifetimememo.MemoDao
 import com.darekbx.storage.lifetimememo.SearchDao
 import com.darekbx.storage.stocks.StocksDao
+import com.darekbx.storage.notes.NotesDao
 import com.darekbx.storage.task.TaskDao
+import com.darekbx.storage.weight.WeightDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -84,10 +88,19 @@ class CommonModule {
         return database.fuelDao()
     }
 
-
     @Provides
     fun provideTaskDao(database: HomeDatabase): TaskDao {
         return database.taskDao()
+    }
+
+    @Provides
+    fun provideNotesDao(database: HomeDatabase): NotesDao {
+        return database.notesDao()
+    }
+
+    @Provides
+    fun provideWeightDao(database: HomeDatabase): WeightDao {
+        return database.weightDao()
     }
 
     @Provides
@@ -105,6 +118,8 @@ class CommonModule {
             .addMigrations(MIGRATION_5_6)
             .addMigrations(MIGRATION_6_7)
             .addMigrations(MIGRATION_7_8)
+            .addMigrations(MIGRATION_8_9)
+            .addMigrations(MIGRATION_9_10)
             .build()
     }
 }

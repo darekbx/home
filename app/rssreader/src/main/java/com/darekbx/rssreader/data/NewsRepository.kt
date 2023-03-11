@@ -1,9 +1,9 @@
 package com.darekbx.rssreader.data
 
-import android.util.Log
 import com.darekbx.rssreader.data.model.NewsItem
 import com.prof.rssparser.Parser
 import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 class NewsRepository @Inject constructor(private val parser: Parser) {
@@ -23,7 +23,7 @@ class NewsRepository @Inject constructor(private val parser: Parser) {
         return items.sortedByDescending { it.date }
     }
 
-    suspend fun loadSource(newsSource: NewsSource): List<NewsItem> {
+    private suspend fun loadSource(newsSource: NewsSource): List<NewsItem> {
         val channel = parser.getChannel(newsSource.url)
         return channel.articles.map { article ->
             val date = rssFormat.parse(article.pubDate)
@@ -40,8 +40,8 @@ class NewsRepository @Inject constructor(private val parser: Parser) {
         }
     }
 
-    private val rssFormat by lazy { SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z") }
-    private val parsedFormat by lazy { SimpleDateFormat("yyyy-MM-dd HH:mm") }
+    private val rssFormat by lazy { SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.getDefault()) }
+    private val parsedFormat by lazy { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
 
     private fun getSources() = listOf(
         NewsSource.TuStolicaBemowo(),

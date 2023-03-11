@@ -56,8 +56,10 @@ dependencies {
 
     implementation project(':app:common')
 
-    // TODO: Books, Weight, Notepad, Password Vault, Allegro Observer
+    // TODO: Books, Password Vault, Allegro Observer
     // To change which app should be run at first, move to top correct one:
+    implementation project(':app:weight')
+    implementation project(':app:notepad')
     implementation project(':app:rssreader')
     implementation project(':app:tasks')
     implementation project(':app:fuel')

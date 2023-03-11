@@ -2,7 +2,6 @@ package com.darekbx.hejto.data.remote
 
 import android.text.format.DateUtils
 import androidx.compose.ui.graphics.Color
-import com.darekbx.hejto.utils.LinkParser
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.*
@@ -58,9 +57,9 @@ data class PostComment(
     val createdAt: String
 ) {
     fun dateAgo(): String {
-        val date = inputFormat.parse(createdAt)
+        val date = inputFormat.parse(createdAt) ?: throw IllegalStateException()
         return DateUtils.getRelativeTimeSpanString(
-            date.getTime(),
+            date.time,
             Calendar.getInstance().getTimeInMillis(),
             DateUtils.MINUTE_IN_MILLIS
         ).toString()
@@ -89,28 +88,20 @@ data class PostDetails(
     val community: Community,
     val link: String?
 ) {
-    private val links by lazy { LinkParser.extractLinks(content) }
-
-    val hasContentVideo = true;// contentLinks.any { it.type == "video" }
-
-    val cleanContent by lazy {
-        var result = content
-        links.forEach { link -> result = result.replace(link.source, link.label) }
-        result
-    }
+    val hasContentVideo = true// contentLinks.any { it.type == "video" }
 
     fun dateAgo(): String {
-        val date = inputFormat.parse(createdAt)
+        val date = inputFormat.parse(createdAt) ?: throw IllegalStateException()
         return DateUtils.getRelativeTimeSpanString(
-            date.getTime(),
-            Calendar.getInstance().getTimeInMillis(),
+            date.time,
+            Calendar.getInstance().timeInMillis,
             DateUtils.MINUTE_IN_MILLIS
         ).toString()
     }
 
     fun displayDate(): String {
         val date = inputFormat.parse(createdAt)
-        return displayFormat.format(date)
+        return displayFormat.format(date!!)
     }
 }
 

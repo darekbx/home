@@ -24,8 +24,12 @@ import com.darekbx.storage.lifetimememo.SearchDao
 import com.darekbx.storage.stocks.CurrencyDto
 import com.darekbx.storage.stocks.StocksDao
 import com.darekbx.storage.stocks.RateDto
+import com.darekbx.storage.notes.NoteDto
+import com.darekbx.storage.notes.NotesDao
 import com.darekbx.storage.task.TaskDao
 import com.darekbx.storage.task.TaskDto
+import com.darekbx.storage.weight.WeightDao
+import com.darekbx.storage.weight.WeightDto
 
 @Database(
     entities = [
@@ -42,10 +46,12 @@ import com.darekbx.storage.task.TaskDto
         SavedLinkDto::class,
         SavedTagDto::class,
         FuelEntryDto::class,
-        TaskDto::class
+        TaskDto::class,
+        NoteDto::class,
+        WeightDto::class,
     ],
     exportSchema = true,
-    version = 8
+    version = 10
 )
 abstract class HomeDatabase : RoomDatabase() {
 
@@ -64,6 +70,10 @@ abstract class HomeDatabase : RoomDatabase() {
     abstract fun fuelDao(): FuelDao
 
     abstract fun taskDao(): TaskDao
+
+    abstract fun notesDao(): NotesDao
+
+    abstract fun weightDao(): WeightDao
 
     companion object {
         val DB_NAME = "home_db"
@@ -132,6 +142,18 @@ abstract class HomeDatabase : RoomDatabase() {
         val MIGRATION_7_8 = object : Migration(7, 8) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `task` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `content` TEXT NOT NULL, `date` TEXT NOT NULL)")
+            }
+        }
+
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `note` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `contents` TEXT NOT NULL)")
+            }
+        }
+
+        val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `weight_entry` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `date` INTEGER NOT NULL, `weight` REAL NOT NULL, `type` INTEGER NOT NULL)")
             }
         }
     }
