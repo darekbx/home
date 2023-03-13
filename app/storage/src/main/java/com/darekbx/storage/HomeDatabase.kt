@@ -8,6 +8,9 @@ import com.darekbx.storage.lifetimememo.BackupDao
 import com.darekbx.storage.lifetimememo.MemoDao
 import com.darekbx.storage.lifetimememo.CategoryDto
 import com.darekbx.lifetimememo.data.dto.ContainerDto
+import com.darekbx.storage.books.BookDao
+import com.darekbx.storage.books.BookDto
+import com.darekbx.storage.books.ToReadDto
 import com.darekbx.storage.diggpl.DiggDao
 import com.darekbx.storage.diggpl.SavedEntryDto
 import com.darekbx.storage.diggpl.SavedLinkDto
@@ -49,9 +52,11 @@ import com.darekbx.storage.weight.WeightDto
         TaskDto::class,
         NoteDto::class,
         WeightDto::class,
+        BookDto::class,
+        ToReadDto::class,
     ],
     exportSchema = true,
-    version = 10
+    version = 11
 )
 abstract class HomeDatabase : RoomDatabase() {
 
@@ -74,6 +79,8 @@ abstract class HomeDatabase : RoomDatabase() {
     abstract fun notesDao(): NotesDao
 
     abstract fun weightDao(): WeightDao
+
+    abstract fun bookDao(): BookDao
 
     companion object {
         val DB_NAME = "home_db"
@@ -154,6 +161,13 @@ abstract class HomeDatabase : RoomDatabase() {
         val MIGRATION_9_10 = object : Migration(9, 10) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `weight_entry` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `date` INTEGER NOT NULL, `weight` REAL NOT NULL, `type` INTEGER NOT NULL)")
+            }
+        }
+
+        val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `book` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `author` TEXT NOT NULL, `title` TEXT NOT NULL, `flags` TEXT NOT NULL, `year` INTEGER NOT NULL)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `book_to_read` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `author` TEXT NOT NULL, `title` TEXT NOT NULL)")
             }
         }
     }

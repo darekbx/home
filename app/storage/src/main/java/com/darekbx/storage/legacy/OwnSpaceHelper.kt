@@ -5,12 +5,15 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteDatabase.OPEN_READONLY
 import android.database.sqlite.SQLiteDatabase.OpenParams
 import android.database.sqlite.SQLiteOpenHelper
+import com.darekbx.storage.legacy.model.LegacyBook
 import com.darekbx.storage.legacy.model.LegacyTask
+import com.darekbx.storage.legacy.model.LegacyToRead
 import com.darekbx.storage.legacy.model.LegacyWeightEntry
 import java.io.File
 import java.io.FileOutputStream
 
-class OwnSpaceHelper(private val context: Context) : SQLiteOpenHelper(context, DB_NAME, null, 1) {
+class OwnSpaceHelper(private val context: Context) :
+    SQLiteOpenHelper(context, DB_NAME, null, 1) {
 
     private var database: SQLiteDatabase
 
@@ -29,16 +32,22 @@ class OwnSpaceHelper(private val context: Context) : SQLiteOpenHelper(context, D
         )
     }
 
-    override fun onCreate(db: SQLiteDatabase?) { }
+    override fun onCreate(db: SQLiteDatabase?) {}
 
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) { }
+    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
 
     fun getTasks(): List<LegacyTask> {
         val tasks = mutableListOf<LegacyTask>()
         database.rawQuery("SELECT * FROM tasks", emptyArray())?.use { cursor ->
             if (cursor.moveToFirst()) {
                 do {
-                    tasks.add(LegacyTask(cursor.getString(1), cursor.getString(2), cursor.getString(3)))
+                    tasks.add(
+                        LegacyTask(
+                            cursor.getString(1),
+                            cursor.getString(2),
+                            cursor.getString(3)
+                        )
+                    )
                 } while (cursor.moveToNext())
             }
         }
@@ -65,9 +74,45 @@ class OwnSpaceHelper(private val context: Context) : SQLiteOpenHelper(context, D
                     var date = cursor.getLong(1)
                     // Fix timestamp in seconds
                     if (date < 1600000000) {
-                       date *= 1000
+                        date *= 1000
                     }
                     items.add(LegacyWeightEntry(date, cursor.getDouble(2), cursor.getInt(3)))
+                } while (cursor.moveToNext())
+            }
+        }
+        return items
+    }
+
+    fun getBooks(): List<LegacyBook> {
+        val items = mutableListOf<LegacyBook>()
+        database.rawQuery("SELECT * FROM books", emptyArray())?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                do {
+                    items.add(
+                        LegacyBook(
+                            cursor.getString(1),
+                            cursor.getString(2),
+                            cursor.getString(3),
+                            cursor.getInt(4)
+                        )
+                    )
+                } while (cursor.moveToNext())
+            }
+        }
+        return items
+    }
+
+    fun getToRead(): List<LegacyToRead> {
+        val items = mutableListOf<LegacyToRead>()
+        database.rawQuery("SELECT * FROM books_to_read", emptyArray())?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                do {
+                    items.add(
+                        LegacyToRead(
+                            cursor.getString(1),
+                            cursor.getString(2)
+                        )
+                    )
                 } while (cursor.moveToNext())
             }
         }
