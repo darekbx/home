@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.books.data.model.ToRead
-import com.darekbx.books.ui.ConfirmationDialog
 import com.darekbx.books.ui.LocalColors
+import com.darekbx.common.ui.ConfirmationDialog
 
 @Composable
 fun ToReadScreen(toReadViewModel: ToReadViewModel = hiltViewModel()) {

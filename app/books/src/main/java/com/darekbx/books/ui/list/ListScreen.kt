@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.books.data.model.Book
-import com.darekbx.books.ui.ConfirmationDialog
 import com.darekbx.books.ui.LocalColors
+import com.darekbx.common.ui.ConfirmationDialog
 import com.darekbx.common.ui.theme.HomeTheme
 
 @Composable

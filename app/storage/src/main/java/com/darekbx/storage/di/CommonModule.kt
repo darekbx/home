@@ -7,6 +7,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.darekbx.storage.HomeDatabase
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_10_11
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_11_12
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_1_2
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_2_3
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_3_4
@@ -27,6 +28,7 @@ import com.darekbx.storage.lifetimememo.SearchDao
 import com.darekbx.storage.stocks.StocksDao
 import com.darekbx.storage.notes.NotesDao
 import com.darekbx.storage.task.TaskDao
+import com.darekbx.storage.vault.VaultDao
 import com.darekbx.storage.weight.WeightDao
 import dagger.Module
 import dagger.Provides
@@ -111,6 +113,11 @@ class CommonModule {
     }
 
     @Provides
+    fun provideVaultDao(database: HomeDatabase): VaultDao {
+        return database.vaultDao()
+    }
+
+    @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): HomeDatabase {
         return Room
             .databaseBuilder(
@@ -128,6 +135,7 @@ class CommonModule {
             .addMigrations(MIGRATION_8_9)
             .addMigrations(MIGRATION_9_10)
             .addMigrations(MIGRATION_10_11)
+            .addMigrations(MIGRATION_11_12)
             .build()
     }
 }

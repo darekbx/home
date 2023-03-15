@@ -19,6 +19,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.darekbx.common.ui.ConfirmationDialog
 import com.darekbx.lifetimememo.commonui.ElementsList
 import com.darekbx.lifetimememo.commonui.ProgressIndicator
 import com.darekbx.lifetimememo.commonui.theme.*

@@ -5,10 +5,9 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteDatabase.OPEN_READONLY
 import android.database.sqlite.SQLiteDatabase.OpenParams
 import android.database.sqlite.SQLiteOpenHelper
-import com.darekbx.storage.legacy.model.LegacyBook
-import com.darekbx.storage.legacy.model.LegacyTask
-import com.darekbx.storage.legacy.model.LegacyToRead
-import com.darekbx.storage.legacy.model.LegacyWeightEntry
+import android.util.Log
+import com.darekbx.storage.BuildConfig
+import com.darekbx.storage.legacy.model.*
 import java.io.File
 import java.io.FileOutputStream
 
@@ -22,7 +21,7 @@ class OwnSpaceHelper(private val context: Context) :
     }
 
     init {
-        if (!context.databaseList().contains(DB_NAME)) {
+        if (BuildConfig.DEBUG || !context.databaseList().contains(DB_NAME)) {
             copyLegacyDatabase()
         }
 
@@ -35,6 +34,24 @@ class OwnSpaceHelper(private val context: Context) :
     override fun onCreate(db: SQLiteDatabase?) {}
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
+
+    fun getVaultEntries(): List<LegacyVault> {
+        val items = mutableListOf<LegacyVault>()
+        database.rawQuery("SELECT * FROM aes_vault", emptyArray())?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                do {
+                    items.add(
+                        LegacyVault(
+                            cursor.getString(1),
+                            String(cursor.getBlob(2)),
+                            String(cursor.getBlob(3))
+                        )
+                    )
+                } while (cursor.moveToNext())
+            }
+        }
+        return items
+    }
 
     fun getTasks(): List<LegacyTask> {
         val tasks = mutableListOf<LegacyTask>()
