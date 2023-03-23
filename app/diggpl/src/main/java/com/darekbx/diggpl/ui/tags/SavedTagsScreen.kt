@@ -41,7 +41,9 @@ fun SavedTagsScreen(
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { openTagsList() }) {
+            FloatingActionButton(
+                modifier = Modifier.padding(32.dp),
+                onClick = { openTagsList() }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
         },

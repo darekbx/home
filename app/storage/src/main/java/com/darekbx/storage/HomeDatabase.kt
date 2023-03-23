@@ -29,6 +29,8 @@ import com.darekbx.storage.stocks.StocksDao
 import com.darekbx.storage.stocks.RateDto
 import com.darekbx.storage.notes.NoteDto
 import com.darekbx.storage.notes.NotesDao
+import com.darekbx.storage.riverstatus.WaterLevelDao
+import com.darekbx.storage.riverstatus.WaterLevelDto
 import com.darekbx.storage.task.TaskDao
 import com.darekbx.storage.task.TaskDto
 import com.darekbx.storage.vault.VaultDao
@@ -57,9 +59,10 @@ import com.darekbx.storage.weight.WeightDto
         BookDto::class,
         ToReadDto::class,
         VaultDto::class,
+        WaterLevelDto::class,
     ],
     exportSchema = true,
-    version = 12
+    version = 13
 )
 abstract class HomeDatabase : RoomDatabase() {
 
@@ -86,6 +89,8 @@ abstract class HomeDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
 
     abstract fun vaultDao(): VaultDao
+
+    abstract fun waterLevelDao(): WaterLevelDao
 
     companion object {
         val DB_NAME = "home_db"
@@ -179,6 +184,12 @@ abstract class HomeDatabase : RoomDatabase() {
         val MIGRATION_11_12 = object : Migration(11, 12) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `vault` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `key` TEXT NOT NULL, `account` TEXT NOT NULL, `password` TEXT NOT NULL)")
+            }
+        }
+
+        val MIGRATION_12_13 = object : Migration(12, 13) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `water_level` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT, `value` INTEGER NOT NULL, `date` TEXT NOT NULL, `station_id` INTEGER NOT NULL)")
             }
         }
     }

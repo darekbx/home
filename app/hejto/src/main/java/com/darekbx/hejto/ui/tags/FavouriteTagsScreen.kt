@@ -29,6 +29,7 @@ import com.darekbx.hejto.ui.posts.LoadingProgress
 import com.darekbx.hejto.ui.tags.viewmodel.TagsViewModel
 import com.darekbx.hejto.ui.tags.viewmodel.UiState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavouriteTagsScreen(
     tagsViewModel: TagsViewModel = hiltViewModel(),
@@ -43,7 +44,9 @@ fun FavouriteTagsScreen(
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { openTagsList() }) {
+            FloatingActionButton(
+                modifier = Modifier.padding(32.dp),
+                onClick = { openTagsList() }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
         },

@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 
 package com.darekbx.books.ui.list
 
@@ -114,12 +114,28 @@ private fun BooksList(
     onBookClick: (Book) -> Unit,
     onBookLongClick: (Book) -> Unit
 ) {
+    var filter = remember { mutableStateOf("") }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 4.dp)
     ) {
-        itemsIndexed(books, key = { _, book -> book.id!! }) { index, book ->
+        stickyHeader {
+            InputField(
+                modifier = Modifier.padding(start = 2.dp, end = 2.dp, top = 2.dp, bottom = 4.dp),
+                value = filter,
+                label = "Search",
+                valueError = mutableStateOf(false)
+            )
+        }
+        itemsIndexed(books.filter {
+            if (filter.value.isNotBlank()) {
+                it.title.contains(filter.value) || it.author.contains(filter.value)
+            } else {
+                true
+            }
+        }, key = { _, book -> book.id!! }) { index, book ->
             BookEntryView(
                 book,
                 count - index,

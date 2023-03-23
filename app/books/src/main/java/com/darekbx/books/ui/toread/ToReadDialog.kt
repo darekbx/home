@@ -59,9 +59,9 @@ private fun DialogContents(
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                InputField("Author", author, authorError)
+                InputField(Modifier, "Author", author, authorError)
                 Spacer(modifier = Modifier.height(8.dp))
-                InputField("Title", title, titleError)
+                InputField(Modifier, "Title", title, titleError)
             }
 
             Row(

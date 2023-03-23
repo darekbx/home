@@ -77,9 +77,9 @@ private fun DialogContents(
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                InputField("Author", author, authorError)
+                InputField(Modifier, "Author", author, authorError)
                 Spacer(modifier = Modifier.height(8.dp))
-                InputField("Title", title, titleError)
+                InputField(Modifier, "Title", title, titleError)
             }
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -199,12 +199,13 @@ private fun FlagCheckBox(label: String, isChecked: MutableState<Boolean>) {
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun InputField(
+    modifier: Modifier = Modifier,
     label: String,
     value: MutableState<String>,
     valueError: MutableState<Boolean>
 ) {
     TextField(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
             .background(Color.White),
