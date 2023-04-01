@@ -42,25 +42,23 @@ fun FavouriteTagsScreen(
         tagsViewModel.loadFavouritesTags()
     }
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                modifier = Modifier.padding(32.dp),
-                onClick = { openTagsList() }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-            }
-        },
-        content = { innerPadding ->
-            FavouriteTagsList(
-                tagsViewModel,
-                Modifier.padding(innerPadding),
-                favouriteTags
-            ) { name, entriesCount ->
-                tagsViewModel.markOpenedTag(name, entriesCount)
-                openTag(name)
-            }
+
+    Column(Modifier.fillMaxWidth()) {
+        FavouriteTagsList(
+            tagsViewModel,
+            Modifier.weight(1F),
+            favouriteTags
+        ) { name, entriesCount ->
+            tagsViewModel.markOpenedTag(name, entriesCount)
+            openTag(name)
         }
-    )
+        Button(
+            modifier = Modifier.fillMaxWidth().padding(start = 9.dp, end = 9.dp),
+            shape = RoundedCornerShape(8.dp),
+            onClick = { openTagsList() }) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+        }
+    }
 }
 
 @Composable
@@ -81,7 +79,7 @@ private fun FavouriteTagsList(
             reverseLayout = true,
             modifier = modifier
                 .fillMaxSize()
-                .padding(top = 4.dp, bottom = 4.dp)
+                .padding(top = 4.dp, bottom = 0.dp)
         ) {
             items(items = tags) { item ->
                 FavouriteTagView(item, openTag, tagsViewModel::removeFavouriteTag)
@@ -108,7 +106,7 @@ private fun FavouriteTagView(
     ) {
         Text(
             text = "#${tag.name}",
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.padding(start = 8.dp).width(160.dp),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onPrimary,
             maxLines = 1,

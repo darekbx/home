@@ -39,24 +39,21 @@ fun SavedTagsScreen(
         savedTagsViewModel.loadSavedTags()
     }
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                modifier = Modifier.padding(32.dp),
-                onClick = { openTagsList() }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-            }
-        },
-        content = { innerPadding ->
-            SavedTagsList(
-                savedTagsViewModel,
-                Modifier.padding(innerPadding),
-                favouriteTags
-            ) { savedTag ->
-                openTag(savedTag.name)
-            }
+    Column(Modifier.fillMaxWidth()) {
+        SavedTagsList(
+            savedTagsViewModel,
+            Modifier.weight(1F),
+            favouriteTags
+        ) { savedTag ->
+            openTag(savedTag.name)
         }
-    )
+        Button(
+            modifier = Modifier.fillMaxWidth().padding(start = 9.dp, end = 9.dp),
+            shape = RoundedCornerShape(8.dp),
+            onClick = { openTagsList() }) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+        }
+    }
 }
 
 @Composable
@@ -77,7 +74,7 @@ private fun SavedTagsList(
             reverseLayout = true,
             modifier = modifier
                 .fillMaxSize()
-                .padding(top = 4.dp, bottom = 4.dp)
+                .padding(top = 4.dp, bottom = 0.dp)
         ) {
             items(items = tags) { item ->
                 SavedTagView(item, openTag, savedTagsViewModel::removeSavedTag)
@@ -104,7 +101,7 @@ private fun SavedTagView(
     ) {
         Text(
             text = "#${tag.name}",
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.padding(start = 8.dp).width(160.dp),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onPrimary,
             maxLines = 1,
