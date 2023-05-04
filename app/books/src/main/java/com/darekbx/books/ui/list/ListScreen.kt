@@ -131,7 +131,7 @@ private fun BooksList(
         }
         itemsIndexed(books.filter {
             if (filter.value.isNotBlank()) {
-                it.title.contains(filter.value) || it.author.contains(filter.value)
+                it.title.contains(filter.value, true) || it.author.contains(filter.value, true)
             } else {
                 true
             }

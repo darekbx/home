@@ -54,7 +54,7 @@ class NewsRepository @Inject constructor(private val parser: Parser) {
         NewsSource.YCombinator(),
         NewsSource.Hackaday(),
         NewsSource.Arduino(),
-        NewsSource.Niebezpiecznik(),
-        NewsSource.Forbot()
+        //NewsSource.Niebezpiecznik(),
+        //NewsSource.Forbot()
     )
 }

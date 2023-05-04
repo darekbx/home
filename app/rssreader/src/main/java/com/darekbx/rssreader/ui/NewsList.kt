@@ -77,7 +77,7 @@ private fun ItemView(item: NewsItem, onClick: (String) -> Unit = { }) {
                 Column {
                     Text(
                         text = item.title ?: "",
-                        maxLines = 1,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.labelMedium
                     )
