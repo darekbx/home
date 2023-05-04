@@ -9,6 +9,7 @@ import com.darekbx.storage.HomeDatabase
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_10_11
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_11_12
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_12_13
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_13_14
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_1_2
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_2_3
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_3_4
@@ -20,8 +21,10 @@ import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_8_9
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_9_10
 import com.darekbx.storage.books.BookDao
 import com.darekbx.storage.diggpl.DiggDao
+import com.darekbx.storage.dotpad.DotsDao
 import com.darekbx.storage.fuel.FuelDao
 import com.darekbx.storage.hejto.HejtoDao
+import com.darekbx.storage.legacy.DotPadHelper
 import com.darekbx.storage.legacy.OwnSpaceHelper
 import com.darekbx.storage.lifetimememo.BackupDao
 import com.darekbx.storage.lifetimememo.MemoDao
@@ -48,6 +51,16 @@ class CommonModule {
     fun provideOwnSpaceHelper(@ApplicationContext context: Context): OwnSpaceHelper? {
         return try {
             OwnSpaceHelper(context)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    @Provides
+    fun provideDotPadHelper(@ApplicationContext context: Context): DotPadHelper? {
+        return try {
+            DotPadHelper(context)
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -125,6 +138,11 @@ class CommonModule {
     }
 
     @Provides
+    fun provideDotsDao(database: HomeDatabase): DotsDao {
+        return database.dotsDao()
+    }
+
+    @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): HomeDatabase {
         return Room
             .databaseBuilder(
@@ -144,6 +162,7 @@ class CommonModule {
             .addMigrations(MIGRATION_10_11)
             .addMigrations(MIGRATION_11_12)
             .addMigrations(MIGRATION_12_13)
+            .addMigrations(MIGRATION_13_14)
             .build()
     }
 }

@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.darekbx.dotpad.repository.local.entities.DotDto
 import com.darekbx.storage.lifetimememo.BackupDao
 import com.darekbx.storage.lifetimememo.MemoDao
 import com.darekbx.storage.lifetimememo.CategoryDto
@@ -15,6 +16,7 @@ import com.darekbx.storage.diggpl.DiggDao
 import com.darekbx.storage.diggpl.SavedEntryDto
 import com.darekbx.storage.diggpl.SavedLinkDto
 import com.darekbx.storage.diggpl.SavedTagDto
+import com.darekbx.storage.dotpad.DotsDao
 import com.darekbx.storage.fuel.FuelDao
 import com.darekbx.storage.fuel.FuelEntryDto
 import com.darekbx.storage.lifetimememo.LocationDto
@@ -60,9 +62,10 @@ import com.darekbx.storage.weight.WeightDto
         ToReadDto::class,
         VaultDto::class,
         WaterLevelDto::class,
+        DotDto::class,
     ],
     exportSchema = true,
-    version = 13
+    version = 14
 )
 abstract class HomeDatabase : RoomDatabase() {
 
@@ -91,6 +94,8 @@ abstract class HomeDatabase : RoomDatabase() {
     abstract fun vaultDao(): VaultDao
 
     abstract fun waterLevelDao(): WaterLevelDao
+
+    abstract fun dotsDao(): DotsDao
 
     companion object {
         val DB_NAME = "home_db"
@@ -190,6 +195,13 @@ abstract class HomeDatabase : RoomDatabase() {
         val MIGRATION_12_13 = object : Migration(12, 13) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `water_level` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT, `value` INTEGER NOT NULL, `date` TEXT NOT NULL, `station_id` INTEGER NOT NULL)")
+            }
+        }
+
+        val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `dots` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `text` TEXT NOT NULL, `size` INTEGER NOT NULL, `color` INTEGER NOT NULL, `position_x` INTEGER NOT NULL, `position_y` INTEGER NOT NULL, `created_date` INTEGER NOT NULL, `is_archived` INTEGER NOT NULL, `is_sticked` INTEGER NOT NULL, `reminder` INTEGER, `calendar_event_id` INTEGER, `calendar_reminder_id` INTEGER)")
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_dots_is_archived` ON `dots` (`is_archived`)")
             }
         }
     }
