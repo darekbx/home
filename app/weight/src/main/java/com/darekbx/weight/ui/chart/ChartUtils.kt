@@ -21,7 +21,7 @@ class ChartUtils(private val entries: List<WeightEntry>) {
 
     fun drawEntries(canvas: DrawScope, color: Color, entries: List<WeightEntry>) {
         val heightRatio = canvas.size.height / maxWeight
-        val widthStep = canvas.size.width / entries.size
+        val widthStep = (canvas.size.width - padding) / entries.size
         var start = padding
 
         var p0 = Offset(

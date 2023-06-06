@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.darekbx.storage.HomeDatabase.Companion.DB_NAME
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.map
@@ -27,7 +28,7 @@ class BackupViewModel @Inject constructor(
     fun makeBackup(pfd: ParcelFileDescriptor) {
         viewModelScope.launch {
             FileOutputStream(pfd.fileDescriptor).use { outputStream ->
-                val localDatabaseFile = context.getDatabasePath(context.databaseList()[0])
+                val localDatabaseFile = context.getDatabasePath(DB_NAME)
                 localDatabaseFile.inputStream().use { input ->
                     input.copyTo(outputStream)
                 }

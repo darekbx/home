@@ -58,11 +58,11 @@ dependencies {
 
     // To change which app should be run at first, move to top correct one:
     // TODO: Allegro Observer
+    implementation project(':app:weight')
     implementation project(':app:dotpad')
     implementation project(':app:riverstatus')
     implementation project(':app:vault')
     implementation project(':app:books')
-    implementation project(':app:weight')
     implementation project(':app:notepad')
     implementation project(':app:rssreader')
     implementation project(':app:tasks')
