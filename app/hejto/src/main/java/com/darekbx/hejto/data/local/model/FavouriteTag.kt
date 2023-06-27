@@ -7,6 +7,8 @@ data class FavouriteTag(
 ) {
     fun hasNewEntries() = newEntriesCount > 0
 
+    var failedToLoad = false
+
     override fun toString(): String {
         return "$name, $entriesCount, $newEntriesCount"
     }

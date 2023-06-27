@@ -11,12 +11,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -135,9 +137,9 @@ private fun FavouriteTagView(
                 modifier = Modifier
                     .width(32.dp)
                     .clickable { removeTag(tag.name) },
-                imageVector = Icons.Default.Favorite,
+                imageVector = if (tag.failedToLoad) Icons.Default.Warning else Icons.Default.Favorite,
                 contentDescription = "favourite",
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = if (tag.failedToLoad) Color.Red else MaterialTheme.colorScheme.onPrimary
             )
         }
     }

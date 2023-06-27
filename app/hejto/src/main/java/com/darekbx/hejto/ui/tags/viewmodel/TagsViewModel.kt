@@ -1,5 +1,6 @@
 package com.darekbx.hejto.ui.tags.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -64,11 +65,20 @@ class TagsViewModel @Inject constructor(
             favouriteTags.clear()
             try {
                 hejtoRespoitory.getFavouriteTags().forEach { localTag ->
-                    val remoteTag = hejtoRespoitory.getTag(localTag.name)
-                    val remotePostsCount = remoteTag.postsCount
-                    localTag.newEntriesCount = max(0, remotePostsCount - localTag.entriesCount)
-                    localTag.entriesCount = remoteTag.postsCount
-                    favouriteTags.add(localTag)
+                    try {
+                        val remoteTag = hejtoRespoitory.getTag(localTag.name)
+                        val remotePostsCount = remoteTag.postsCount
+                        localTag.newEntriesCount = max(0, remotePostsCount - localTag.entriesCount)
+                        localTag.entriesCount = remoteTag.postsCount
+                        favouriteTags.add(localTag)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to load tag: ${localTag.name}")
+                        if (BuildConfig.DEBUG) {
+                            e.printStackTrace()
+                        }
+                        localTag.failedToLoad = true
+                        favouriteTags.add(localTag)
+                    }
                 }
             } catch (e: Exception) {
                 if (BuildConfig.DEBUG) {
@@ -87,4 +97,8 @@ class TagsViewModel @Inject constructor(
                 hejtoRespoitory.getTags(page, HejtoService.PAGE_SIZE)
             }
         }.flow
+
+    companion object {
+        private val TAG = "TagsViewModel"
+    }
 }
