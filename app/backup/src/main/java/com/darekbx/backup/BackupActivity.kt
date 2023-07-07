@@ -79,7 +79,7 @@ class BackupActivity : ComponentActivity() {
         AlertDialog(
             onDismissRequest = { onDismiss() },
             title = { Text(modifier = Modifier.padding(vertical = 8.dp), text = "Please confirm") },
-            text = { Text(text = "Please select backup file to restore. \n\nWARNING: restore will override current database!") },
+            text = { Text(text = "Please select backup file to restore.\n\nBefore restore clear app data and grant all permissions! \n\nWARNING: restore will override current database!") },
             confirmButton = {
                 Button(onClick = {
                     onRestore()

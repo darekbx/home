@@ -40,8 +40,13 @@ class BackupViewModel @Inject constructor(
     fun restoreBackup(pfd: ParcelFileDescriptor, onSuccess: () -> Unit) {
         viewModelScope.launch {
             FileInputStream(pfd.fileDescriptor).use { inputStream ->
-                val localDatabaseFile = context.getDatabasePath(context.databaseList()[0])
+                val localDatabaseFile = context.getDatabasePath(DB_NAME)
+                if (!localDatabaseFile.exists()) {
+                    localDatabaseFile.createNewFile()
+                }
                 localDatabaseFile.writeBytes(inputStream.readBytes())
+
+
             }
             onSuccess()
         }
