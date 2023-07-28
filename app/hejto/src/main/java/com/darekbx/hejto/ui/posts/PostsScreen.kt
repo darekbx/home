@@ -33,6 +33,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
+import com.darekbx.common.ui.isScrolledToEnd
 import com.darekbx.hejto.data.remote.*
 import com.darekbx.hejto.ui.HejtoTheme
 import com.darekbx.hejto.ui.posts.viemodel.Order
@@ -40,9 +41,6 @@ import com.darekbx.hejto.ui.posts.viemodel.PeriodFilter
 import com.darekbx.hejto.ui.posts.viemodel.PostsViewModel
 import com.darekbx.hejto.ui.posts.viemodel.UiState
 import com.darekbx.hejto.ui.saved.viewmodel.SavedViewModel
-
-fun LazyListState.isScrolledToEnd() =
-    layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
 
 @Composable
 fun PostsScreen(
@@ -56,7 +54,7 @@ fun PostsScreen(
     var page by remember { mutableStateOf(1) }
     val posts = postsViewModel.postsList
     val state = rememberLazyListState()
-    val isAtBottom = state.isScrolledToEnd()
+    val isAtBottom by remember { derivedStateOf { state.isScrolledToEnd() } }
     val uiState by postsViewModel.uiState
 
     if (tag != null) {

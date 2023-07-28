@@ -6,6 +6,10 @@
     <application>
         <activity
             android:name=".DiggActivity"
+            android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
+            android:noHistory="false"
+            android:taskAffinity=".DiggActivity"
             android:exported="true"
             android:label="@string/digg_app_name"
             android:icon="@drawable/w_icon"
@@ -14,9 +18,6 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
         </activity>
     </application>
 

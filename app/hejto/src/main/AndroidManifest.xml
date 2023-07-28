@@ -7,6 +7,8 @@
         <activity
             android:name=".HejtoActivity"
             android:exported="true"
+            android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
             android:label="@string/hejto_app_name"
             android:icon="@drawable/ic_scaled_hejto_logo"
             android:theme="@style/Theme.Home">

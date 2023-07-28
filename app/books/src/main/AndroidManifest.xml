@@ -4,14 +4,15 @@
         <activity
             android:name=".BooksActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
+            android:noHistory="true"
             android:label="@string/books_app_name"
             android:icon="@drawable/ic_book"
             android:theme="@style/Theme.Home"
-            android:launchMode="singleTask"
             android:usesCleartextTraffic="true"
             android:windowSoftInputMode="adjustResize"
-            android:noHistory="true">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

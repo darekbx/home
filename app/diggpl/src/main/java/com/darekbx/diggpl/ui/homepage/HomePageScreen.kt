@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.darekbx.common.ui.isScrolledToEnd
 import com.darekbx.diggpl.data.remote.StreamItem
 import com.darekbx.diggpl.ui.ErrorMessage
 import com.darekbx.diggpl.ui.LoadingProgress
@@ -24,13 +25,10 @@ fun HomePageScreen(
     savedViewModel: SavedViewModel = hiltViewModel(),
     openStreamItem: (StreamItem) -> Unit = { }
 ) {
-    fun LazyListState.isScrolledToEnd() =
-        layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
-
     val tagStream = homePageViewModel.linkStreamItems
     var page by remember { mutableStateOf(1) }
     val state = rememberLazyListState()
-    val isAtBottom = state.isScrolledToEnd()
+    val isAtBottom by remember { derivedStateOf { state.isScrolledToEnd() } }
     val uiState by homePageViewModel.uiState
 
     LaunchedEffect(Unit) {

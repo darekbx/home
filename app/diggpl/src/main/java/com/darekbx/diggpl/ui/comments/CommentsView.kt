@@ -3,7 +3,6 @@ package com.darekbx.diggpl.ui.comments
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.darekbx.common.ui.isScrolledToEnd
 import com.darekbx.diggpl.data.remote.Comment
 import com.darekbx.diggpl.data.remote.MediaPhoto
 import com.darekbx.diggpl.ui.*
@@ -27,12 +27,9 @@ fun CommentsLazyList(
     header: @Composable () -> Unit = { },
     commentsViewModel: CommentsViewModel = hiltViewModel()
 ) {
-    fun LazyListState.isScrolledToEnd() =
-        layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
-
     var page by remember { mutableStateOf(1) }
     val state = rememberLazyListState()
-    val isAtBottom = state.isScrolledToEnd()
+    val isAtBottom by remember { derivedStateOf { state.isScrolledToEnd() } }
     val uiState by commentsViewModel.uiState
 
     LaunchedEffect(Unit) {

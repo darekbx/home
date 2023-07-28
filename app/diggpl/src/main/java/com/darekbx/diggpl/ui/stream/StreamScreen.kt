@@ -2,7 +2,6 @@ package com.darekbx.diggpl.ui.stream
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
@@ -10,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.darekbx.common.ui.isScrolledToEnd
 import com.darekbx.diggpl.data.remote.*
 import com.darekbx.diggpl.ui.*
 import com.darekbx.diggpl.ui.saved.SavedViewModel
@@ -22,13 +22,10 @@ fun StreamScreen(
     savedViewModel: SavedViewModel = hiltViewModel(),
     openStreamItem: (StreamItem) -> Unit = { }
 ) {
-    fun LazyListState.isScrolledToEnd() =
-        layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
-
     val tagStream = streamViewModel.streamItems
     var page by remember { mutableStateOf(1) }
     val state = rememberLazyListState()
-    val isAtBottom = state.isScrolledToEnd()
+    val isAtBottom by remember { derivedStateOf { state.isScrolledToEnd() } }
     val uiState by streamViewModel.uiState
 
     LaunchedEffect(tagName) {

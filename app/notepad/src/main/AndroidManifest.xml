@@ -4,14 +4,15 @@
         <activity
             android:name=".NotepadActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
+            android:noHistory="true"
             android:label="@string/notepad_app_name"
             android:icon="@drawable/ic_notepad"
             android:theme="@style/Theme.Home"
-            android:launchMode="singleTask"
             android:usesCleartextTraffic="true"
             android:windowSoftInputMode="adjustResize"
-            android:noHistory="true">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

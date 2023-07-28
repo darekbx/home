@@ -114,7 +114,7 @@ fun WeatherView(
                     .scale(1.3F),
                 contentAlignment = Alignment.Center
             ) {
-                WeatherBox(data, points2XL)
+                WeatherBox(data, points6A)
             }
             // Air quality
             val measurements = weatherViewModel.measurementsList
