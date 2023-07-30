@@ -59,6 +59,10 @@ class TagsViewModel @Inject constructor(
         }
     }
 
+    fun reset() {
+        favouriteTags.clear()
+    }
+
     fun loadFavouritesTags() {
         viewModelScope.launch {
             _uiState.value = UiState.InProgress

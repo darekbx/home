@@ -396,7 +396,7 @@ fun MarkdownContent(content: String) {
 fun CommonImage(mediaPhoto: MediaPhoto, isNsfw: Boolean, onClick: (() -> Unit)? = null) {
     val maxImageHeigth = 1920
     var errorWidthFraction by remember { mutableStateOf(1F) }
-    var imageBlur by remember { mutableStateOf(100.dp) }
+    var imageBlur by remember { mutableStateOf(10.dp) }
     var imageAlpha by remember { mutableStateOf(0.1F) }
     val localUriHandler = LocalUriHandler.current
     val image = mediaPhoto.url

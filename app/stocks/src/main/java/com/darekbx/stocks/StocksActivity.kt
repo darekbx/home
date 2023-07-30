@@ -38,6 +38,11 @@ class StocksActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onStop() {
+        super.onStop()
+        this.finishAffinity()
+    }
 }
 
 @Composable

@@ -70,6 +70,11 @@ class MainActivity : ComponentActivity() {
         notifyDotsCount()
     }
 
+    override fun onStop() {
+        super.onStop()
+        this.finishAffinity()
+    }
+
     /**
      * Notify dots count to the KLauncher
      */

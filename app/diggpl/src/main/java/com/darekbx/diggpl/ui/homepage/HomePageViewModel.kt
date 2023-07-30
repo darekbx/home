@@ -31,6 +31,10 @@ class HomePageViewModel @Inject constructor(
     var linkStreamItems = mutableStateListOf<StreamItem>()
     var hasNextPage = true
 
+    fun reset() {
+        linkStreamItems.clear()
+    }
+
     /**
      * @return True if next page is available
      */
