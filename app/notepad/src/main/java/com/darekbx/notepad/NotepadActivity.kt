@@ -1,17 +1,17 @@
 package com.darekbx.notepad
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.darekbx.common.LauncherActivity
 import com.darekbx.common.ui.theme.HomeTheme
 import com.darekbx.notepad.ui.NotesScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class NotepadActivity : ComponentActivity() {
+class NotepadActivity : LauncherActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

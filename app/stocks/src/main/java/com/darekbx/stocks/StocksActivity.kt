@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
 import androidx.compose.ui.platform.LocalContext
@@ -12,6 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.darekbx.common.LauncherActivity
 import com.darekbx.common.ui.NoInternetView
 import com.darekbx.common.ui.theme.HomeTheme
 import com.darekbx.common.utils.ConnectionUtils
@@ -21,7 +21,7 @@ import com.darekbx.stocks.ui.stocks.StocksScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class StocksActivity : ComponentActivity() {
+class StocksActivity : LauncherActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

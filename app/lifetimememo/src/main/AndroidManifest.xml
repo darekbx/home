@@ -9,7 +9,7 @@
             android:name=".MainActivity"
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
-            android:noHistory="true"
+            android:noHistory="false"
             android:exported="true"
             android:icon="@drawable/ic_launcher_round"
             android:label="@string/lifetime_app_name"

@@ -11,7 +11,7 @@
             android:launchMode="singleTask"
             android:usesCleartextTraffic="true"
             android:windowSoftInputMode="adjustResize"
-            android:noHistory="true">
+            android:noHistory="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

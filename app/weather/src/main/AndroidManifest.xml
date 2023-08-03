@@ -13,7 +13,7 @@
             android:icon="@drawable/ic_baseline_cloud"
             android:theme="@style/Theme.Home"
             android:launchMode="singleTask"
-            android:noHistory="true">
+            android:noHistory="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

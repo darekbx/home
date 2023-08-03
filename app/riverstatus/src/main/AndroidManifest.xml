@@ -7,7 +7,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
-            android:noHistory="true"
+            android:noHistory="false"
             android:label="@string/river_status_app_name"
             android:icon="@drawable/ic_water"
             android:theme="@style/Theme.Home"

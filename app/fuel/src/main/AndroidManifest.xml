@@ -6,7 +6,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
-            android:noHistory="true"
+            android:noHistory="false"
             android:label="@string/fuel_app_name"
             android:icon="@drawable/ic_fuel_app_icon"
             android:theme="@style/Theme.Home"

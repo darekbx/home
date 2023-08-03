@@ -5,7 +5,7 @@
             android:name=".WeightActivity"
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
-            android:noHistory="true"
+            android:noHistory="false"
             android:exported="true"
             android:label="@string/weight_app_name"
             android:icon="@drawable/ic_weight"

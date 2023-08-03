@@ -6,7 +6,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
-            android:noHistory="true"
+            android:noHistory="false"
             android:label="@string/notepad_app_name"
             android:icon="@drawable/ic_notepad"
             android:theme="@style/Theme.Home"

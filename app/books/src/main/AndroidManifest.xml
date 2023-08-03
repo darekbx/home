@@ -6,7 +6,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
-            android:noHistory="true"
+            android:noHistory="false"
             android:label="@string/books_app_name"
             android:icon="@drawable/ic_book"
             android:theme="@style/Theme.Home"

@@ -3,7 +3,6 @@
 package com.darekbx.hejto
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -38,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.darekbx.common.LauncherActivity
 import com.darekbx.common.ui.NoInternetView
 import com.darekbx.common.utils.ConnectionUtils
 import com.darekbx.hejto.navigation.*
@@ -46,7 +46,7 @@ import com.darekbx.hejto.ui.saved.viewmodel.SavedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HejtoActivity : ComponentActivity() {
+class HejtoActivity : LauncherActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

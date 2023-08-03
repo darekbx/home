@@ -3,7 +3,6 @@
 package com.darekbx.diggpl
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.darekbx.common.LauncherActivity
 import com.darekbx.common.ui.NoInternetView
 import com.darekbx.common.utils.ConnectionUtils
 import com.darekbx.diggpl.navigation.*
@@ -35,7 +35,7 @@ import com.darekbx.diggpl.ui.saved.SavedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class DiggActivity : ComponentActivity() {
+class DiggActivity : LauncherActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,11 +63,6 @@ class DiggActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        this.finishAffinity()
     }
 }
 

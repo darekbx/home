@@ -9,7 +9,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
-            android:noHistory="true"
+            android:noHistory="false"
             android:label="@string/backup_app_name"
             android:icon="@drawable/ic_backup"
             android:theme="@style/Theme.Home">

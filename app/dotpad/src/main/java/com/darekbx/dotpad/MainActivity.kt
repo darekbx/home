@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -27,6 +26,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.darekbx.common.LauncherActivity
 import com.darekbx.dotpad.navigation.NavigationItem
 import com.darekbx.dotpad.ui.calendar.CalendarScreen
 import com.darekbx.dotpad.ui.history.HistoryListScreen
@@ -47,7 +47,7 @@ import javax.inject.Inject
 @ExperimentalFoundationApi
 @ExperimentalPermissionsApi
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : LauncherActivity() {
 
     companion object {
         var LAST_COUNT = 0

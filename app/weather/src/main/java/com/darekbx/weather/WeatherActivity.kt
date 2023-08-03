@@ -4,7 +4,6 @@ import android.Manifest
 import android.os.Bundle
 import android.widget.Toast
 import androidx.compose.ui.Modifier
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -15,6 +14,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.darekbx.common.LauncherActivity
 import com.darekbx.common.ui.NoInternetView
 import com.darekbx.common.ui.theme.HomeTheme
 import com.darekbx.common.utils.ConnectionUtils
@@ -24,7 +24,7 @@ import com.darekbx.weather.ui.weather.WeatherScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class WeatherActivity : ComponentActivity() {
+class WeatherActivity : LauncherActivity() {
 
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
