@@ -5,6 +5,14 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.darekbx.dotpad.repository.local.entities.DotDto
+import com.darekbx.geotracker.repository.PlaceDao
+import com.darekbx.geotracker.repository.PointDao
+import com.darekbx.geotracker.repository.RouteDao
+import com.darekbx.geotracker.repository.TrackDao
+import com.darekbx.geotracker.repository.entities.PlaceDto
+import com.darekbx.geotracker.repository.entities.PointDto
+import com.darekbx.geotracker.repository.entities.RouteDto
+import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.storage.lifetimememo.BackupDao
 import com.darekbx.storage.lifetimememo.MemoDao
 import com.darekbx.storage.lifetimememo.CategoryDto
@@ -42,63 +50,101 @@ import com.darekbx.storage.weight.WeightDto
 
 @Database(
     entities = [
+        // Stocks
         CurrencyDto::class,
         RateDto::class,
+        // Hejto
         FavouriteTagDto::class,
         SavedSlugDto::class,
         CommunityInfoDto::class,
+        // LifetimeMemo
         CategoryDto::class,
         LocationDto::class,
         MemoDto::class,
         ContainerDto::class,
+        // Digg
         SavedEntryDto::class,
         SavedLinkDto::class,
         SavedTagDto::class,
+        // Fuel
         FuelEntryDto::class,
+        // Tasks
         TaskDto::class,
+        // Notepad
         NoteDto::class,
+        // Weight
         WeightDto::class,
+        // Books
         BookDto::class,
         ToReadDto::class,
+        // PasswordVault
         VaultDto::class,
+        // WaterLevel
         WaterLevelDto::class,
+        // DotPad
         DotDto::class,
+        // GeoTracker
+        PointDto::class,
+        TrackDto::class,
+        PlaceDto::class,
+        RouteDto::class
     ],
     exportSchema = true,
-    version = 14
+    version = 15
 )
 abstract class HomeDatabase : RoomDatabase() {
 
+    // Stocks
     abstract fun stocksDao(): StocksDao
 
+    // Hejto
     abstract fun hejtoDao(): HejtoDao
 
+    // LifetimeMemo
     abstract fun memoDao(): MemoDao
 
     abstract fun searchDao(): SearchDao
 
     abstract fun backupDao(): BackupDao
 
+    // Digg
     abstract fun diggDao(): DiggDao
 
+    // Fuel
     abstract fun fuelDao(): FuelDao
 
+    // Tasks
     abstract fun taskDao(): TaskDao
 
+    // Notes
     abstract fun notesDao(): NotesDao
 
+    // Weight
     abstract fun weightDao(): WeightDao
 
+    // Books
     abstract fun bookDao(): BookDao
 
+    // Vault
     abstract fun vaultDao(): VaultDao
 
+    // Water
     abstract fun waterLevelDao(): WaterLevelDao
 
+    // Dots
     abstract fun dotsDao(): DotsDao
 
+    // Geo tracker
+    abstract fun trackDao(): TrackDao
+
+    abstract fun pointDao(): PointDao
+
+    abstract fun placeDao(): PlaceDao
+
+    abstract fun routeDao(): RouteDao
+
     companion object {
-        val DB_NAME = "home_db"
+        const val DB_NAME = "home_db"
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -202,6 +248,15 @@ abstract class HomeDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `dots` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `text` TEXT NOT NULL, `size` INTEGER NOT NULL, `color` INTEGER NOT NULL, `position_x` INTEGER NOT NULL, `position_y` INTEGER NOT NULL, `created_date` INTEGER NOT NULL, `is_archived` INTEGER NOT NULL, `is_sticked` INTEGER NOT NULL, `reminder` INTEGER, `calendar_event_id` INTEGER, `calendar_reminder_id` INTEGER)")
                 database.execSQL("CREATE INDEX IF NOT EXISTS `index_dots_is_archived` ON `dots` (`is_archived`)")
+            }
+        }
+
+        val MIGRATION_14_15 = object : Migration(14, 15) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `geo_point` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `track_id` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `speed` REAL NOT NULL, `altitude` REAL NOT NULL)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `geo_track` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `label` TEXT, `start_timestamp` INTEGER NOT NULL, `end_timestamp` INTEGER, `distance` REAL)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `geo_place` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `label` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `timestamp` INTEGER NOT NULL)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `geo_route` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `label` TEXT NOT NULL, `url` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)")
             }
         }
     }

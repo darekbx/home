@@ -62,11 +62,6 @@ class WeatherActivity : LauncherActivity() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        this.finishAffinity()
-    }
-
     override fun onResume() {
         super.onResume()
         locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION))

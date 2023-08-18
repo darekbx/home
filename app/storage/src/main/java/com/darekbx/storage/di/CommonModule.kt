@@ -5,11 +5,16 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
+import com.darekbx.geotracker.repository.PlaceDao
+import com.darekbx.geotracker.repository.PointDao
+import com.darekbx.geotracker.repository.RouteDao
+import com.darekbx.geotracker.repository.TrackDao
 import com.darekbx.storage.HomeDatabase
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_10_11
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_11_12
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_12_13
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_13_14
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_14_15
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_1_2
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_2_3
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_3_4
@@ -25,6 +30,7 @@ import com.darekbx.storage.dotpad.DotsDao
 import com.darekbx.storage.fuel.FuelDao
 import com.darekbx.storage.hejto.HejtoDao
 import com.darekbx.storage.legacy.DotPadHelper
+import com.darekbx.storage.legacy.GeoTrackerHelper
 import com.darekbx.storage.legacy.OwnSpaceHelper
 import com.darekbx.storage.lifetimememo.BackupDao
 import com.darekbx.storage.lifetimememo.MemoDao
@@ -46,6 +52,16 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ho
 @Module
 @InstallIn(SingletonComponent::class)
 class CommonModule {
+
+    @Provides
+    fun provideGeoTrackerHelper(@ApplicationContext context: Context): GeoTrackerHelper? {
+        return try {
+            GeoTrackerHelper(context)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
     @Provides
     fun provideOwnSpaceHelper(@ApplicationContext context: Context): OwnSpaceHelper? {
@@ -143,6 +159,25 @@ class CommonModule {
     }
 
     @Provides
+    fun provideTrackDao(database: HomeDatabase): TrackDao {
+        return database.trackDao()
+    }
+
+    @Provides
+    fun providePointDao(database: HomeDatabase): PointDao {
+        return database.pointDao()
+    }
+    @Provides
+    fun provideRouteDao(database: HomeDatabase): RouteDao {
+        return database.routeDao()
+    }
+
+    @Provides
+    fun providePlaceDao(database: HomeDatabase): PlaceDao {
+        return database.placeDao()
+    }
+
+    @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): HomeDatabase {
         return Room
             .databaseBuilder(
@@ -163,6 +198,7 @@ class CommonModule {
             .addMigrations(MIGRATION_11_12)
             .addMigrations(MIGRATION_12_13)
             .addMigrations(MIGRATION_13_14)
+            .addMigrations(MIGRATION_14_15)
             .build()
     }
 }

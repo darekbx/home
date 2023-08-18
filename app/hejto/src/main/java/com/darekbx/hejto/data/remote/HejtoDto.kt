@@ -2,6 +2,7 @@ package com.darekbx.hejto.data.remote
 
 import android.text.format.DateUtils
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.*
@@ -114,7 +115,11 @@ data class Author(
     val rankColor: String,
     val avatar: RemoteImage?
 ) {
-    val color = Color(android.graphics.Color.parseColor(rankColor))
+    val color: Int = try {
+        android.graphics.Color.parseColor(rankColor)
+    } catch (e: Exception) {
+        Color.Black.toArgb()
+    }
 }
 
 data class RemoteImage(

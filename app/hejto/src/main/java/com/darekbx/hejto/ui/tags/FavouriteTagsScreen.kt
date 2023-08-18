@@ -45,16 +45,9 @@ fun FavouriteTagsScreen(
     openTag: (name: String) -> Unit = { }
 ) {
     val favouriteTags = tagsViewModel.favouriteTags
-    var wasResumed by remember { mutableStateOf(false) }
-    val lifecycleState = LocalLifecycleOwner.current.lifecycle.observeAsState()
-    LaunchedEffect(lifecycleState.value) {
-        if (!wasResumed && lifecycleState.value == Lifecycle.Event.ON_RESUME) {
-            wasResumed = true
-            tagsViewModel.reset()
-            tagsViewModel.loadFavouritesTags()
-        } else if (lifecycleState.value == Lifecycle.Event.ON_PAUSE) {
-            wasResumed = false
-        }
+
+    LaunchedEffect(Unit) {
+        tagsViewModel.loadFavouritesTags()
     }
 
     Column(Modifier.fillMaxWidth()) {

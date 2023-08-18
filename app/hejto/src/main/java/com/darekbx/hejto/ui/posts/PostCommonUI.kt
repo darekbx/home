@@ -1,6 +1,7 @@
 package com.darekbx.hejto.ui.posts
 
 import android.os.Build
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -225,7 +226,7 @@ fun AuthorRank(author: Author) {
         modifier = Modifier
             .padding(start = 8.dp)
             .background(
-                Color(android.graphics.Color.parseColor(author.rankColor)),
+                Color(author.color),
                 RoundedCornerShape(4.dp)
             )
             .padding(start = 4.dp, end = 4.dp, top = 2.dp, bottom = 2.dp),

@@ -1,7 +1,6 @@
 package com.darekbx.books
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,12 +25,13 @@ import com.darekbx.books.ui.LocalColors
 import com.darekbx.books.ui.list.ListScreen
 import com.darekbx.books.ui.statistics.StatisticsScreen
 import com.darekbx.books.ui.toread.ToReadScreen
+import com.darekbx.common.LauncherActivity
 import com.darekbx.common.ui.theme.HomeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @OptIn(ExperimentalMaterial3Api::class)
 @AndroidEntryPoint
-class BooksActivity : ComponentActivity() {
+class BooksActivity : LauncherActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

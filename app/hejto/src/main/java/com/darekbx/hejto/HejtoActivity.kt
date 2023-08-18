@@ -76,11 +76,6 @@ class HejtoActivity : LauncherActivity() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        this.finishAffinity()
-    }
-
     @Composable
     private fun BottomMenu(
         navController: NavHostController,

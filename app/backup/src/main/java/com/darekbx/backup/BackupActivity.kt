@@ -3,7 +3,6 @@ package com.darekbx.backup
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -13,13 +12,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.darekbx.common.LauncherActivity
 import com.darekbx.common.ui.theme.HomeTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
-class BackupActivity : ComponentActivity() {
+class BackupActivity : LauncherActivity() {
 
     private val backupViewModel: BackupViewModel by viewModels()
 

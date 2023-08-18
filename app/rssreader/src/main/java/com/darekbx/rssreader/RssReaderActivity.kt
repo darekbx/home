@@ -23,9 +23,4 @@ class RssReaderActivity : LauncherActivity() {
             }
         }
     }
-
-    override fun onStop() {
-        super.onStop()
-        this.finishAffinity()
-    }
 }

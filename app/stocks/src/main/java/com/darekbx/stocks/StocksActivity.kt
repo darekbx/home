@@ -38,11 +38,6 @@ class StocksActivity : LauncherActivity() {
             }
         }
     }
-
-    override fun onStop() {
-        super.onStop()
-        this.finishAffinity()
-    }
 }
 
 @Composable
