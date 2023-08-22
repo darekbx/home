@@ -10,6 +10,7 @@ interface TrackDao {
     @Insert
     suspend fun addAll(dtos: List<TrackDto>)
 
+/*
     @Query("""
 SELECT 
 	geo_track.*,
@@ -20,6 +21,7 @@ GROUP BY geo_track.id
 ORDER BY geo_track.id DESC
     """)
     fun fetchAll___2(): List<TrackPointsDto>
+*/
 
     @Query("SELECT * FROM geo_track")
     suspend fun fetchAll(): List<TrackDto>

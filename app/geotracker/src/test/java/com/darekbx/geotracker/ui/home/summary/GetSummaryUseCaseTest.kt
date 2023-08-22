@@ -1,6 +1,7 @@
 package com.darekbx.geotracker.ui.home.summary
 
 import com.darekbx.geotracker.repository.BaseHomeRepository
+import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -19,6 +20,8 @@ class GetSummaryUseCaseTest {
             override suspend fun fetchYearTracks(): List<TrackDto> {
                 return emptyList()
             }
+
+            override suspend fun fetchMaxSpeed(): PointDto? = null
         }
         val useCase = GetSummaryUseCase(repository)
 
@@ -59,6 +62,8 @@ class GetSummaryUseCaseTest {
                     TrackDto(null, null, 10000, 250000, 15000.21F),
                 )
             }
+
+            override suspend fun fetchMaxSpeed(): PointDto? = null
         }
         val useCase = GetSummaryUseCase(repository)
 

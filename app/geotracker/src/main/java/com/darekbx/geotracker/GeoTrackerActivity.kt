@@ -59,6 +59,8 @@ import dagger.hilt.android.AndroidEntryPoint
  *      - settings
  *  - Tracker:
  *      - add actual track to map (new)
+ *  - Trips list
+ *      - add search filter by track ID
  */
 
 @AndroidEntryPoint

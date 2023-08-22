@@ -14,12 +14,13 @@ import javax.inject.Inject
 sealed class SummaryUiState {
     object Idle : SummaryUiState()
     object InProgress : SummaryUiState()
-    class Done(val data: SummaryWrapper) : SummaryUiState()
+    class Done(val data: SummaryWrapper, val maxSpeed: Float) : SummaryUiState()
 }
 
 @HiltViewModel
 class SummaryViewModel @Inject constructor(
-    private val getSummaryUseCase: GetSummaryUseCase
+    private val getSummaryUseCase: GetSummaryUseCase,
+    private val getMaxSpeedUseCase: GetMaxSpeedUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<SummaryUiState>(SummaryUiState.Idle)
@@ -34,7 +35,9 @@ class SummaryViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 _uiState.value = SummaryUiState.InProgress
-                _uiState.value = SummaryUiState.Done(getSummaryUseCase.getSummary())
+                val summary = getSummaryUseCase.getSummary()
+                val maxSpeed = getMaxSpeedUseCase.getMaxSpeed()
+                _uiState.value = SummaryUiState.Done(summary, maxSpeed)
             }
         }
     }

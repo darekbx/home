@@ -41,13 +41,13 @@ fun ActivityView(
 @Composable
 private fun ActivityBox(
     modifier: Modifier = Modifier,
-    activityData: ActivityData
+    activityData: List<ActivityData>
 ) {
     Column(
         modifier = modifier
             .padding(8.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        Text(text = "Done")
+
     }
 }

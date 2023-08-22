@@ -16,6 +16,10 @@ class HomeRepository @Inject constructor(
     private val geoTrackerHelper: GeoTrackerHelper?
 ) : BaseHomeRepository {
 
+    override suspend fun fetchMaxSpeed(): PointDto? {
+        return pointDao.fetchMaxSpeed().firstOrNull()
+    }
+
     override suspend fun fetchAllTracks(): List<TrackDto> {
         prepareLegacyStorage()
         return trackDao.fetchAll()

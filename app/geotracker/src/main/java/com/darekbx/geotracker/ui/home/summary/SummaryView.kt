@@ -18,8 +18,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.darekbx.geotracker.repository.model.Summary
 import com.darekbx.geotracker.repository.model.SummaryWrapper
 import com.darekbx.geotracker.ui.LoadingProgress
@@ -43,7 +45,7 @@ fun SummaryView(
     ) {
         when (state) {
             is SummaryUiState.InProgress -> LoadingProgress()
-            is SummaryUiState.Done -> SummaryBox(summaryWrapper = state.data)
+            is SummaryUiState.Done -> SummaryBox(summaryWrapper = state.data, maxSpeed = state.maxSpeed)
             else -> {}
         }
     }
@@ -52,31 +54,62 @@ fun SummaryView(
 @Composable
 private fun SummaryBox(
     modifier: Modifier = Modifier,
-    summaryWrapper: SummaryWrapper
+    summaryWrapper: SummaryWrapper,
+    maxSpeed: Float
 ) {
-    Column(
+    Row(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalAlignment = Alignment.Start
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "Summary",
-            style = LocalStyles.current.title
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Overall",
-            style = LocalStyles.current.grayLabel
-        )
-        SummaryRow(summaryWrapper.summary, fscale = 1.1F)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "This year",
-            style = LocalStyles.current.grayLabel
-        )
-        SummaryRow(summaryWrapper.yearSummary)
-        Spacer(modifier = Modifier.height(8.dp))
+
+        Column(
+            modifier = modifier
+                //.fillMaxWidth()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = "Summary",
+                style = LocalStyles.current.title
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Overall",
+                style = LocalStyles.current.grayLabel
+            )
+            SummaryRow(summaryWrapper.summary, fscale = 1.1F)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "This year",
+                style = LocalStyles.current.grayLabel
+            )
+            SummaryRow(summaryWrapper.yearSummary)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        Column(
+            modifier = Modifier.padding(end = 8.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+
+            Text(
+                text = "Max speed",
+                style = LocalStyles.current.grayLabel
+            )
+            Text(
+                text = "%.1f".format(maxSpeed),
+                style = LocalStyles.current.title,
+                fontSize = 36.sp,
+                color = Color(0xFFEF5350)
+            )
+            Text(
+                text = "km/h",
+                style = LocalStyles.current.grayLabel
+            )
+        }
+
     }
 }
 
@@ -122,8 +155,9 @@ fun SummaryPreview() {
         SummaryBox(
             summaryWrapper = SummaryWrapper(
                 Summary(5213.27, 187800, 213),
-                Summary(2430.02, 21004, 81)
-            )
+                Summary(2430.02, 21004, 81),
+            ),
+            maxSpeed = 52.4F
         )
     }
 }

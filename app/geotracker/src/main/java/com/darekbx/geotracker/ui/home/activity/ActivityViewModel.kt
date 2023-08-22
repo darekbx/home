@@ -12,7 +12,7 @@ import javax.inject.Inject
 sealed class ActivityUiState {
     object Idle : ActivityUiState()
     object InProgress : ActivityUiState()
-    class Done(val data: ActivityData) : ActivityUiState()
+    class Done(val data: List<ActivityData>) : ActivityUiState()
 }
 
 @HiltViewModel

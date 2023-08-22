@@ -1,8 +1,10 @@
 package com.darekbx.dotpad.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import com.darekbx.dotpad.model.StatisticValue
 import com.darekbx.dotpad.reminder.ReminderCreator
 import com.darekbx.dotpad.repository.local.entities.DotDto
@@ -35,13 +37,13 @@ class DotsViewModel(
     private var reminderChanged = false
 
     fun activeDots(): LiveData<List<Dot>> =
-        Transformations.map(dao.fetchActive()) { dots ->
+        dao.fetchActive().map { dots ->
             activeDotsCount = dots.size
             dots.map { dto -> dto.toDot() }
         }
 
     fun archivedDots(): LiveData<List<Dot>> =
-        Transformations.map(dao.fetchArchive(Int.MAX_VALUE, 0)) { dots ->
+        dao.fetchArchive(Int.MAX_VALUE, 0).map { dots ->
             dots.map { dto -> dto.toDot() }
         }
 
@@ -79,13 +81,13 @@ class DotsViewModel(
 
     private fun mapToPercents(values: LiveData<List<StatisticsEntity>>):
             LiveData<List<StatisticValue>> =
-        Transformations.map(values, { statisticValues ->
+        values.map { statisticValues ->
             val sum = statisticValues.sumOf { it.occurrences ?: 0 }.toFloat()
             return@map statisticValues.map { statisticValue ->
                 val percent = (statisticValue.occurrences ?: 0) / sum * 100F
                 return@map StatisticValue(percent, statisticValue.value!!)
             }
-        })
+        }
 
     private fun addReminder(dot: Dot) {
         if (reminderChanged && dot.hasReminder()) {

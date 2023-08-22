@@ -10,6 +10,9 @@ import com.darekbx.geotracker.repository.entities.SimplePointDto
 @Dao
 interface PointDao {
 
+    @Query("SELECT * FROM geo_point ORDER BY speed DESC LIMIT 1")
+    suspend fun fetchMaxSpeed(): List<PointDto>
+
     @Insert
     suspend fun addAll(dtos: List<PointDto>)
 
