@@ -2,6 +2,7 @@ package com.darekbx.geotracker.ui.home.activity
 
 import com.darekbx.geotracker.repository.BaseHomeRepository
 import com.darekbx.geotracker.repository.entities.PointDto
+import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -26,6 +27,10 @@ class GetActivityUseCaseTest {
                 );
             }
 
+            override suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
+                return emptyMap()
+            }
+
             override suspend fun fetchMaxSpeed(): PointDto? = null
         }
 
@@ -34,8 +39,8 @@ class GetActivityUseCaseTest {
 
         // Then
         assertEquals(3, activity.size)
-        assertEquals(36000.0, activity[0].distance, 0.01)
-        assertEquals(9002.88, activity[1].distance, 0.01)
-        assertEquals(54000.75, activity[2].distance, 0.01)
+        assertEquals(10000.0, activity[0].distance, 0.01)
+        assertEquals(2500.80, activity[1].distance, 0.01)
+        assertEquals(15000.20, activity[2].distance, 0.01)
     }
 }

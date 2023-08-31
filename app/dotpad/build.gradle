@@ -10,7 +10,7 @@ apply from: '../../dependencies.gradle'
 
 android {
     namespace 'com.darekbx.dotpad'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 30
@@ -57,7 +57,7 @@ dependencies {
     implementation project(':app:common')
     implementation project(':app:storage')
 
-    implementation "com.google.accompanist:accompanist-permissions:0.20.2"
+    implementation other.accompanist
     implementation "io.github.boguszpawlowski.composecalendar:composecalendar:0.2.1"
 
     implementation androidx.core_ktx

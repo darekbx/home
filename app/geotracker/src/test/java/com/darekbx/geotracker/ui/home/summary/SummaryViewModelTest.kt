@@ -2,7 +2,9 @@ package com.darekbx.geotracker.ui.home.summary
 
 import com.darekbx.geotracker.repository.BaseHomeRepository
 import com.darekbx.geotracker.repository.entities.PointDto
+import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
+import com.darekbx.geotracker.ui.home.MainCoroutineRule
 import junit.framework.TestCase.assertNotNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.firstOrNull
@@ -30,6 +32,10 @@ class SummaryViewModelTest {
                 return emptyList()
             }
 
+            override suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
+                return emptyMap()
+            }
+
             override suspend fun fetchMaxSpeed(): PointDto? = null
         }
         val useCase = GetSummaryUseCase(repository)
@@ -53,6 +59,10 @@ class SummaryViewModelTest {
 
             override suspend fun fetchYearTracks(): List<TrackDto> {
                 return listOf(TrackDto(null, null, 10000, 19000, 5000.0F))
+            }
+
+            override suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
+                return emptyMap()
             }
 
             override suspend fun fetchMaxSpeed(): PointDto =

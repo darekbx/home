@@ -1,9 +1,8 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.darekbx.geotracker
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -46,11 +44,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Home view:
- *  - summary (distance, time, tracks count)
- *  - chart view (distance from X day), X is configurable from settings, default 100?
- *      - chart view contains "Calendar >" button, which is opening calendar view
- *  - big button record
- *  - map with preview of last X tracks (if have points)
  *  - bottom menu:
  *      - home
  *      - map
@@ -61,6 +54,11 @@ import dagger.hilt.android.AndroidEntryPoint
  *      - add actual track to map (new)
  *  - Trips list
  *      - add search filter by track ID
+ *
+ *  Others:
+ *   - location updates as a Flow
+ *   - add ability to edit track
+ *   - add ability to add new track (without points)
  */
 
 @AndroidEntryPoint
@@ -68,6 +66,7 @@ class GeoTrackerActivity : LauncherActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             GeoTrackerTheme {
                 val navController = rememberNavController()
@@ -90,6 +89,7 @@ class GeoTrackerActivity : LauncherActivity() {
         }
     }
 }
+
 
 @Composable
 fun BottomMenu(navController: NavHostController) {
@@ -179,11 +179,19 @@ fun MenuItem(
 @Preview
 @Composable
 fun SelectedMenuItemPreview() {
-    MenuItem(label = "Selected", icon = painterResource(id = R.drawable.ic_settings), selected = true)
+    MenuItem(
+        label = "Selected",
+        icon = painterResource(id = R.drawable.ic_settings),
+        selected = true
+    )
 }
 
 @Preview
 @Composable
 fun MenuItemPreview() {
-    MenuItem(label = "Default", icon = painterResource(id = R.drawable.ic_settings), selected = false)
+    MenuItem(
+        label = "Default",
+        icon = painterResource(id = R.drawable.ic_settings),
+        selected = false
+    )
 }

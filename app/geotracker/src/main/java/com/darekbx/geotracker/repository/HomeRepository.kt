@@ -3,6 +3,7 @@ package com.darekbx.geotracker.repository
 import com.darekbx.geotracker.repository.entities.PlaceDto
 import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.repository.entities.RouteDto
+import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.storage.legacy.GeoTrackerHelper
 import java.util.Calendar
@@ -26,15 +27,28 @@ class HomeRepository @Inject constructor(
     }
 
     override suspend fun fetchYearTracks(): List<TrackDto> {
-        // Get {current_year}-01-01 00:00:00 date
-        val startTimestamp = Calendar.getInstance().apply {
+        val startTimestamp = currentYearTimestamp()
+        return trackDao.fetchAll(startTimestamp.timeInMillis)
+    }
+
+    override suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
+        val startTimestamp = currentYearTimestamp()
+        return pointDao
+            .fetchAllPoints(startTimestamp.timeInMillis, nthPointsToSkip)
+            .groupBy { it.trackId }
+    }
+
+    /**
+     * Get {current_year}-01-01 00:00:00 date
+     */
+    private fun currentYearTimestamp(): Calendar {
+        return Calendar.getInstance().apply {
             set(Calendar.MONTH, 0)
             set(Calendar.DAY_OF_YEAR, 0)
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
         }
-        return trackDao.fetchAll(startTimestamp.timeInMillis)
     }
 
     private suspend fun prepareLegacyStorage() {

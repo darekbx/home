@@ -9,7 +9,7 @@ apply from: '../../dependencies.gradle'
 
 android {
     namespace 'com.darekbx.geotracker'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 30
@@ -55,8 +55,12 @@ dependencies {
     implementation androidx.core_ktx
     implementation androidx.lifecycle_runtime_ktx
 
-    testImplementation other.junit
+    implementation other.osmdroid
+    implementation other.accompanist
 
+    testImplementation other.junit
+    testImplementation other.mockk_android
+    testImplementation other.mockk_agent
     testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1") {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }

@@ -7,7 +7,7 @@ object DateTimeUtils {
         val hours = timeInSeconds % 86400 / 3600
         val days = timeInSeconds / 86400
 
-        return "${days.pad()}d  ${hours.pad()}h ${minutes.pad()}m"
+        return "${days.pad()}d ${hours.pad()}h ${minutes.pad()}m"
     }
 
     private fun Long.pad() = toString().padStart(2, '0')

@@ -2,6 +2,7 @@
 
 package com.darekbx.notepad.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -67,12 +68,13 @@ private fun NotesView(
             modifier = Modifier
                 .fillMaxWidth(1F)
                 .fillMaxHeight(1F)
+                .background(Color(252, 245, 181))
                 .padding(start = 4.dp, end = 4.dp, bottom = 4.dp),
             shape = RoundedCornerShape(2.dp),
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color(252, 245, 181),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(252, 245, 181),
+                unfocusedContainerColor = Color(252, 245, 181),
                 cursorColor = Color(11, 23, 125),
-                textColor = Color(11, 23, 125),
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),

@@ -9,7 +9,7 @@ apply from: '../dependencies.gradle'
 
 android {
     namespace 'com.darekbx.home'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.darekbx.home"

@@ -2,7 +2,6 @@ package com.darekbx.geotracker.ui.home.activity
 
 import com.darekbx.geotracker.repository.BaseHomeRepository
 import com.darekbx.geotracker.repository.model.ActivityData
-import com.darekbx.geotracker.utils.SpeedUtils
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -15,7 +14,7 @@ class GetActivityUseCase @Inject constructor(
             .groupBy { track -> getDayOfYearFromTimestamp(track.startTimestamp) }
             .map { group ->
                 val sumDistance = group.value.sumOf { it.distance?.toDouble() ?: 0.0 }
-                ActivityData(group.key, SpeedUtils.msToKm(sumDistance))
+                ActivityData(group.key, sumDistance)
             }
     }
 

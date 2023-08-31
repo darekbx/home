@@ -63,10 +63,8 @@ private fun SummaryBox(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         Column(
             modifier = modifier
-                //.fillMaxWidth()
                 .padding(8.dp),
             horizontalAlignment = Alignment.Start
         ) {
@@ -79,7 +77,7 @@ private fun SummaryBox(
                 text = "Overall",
                 style = LocalStyles.current.grayLabel
             )
-            SummaryRow(summaryWrapper.summary, fscale = 1.1F)
+            SummaryRow(summaryWrapper.summary, fscale = 1.25F)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "This year",
@@ -120,8 +118,8 @@ private fun SummaryRow(summary: Summary, fscale: Float = 1.0F) {
     Row(
         modifier = Modifier
             .scale(fscale)
-            .offset(x = if (fscale == 1.0F) 0.dp else 11.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+            .offset(x = if (fscale == 1.0F) 0.dp else 23.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
         verticalAlignment = Alignment.Bottom
     ) {
         Text(

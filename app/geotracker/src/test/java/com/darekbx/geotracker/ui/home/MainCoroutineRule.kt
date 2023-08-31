@@ -1,4 +1,4 @@
-package com.darekbx.geotracker.ui.home.summary
+package com.darekbx.geotracker.ui.home
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

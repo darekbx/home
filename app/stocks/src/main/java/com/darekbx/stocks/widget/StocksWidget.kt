@@ -29,12 +29,13 @@ class StocksWidget : GlanceAppWidget() {
 
     override val stateDefinition = StocksInfoStateDefinition
 
-    @Composable
-    override fun Content() {
-        when (val stocksInfo = currentState<StocksInfo>()) {
-            StocksInfo.Loading -> Loading()
-            is StocksInfo.Unavailable -> Unavailable()
-            is StocksInfo.Available -> StockContent(stocksInfo)
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        provideContent {
+            when (val stocksInfo = currentState<StocksInfo>()) {
+                StocksInfo.Loading -> Loading()
+                is StocksInfo.Unavailable -> Unavailable()
+                is StocksInfo.Available -> StockContent(stocksInfo)
+            }
         }
     }
 }

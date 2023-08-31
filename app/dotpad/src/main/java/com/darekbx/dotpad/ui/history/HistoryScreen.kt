@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.darekbx.dotpad.ui.history
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -178,12 +176,10 @@ fun SearchView(state: MutableState<TextFieldValue>) {
         },
         singleLine = true,
         shape = RectangleShape,
-        colors = TextFieldDefaults.textFieldColors(
-            textColor = Color.White,
+        colors = TextFieldDefaults.colors(
             cursorColor = dotYellow.toColor(),
-            //leadingIconColor = Color.White,
-            //trailingIconColor = Color.White,
-            containerColor = Color.Black
+            focusedContainerColor = Color.Black,
+            unfocusedContainerColor = Color.Black
         )
     )
 }

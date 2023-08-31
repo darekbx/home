@@ -2,6 +2,7 @@ package com.darekbx.geotracker.ui.home.summary
 
 import com.darekbx.geotracker.repository.BaseHomeRepository
 import com.darekbx.geotracker.repository.entities.PointDto
+import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -19,6 +20,10 @@ class GetMaxSpeedUseCaseTest {
 
             override suspend fun fetchYearTracks(): List<TrackDto> {
                 return emptyList()
+            }
+
+            override suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
+                return emptyMap()
             }
 
             override suspend fun fetchMaxSpeed(): PointDto? = null
@@ -41,6 +46,10 @@ class GetMaxSpeedUseCaseTest {
 
             override suspend fun fetchYearTracks(): List<TrackDto> {
                 return emptyList()
+            }
+
+            override suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
+                return emptyMap()
             }
 
             override suspend fun fetchMaxSpeed() =
