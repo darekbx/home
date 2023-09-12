@@ -28,7 +28,11 @@ class MapPreviewViewModel @Inject constructor(
         _uiState.value = MapPreviewUiState.InProgress
         viewModelScope.launch {
             val latestTracks = getLatestTracksUseCase()
-            _uiState.value = MapPreviewUiState.Done(latestTracks)
+            if (latestTracks.isEmpty()) {
+                _uiState.value = MapPreviewUiState.Idle
+            } else {
+                _uiState.value = MapPreviewUiState.Done(latestTracks)
+            }
         }
     }
 }

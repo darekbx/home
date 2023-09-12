@@ -1,45 +1,33 @@
 package com.darekbx.geotracker.ui.home.summary
 
 import com.darekbx.geotracker.repository.BaseHomeRepository
-import com.darekbx.geotracker.repository.entities.PointDto
-import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
-import kotlinx.coroutines.runBlocking
+import io.mockk.coEvery
+import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class GetSummaryUseCaseTest {
 
     @Test
-    fun `Successfull getSummary when there is no data`() = runBlocking {
+    fun `Successfull getSummary when there is no data`() = runTest {
         // Given
-        val repository = object: BaseHomeRepository {
-            override suspend fun fetchAllTracks(): List<TrackDto> {
-                return emptyList()
-            }
-
-            override suspend fun fetchYearTracks(): List<TrackDto> {
-                return emptyList()
-            }
-
-            override suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
-                return emptyMap()
-            }
-
-            override suspend fun fetchMaxSpeed(): PointDto? = null
-        }
+        val repository = mockk<BaseHomeRepository>()
+        coEvery { repository.fetchYearTracks() } returns emptyList()
+        coEvery { repository.fetchAllTracks() } returns emptyList()
         val useCase = GetSummaryUseCase(repository)
 
         // When
         val wrapper = useCase.getSummary()
 
         // Then
-        with (wrapper.summary) {
+        with(wrapper.summary) {
             assertEquals(0, tripsCount)
             assertEquals(0.0, distance, 0.01)
             assertEquals(0, tripsCount)
         }
-        with (wrapper.yearSummary) {
+        with(wrapper.yearSummary) {
             assertEquals(0, tripsCount)
             assertEquals(0.0, distance, 0.01)
             assertEquals(0, tripsCount)
@@ -47,45 +35,33 @@ class GetSummaryUseCaseTest {
     }
 
     @Test
-    fun `Correct data for getSummary`() = runBlocking {
+    fun `Correct data for getSummary`() = runTest {
         // Given
-        val repository = object: BaseHomeRepository {
-            override suspend fun fetchAllTracks(): List<TrackDto> {
-                return listOf(
-                    TrackDto(null, null, 10000, 19000, 5000.0F),
-                    TrackDto(null, null, 10000, 20000, 2500.8F),
-                    TrackDto(null, null, 10000, 250000, 15000.21F),
-                    TrackDto(null, null, 20000, 450000, 25000.21F),
-                    TrackDto(null, null, 30000, 550000, 105110.21F),
-                )
-            }
-
-            override suspend fun fetchYearTracks(): List<TrackDto> {
-                return listOf(
-                    TrackDto(null, null, 10000, 19000, 5000.0F),
-                    TrackDto(null, null, 10000, 20000, 2500.8F),
-                    TrackDto(null, null, 10000, 250000, 15000.21F),
-                )
-            }
-
-            override suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
-                return emptyMap()
-            }
-
-            override suspend fun fetchMaxSpeed(): PointDto? = null
-        }
+        val repository = mockk<BaseHomeRepository>()
+        coEvery { repository.fetchYearTracks() } returns listOf(
+            TrackDto(null, null, 10000, 19000, 5000.0F),
+            TrackDto(null, null, 10000, 20000, 2500.8F),
+            TrackDto(null, null, 10000, 250000, 15000.21F),
+        )
+        coEvery { repository.fetchAllTracks() } returns listOf(
+            TrackDto(null, null, 10000, 19000, 5000.0F),
+            TrackDto(null, null, 10000, 20000, 2500.8F),
+            TrackDto(null, null, 10000, 250000, 15000.21F),
+            TrackDto(null, null, 20000, 450000, 25000.21F),
+            TrackDto(null, null, 30000, 550000, 105110.21F),
+        )
         val useCase = GetSummaryUseCase(repository)
 
         // When
         val wrapper = useCase.getSummary()
 
         // Then
-        with (wrapper.summary) {
+        with(wrapper.summary) {
             assertEquals(5, tripsCount)
             assertEquals(152.61, distance, 0.01)
             assertEquals(1209, time)
         }
-        with (wrapper.yearSummary) {
+        with(wrapper.yearSummary) {
             assertEquals(3, tripsCount)
             assertEquals(22.50, distance, 0.01)
             assertEquals(259, time)

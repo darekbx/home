@@ -10,18 +10,11 @@ interface TrackDao {
     @Insert
     suspend fun addAll(dtos: List<TrackDto>)
 
-/*
-    @Query("""
-SELECT 
-	geo_track.*,
-	COUNT(geo_point.id) AS `pointsCount`
-FROM geo_track 
-LEFT OUTER JOIN geo_point ON geo_point.track_id = geo_track.id
-GROUP BY geo_track.id
-ORDER BY geo_track.id DESC
-    """)
-    fun fetchAll___2(): List<TrackPointsDto>
-*/
+    @Query("SELECT * FROM geo_track WHERE end_timestamp IS NULL ORDER BY start_timestamp DESC")
+    suspend fun fetchUnFinishedTracks(): List<TrackDto>
+
+    @Insert
+    suspend fun add(trackDto: TrackDto): Long
 
     @Query("SELECT * FROM geo_track")
     suspend fun fetchAll(): List<TrackDto>
@@ -30,33 +23,46 @@ ORDER BY geo_track.id DESC
     suspend fun fetchAll(fromTimestamp: Long): List<TrackDto>
 
     @Query("SELECT COUNT(id) FROM geo_track LIMIT 1")
-    fun countAllTracks(): Int
+    suspend fun countAllTracks(): Int
 
-    @Deprecated("Use fetchAllPoints")
-    @Query("SELECT * FROM geo_track ORDER BY id ASC")
-    fun fetchAllAscending(): List<TrackDto>
+    @Query("SELECT DISTINCT strftime('%Y', datetime(start_timestamp / 1000, 'unixepoch')) AS `year` FROM geo_track ORDER BY `year` ASC")
+    suspend fun fetchDistinctYears(): List<Int>
 
-    @Query("SELECT * FROM geo_track WHERE id = :trackId")
-    fun fetch(trackId: Long): TrackDto?
+    @Query("""
+SELECT
+    geo_track.*,
+    COUNT(geo_point.id) AS `pointsCount`
+FROM geo_track 
+LEFT OUTER JOIN geo_point ON geo_point.track_id = geo_track.id
+WHERE geo_track.start_timestamp > :fromTimestamp AND geo_track.start_timestamp < :toTimestamp
+GROUP BY geo_track.id
+ORDER BY geo_track.id DESC
+    """)
+    suspend fun fetchAll(fromTimestamp: Long, toTimestamp: Long): List<TrackPointsDto>
+    /*
+        @Deprecated("Use fetchAllPoints")
+        @Query("SELECT * FROM geo_track ORDER BY id ASC")
+        fun fetchAllAscending(): List<TrackDto>
 
-    @Query("UPDATE geo_track SET label = :label, end_timestamp = :endTimestamp WHERE id = :trackId")
-    fun update(trackId: Long, label: String?, endTimestamp: Long)
+        @Query("SELECT * FROM geo_track WHERE id = :trackId")
+        fun fetch(trackId: Long): TrackDto?
 
-    @Query("UPDATE geo_track SET end_timestamp = :endTimestamp WHERE id = :trackId")
-    fun update(trackId: Long, endTimestamp: Long)
+        @Query("UPDATE geo_track SET label = :label, end_timestamp = :endTimestamp WHERE id = :trackId")
+        fun update(trackId: Long, label: String?, endTimestamp: Long)
 
-    @Query("UPDATE geo_track SET distance = :distance WHERE id = :trackId")
-    fun updateDistance(trackId: Long, distance: Float)
+        @Query("UPDATE geo_track SET end_timestamp = :endTimestamp WHERE id = :trackId")
+        fun update(trackId: Long, endTimestamp: Long)
 
-    @Query("UPDATE geo_track SET distance = distance + :distance WHERE id = :trackId")
-    fun appendDistance(trackId: Long, distance: Float)
+        @Query("UPDATE geo_track SET distance = :distance WHERE id = :trackId")
+        fun updateDistance(trackId: Long, distance: Float)
 
-    @Insert
-    fun add(trackDto: TrackDto): Long
+        @Query("UPDATE geo_track SET distance = distance + :distance WHERE id = :trackId")
+        fun appendDistance(trackId: Long, distance: Float)
 
-    @Query("DELETE FROM geo_track WHERE id = :trackId")
-    fun delete(trackId: Long)
+        @Query("DELETE FROM geo_track WHERE id = :trackId")
+        fun delete(trackId: Long)
 
-    @Query("UPDATE geo_track SET end_timestamp = :endTimestamp WHERE id = :trackId")
-    fun updateDate(trackId: Long, endTimestamp: Long)
+        @Query("UPDATE geo_track SET end_timestamp = :endTimestamp WHERE id = :trackId")
+        fun updateDate(trackId: Long, endTimestamp: Long)
+        */
 }

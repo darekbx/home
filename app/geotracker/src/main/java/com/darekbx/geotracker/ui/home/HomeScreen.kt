@@ -2,6 +2,7 @@ package com.darekbx.geotracker.ui.home
 
 import android.Manifest
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,13 +14,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.darekbx.common.ui.InformationDialog
 import com.darekbx.geotracker.service.LocationService
 import com.darekbx.geotracker.ui.home.activity.ActivityView
 import com.darekbx.geotracker.ui.home.mappreview.MapPreviewView
@@ -32,7 +42,17 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
+) {
+    val isLocationEnabled by remember { homeScreenViewModel.isLocationEnabled() }
+    var locationDisabledDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isLocationEnabled) {
+        if (!isLocationEnabled) {
+            locationDisabledDialog = true
+        }
+    }
 
     val context = LocalContext.current
 
@@ -74,39 +94,63 @@ fun HomeScreen() {
             MapPreviewView()
         }
 
-        RecordButton {
+        RecordButton(enabled = isLocationEnabled) {
             when {
                 !locationPermissionState.allPermissionsGranted -> {
                     locationPermissionState.launchMultiplePermissionRequest()
                 }
+
                 !foregroundPermissionState.status.isGranted -> {
                     foregroundPermissionState.launchPermissionRequest()
                 }
+
                 !backgroundPermissionState.status.isGranted -> {
                     backgroundPermissionState.launchPermissionRequest()
                 }
+
                 else -> {
-                    // Permissions granted, start service!
                     val intent = Intent(context, LocationService::class.java)
-                    context.startForegroundService(intent)
+                    if (LocationService.IS_RUNNING) {
+                        Log.v("darek", "stopService")
+                        context.stopService(intent)
+                    } else {
+                        // Permissions granted, start service!
+                        context.startForegroundService(intent)
+                        Log.v("darek", "startForegroundService")
+                    }
                 }
             }
         }
 
     }
+
+    if (locationDisabledDialog) {
+        InformationDialog("Please enable location!") {
+            locationDisabledDialog = false
+        }
+    }
 }
 
 @Preview
 @Composable
-fun RecordButton(onClick: () -> Unit = { }) {
-    Box(
+fun RecordButton(enabled: Boolean = true, onClick: () -> Unit = { }) {
+    val alpha by remember { derivedStateOf { if (enabled) 1F else 0.33F } }
+    val modifier = if (enabled) {
         Modifier
             .bounceClick()
+            .clickable { onClick() }
+    } else {
+        Modifier
+    }
+
+    Box(
+        modifier
+            .alpha(alpha)
             .padding(24.dp)
             .size(72.dp)
             .clip(CircleShape)
             .background(Color.White)
-            .clickable { onClick() }
+
     ) {
         Box(
             Modifier

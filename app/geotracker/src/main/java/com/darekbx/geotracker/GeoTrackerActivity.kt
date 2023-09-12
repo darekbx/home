@@ -2,7 +2,6 @@ package com.darekbx.geotracker
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,7 +55,6 @@ import dagger.hilt.android.AndroidEntryPoint
  *      - add search filter by track ID
  *
  *  Others:
- *   - location updates as a Flow
  *   - add ability to edit track
  *   - add ability to add new track (without points)
  */
@@ -121,7 +119,7 @@ fun BottomMenu(navController: NavHostController) {
             MenuItem(
                 modifier = Modifier
                     .weight(1f)
-                    .clickable { /*navController.navigateSingleTopTo(NavigationItem.List.route)*/ },
+                    .clickable { navController.navigateSingleTopTo(TripsDestination.route) },
                 label = "Trips",
                 icon = painterResource(id = R.drawable.ic_trips),
                 selected = navBackStackEntry?.destination?.route == TripsDestination.route

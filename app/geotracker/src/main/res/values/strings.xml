@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="geotracker_app_name">Geo Tracker</string>
+    <string name="notification_channel_title">Notification indicating location collection</string>
+    <string name="notification_text">Geo Tracker is collecting location</string>
+    <string name="notification_title">Distance: %1$.2fkm, time: %2$s</string>
 </resources>

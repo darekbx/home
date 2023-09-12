@@ -2,32 +2,19 @@ package com.darekbx.geotracker.ui.home.summary
 
 import com.darekbx.geotracker.repository.BaseHomeRepository
 import com.darekbx.geotracker.repository.entities.PointDto
-import com.darekbx.geotracker.repository.entities.SimplePointDto
-import com.darekbx.geotracker.repository.entities.TrackDto
-import kotlinx.coroutines.runBlocking
+import io.mockk.coEvery
+import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class GetMaxSpeedUseCaseTest {
 
     @Test
-    fun `Speed is -1, because table is empty`()  = runBlocking {
+    fun `Speed is -1, because table is empty`() = runTest {
         // Given
-        val repository = object: BaseHomeRepository {
-            override suspend fun fetchAllTracks(): List<TrackDto> {
-                return emptyList()
-            }
-
-            override suspend fun fetchYearTracks(): List<TrackDto> {
-                return emptyList()
-            }
-
-            override suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
-                return emptyMap()
-            }
-
-            override suspend fun fetchMaxSpeed(): PointDto? = null
-        }
+        val repository = mockk<BaseHomeRepository>()
+        coEvery { repository.fetchMaxSpeed() } returns null
 
         // When
         val speed = GetMaxSpeedUseCase(repository).getMaxSpeed()
@@ -37,24 +24,11 @@ class GetMaxSpeedUseCaseTest {
     }
 
     @Test
-    fun `Speed fetched successfully`()  = runBlocking {
+    fun `Speed fetched successfully`() = runTest {
         // Given
-        val repository = object: BaseHomeRepository {
-            override suspend fun fetchAllTracks(): List<TrackDto> {
-                return emptyList()
-            }
+        val repository = mockk<BaseHomeRepository>()
+        coEvery { repository.fetchMaxSpeed() } returns PointDto(null, 1L, 1L, 0.0, 0.0, 52.2F, 0.0)
 
-            override suspend fun fetchYearTracks(): List<TrackDto> {
-                return emptyList()
-            }
-
-            override suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
-                return emptyMap()
-            }
-
-            override suspend fun fetchMaxSpeed() =
-                PointDto(null, 1L, 1L, 0.0, 0.0, 52.2F, 0.0)
-        }
 
         // When
         val speed = GetMaxSpeedUseCase(repository).getMaxSpeed()

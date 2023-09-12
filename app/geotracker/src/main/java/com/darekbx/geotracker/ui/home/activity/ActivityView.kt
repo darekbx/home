@@ -35,6 +35,7 @@ import com.darekbx.geotracker.R
 import com.darekbx.geotracker.repository.model.ActivityData
 import com.darekbx.geotracker.ui.LoadingProgress
 import com.darekbx.geotracker.ui.defaultCard
+import com.darekbx.geotracker.ui.theme.LocalColors
 import com.darekbx.geotracker.ui.theme.LocalStyles
 import kotlin.random.Random
 
@@ -70,12 +71,14 @@ private fun ActivityBox(
     ) {
         Header()
         Spacer(modifier = Modifier.height(12.dp))
-        Chart(
-            modifier = Modifier
-                .fillMaxSize()
-                .height(140.dp),
-            data = activityData
-        )
+        if (activityData.isNotEmpty()) {
+            Chart(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .height(140.dp),
+                data = activityData
+            )
+        }
     }
 }
 
@@ -120,20 +123,30 @@ private fun Header(openCalendar: () -> Unit = { }) {
 @Composable
 fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>) {
     val textMeasurer = rememberTextMeasurer()
+    val red = LocalColors.current.red
     Canvas(
         modifier = modifier
     ) {
         val drawLine = false
-        val red = Color(0xFFE75B52)
+
+        // Chart line colors
+        // TODO: will throw an exception when there will be more than 6 trips during one day
+        val orange = Color(0xFFE87B52)
+        val yellow = Color(0xFFE7AB52)
+        val yellow2 = Color(0xFFE7CB52)
+        val yellow3 = Color(0xFFE7FB52)
+        val yellow4 = Color(0xFFE7FBE2)
+        val colors = listOf(red, orange, yellow, yellow2, yellow3, yellow4)
+
         val itemsToMark = 10
         val yScale = 0.85F
         val leftOffset = 50F
 
-        val maximum = data.maxOf { it.distance }
-        val minimum = data.minOf { it.distance }
+        val maximum = data.maxOf { it.sumDistance() }
+        val minimum = data.minOf { it.sumDistance() }
 
         val highestItems = data
-            .sortedByDescending { it.distance }
+            .sortedByDescending { it.sumDistance() }
             .take(itemsToMark) + data.first() + data.last()
 
         val widthStep = (size.width - leftOffset) / data.size
@@ -154,25 +167,31 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>) {
                                 drawLine(
                                     Color(0xAAE75B52),
                                     it,
-                                    Offset(start, (highestItem.distance * heightStep).toFloat())
+                                    Offset(start, (highestItem.sumDistance() * heightStep).toFloat())
                                 )
                             }
                             prevHighest = Offset(
                                 start + widthStep / 2F,
-                                (highestItem.distance * heightStep).toFloat()
+                                (highestItem.sumDistance() * heightStep).toFloat()
                             )
                         }
                 }
 
-                drawRect(
-                    color = red,
-                    topLeft = Offset(start, 0F),
-                    size = Size(widthStep, (item.distance * heightStep).toFloat())
-                )
+                var innerTop = 0.0F
+                var index = 0
+                item.distances.forEach { distance ->
+                    drawRect(
+                        color = colors[index],
+                        topLeft = Offset(start, innerTop + 0F),
+                        size = Size(widthStep, (distance * heightStep).toFloat())
+                    )
+                    innerTop += (distance * heightStep).toFloat()
+                    index++
+                }
                 drawCircle(
-                    red,
+                    colors[index - 1],
                     radius = widthStep / 2F,
-                    Offset(start + widthStep / 2F, (item.distance * heightStep).toFloat())
+                    Offset(start + widthStep / 2F, (item.sumDistance() * heightStep).toFloat())
                 )
 
                 start += widthStep
@@ -220,25 +239,25 @@ fun ChartPreview() {
     val r = Random(100)
     val randomData = (0..100)
         .map { r.nextDouble() * 54120.0 }
-        .mapIndexed { i, d -> ActivityData(i, d + 2100.0) }
+        .mapIndexed { i, d -> ActivityData(i, listOf(d + 2100.0)) }
 
     val data = listOf(
-        ActivityData(1, 10000.0),
-        ActivityData(2, 20000.0),
-        ActivityData(3, 26000.0),
-        ActivityData(4, 65000.0),
-        ActivityData(5, 12000.0),
-        ActivityData(6, 16000.0),
-        ActivityData(7, 5000.0),
-        ActivityData(8, 45000.0),
-        ActivityData(9, 20000.0),
-        ActivityData(10, 24000.0),
-        ActivityData(11, 9000.0),
-        ActivityData(12, 12000.0),
-        ActivityData(13, 18000.0),
-        ActivityData(14, 39000.0),
-        ActivityData(15, 37000.0),
-        ActivityData(16, 5000.0),
+        ActivityData(1, listOf(10000.0)),
+        ActivityData(2, listOf(20000.0)),
+        ActivityData(3, listOf(26000.0)),
+        ActivityData(4, listOf(65000.0)),
+        ActivityData(5, listOf(12000.0)),
+        ActivityData(6, listOf(8000.0, 8000.0)),
+        ActivityData(7, listOf(5000.0)),
+        ActivityData(8, listOf(20000.0, 20000.0, 5000.0)),
+        ActivityData(9, listOf(20000.0)),
+        ActivityData(10, listOf(24000.0)),
+        ActivityData(11, listOf(9000.0)),
+        ActivityData(12, listOf(12000.0)),
+        ActivityData(13, listOf(18000.0)),
+        ActivityData(14, listOf(39000.0)),
+        ActivityData(15, listOf(37000.0)),
+        ActivityData(16, listOf(5000.0)),
     )
 
     Chart(Modifier.size(200.dp, 100.dp), data)

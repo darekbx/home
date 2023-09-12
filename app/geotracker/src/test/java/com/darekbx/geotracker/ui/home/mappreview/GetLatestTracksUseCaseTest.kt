@@ -5,13 +5,13 @@ import com.darekbx.geotracker.repository.SettingsRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class GetLatestTracksUseCaseTest {
 
     @Test
-    fun `Successfully fetched map preview`() = runBlocking {
+    fun `Successfully fetched map preview`() = runTest {
         // Given
         val homeRepo = mockk<BaseHomeRepository>()
         val settingsRepo = mockk<SettingsRepository>()

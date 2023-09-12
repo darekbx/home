@@ -9,8 +9,8 @@ class GetSummaryUseCase @Inject constructor(
     private val homeRepository: BaseHomeRepository
 ) {
     suspend fun getSummary(): SummaryWrapper {
-        val allTracks = homeRepository.fetchAllTracks()
-        val yearTracks = homeRepository.fetchYearTracks()
+        val allTracks = homeRepository.fetchAllTracks().filter { it.endTimestamp != null }
+        val yearTracks = homeRepository.fetchYearTracks().filter { it.endTimestamp != null }
 
         val summary = Summary(
             allTracks.sumOf { it.distance?.toDouble() ?: 0.0 } / 1000,

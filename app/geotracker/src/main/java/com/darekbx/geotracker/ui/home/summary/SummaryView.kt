@@ -27,6 +27,7 @@ import com.darekbx.geotracker.repository.model.SummaryWrapper
 import com.darekbx.geotracker.ui.LoadingProgress
 import com.darekbx.geotracker.ui.defaultCard
 import com.darekbx.geotracker.ui.theme.GeoTrackerTheme
+import com.darekbx.geotracker.ui.theme.LocalColors
 import com.darekbx.geotracker.ui.theme.LocalStyles
 import com.darekbx.geotracker.utils.DateTimeUtils
 
@@ -100,7 +101,7 @@ private fun SummaryBox(
                 text = "%.1f".format(maxSpeed),
                 style = LocalStyles.current.title,
                 fontSize = 36.sp,
-                color = Color(0xFFEF5350)
+                color = LocalColors.current.red
             )
             Text(
                 text = "km/h",

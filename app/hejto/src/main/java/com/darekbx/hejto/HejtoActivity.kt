@@ -96,6 +96,7 @@ class HejtoActivity : LauncherActivity() {
                 icon = painterResource(id = R.drawable.ic_label),
                 selected = navBackStackEntry?.destination?.route == FavouriteTags.route
             )
+            /*
             MenuItem(
                 modifier = Modifier.clickable { navController.navigateSingleTopTo(Communities.route) },
                 label = "Communities",
@@ -108,6 +109,7 @@ class HejtoActivity : LauncherActivity() {
                 icon = painterResource(id = R.drawable.ic_board),
                 selected = navBackStackEntry?.destination?.route == Board.route
             )
+            */
             MenuItem(
                 modifier = Modifier.clickable { navController.navigateSingleTopTo(Saved.route) },
                 label = "  Saved  ",
@@ -135,7 +137,8 @@ private fun MenuItem(
     label: String,
     icon: Painter,
     selected: Boolean,
-    count: Int = 0
+    count: Int = 0,
+    disabled: Boolean = false
 ) {
     Box(modifier = Modifier, contentAlignment = Alignment.TopEnd) {
         Column(

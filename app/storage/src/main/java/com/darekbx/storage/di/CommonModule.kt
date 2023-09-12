@@ -46,6 +46,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Singleton
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "home_preferences")
 
@@ -53,6 +54,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ho
 @InstallIn(SingletonComponent::class)
 class CommonModule {
 
+    @Singleton
     @Provides
     fun provideGeoTrackerHelper(@ApplicationContext context: Context): GeoTrackerHelper? {
         return try {
@@ -63,6 +65,7 @@ class CommonModule {
         }
     }
 
+    @Singleton
     @Provides
     fun provideOwnSpaceHelper(@ApplicationContext context: Context): OwnSpaceHelper? {
         return try {
@@ -73,6 +76,7 @@ class CommonModule {
         }
     }
 
+    @Singleton
     @Provides
     fun provideDotPadHelper(@ApplicationContext context: Context): DotPadHelper? {
         return try {

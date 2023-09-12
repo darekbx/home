@@ -13,8 +13,8 @@ class GetActivityUseCase @Inject constructor(
         return yearTracks
             .groupBy { track -> getDayOfYearFromTimestamp(track.startTimestamp) }
             .map { group ->
-                val sumDistance = group.value.sumOf { it.distance?.toDouble() ?: 0.0 }
-                ActivityData(group.key, sumDistance)
+                val distances = group.value.map { it.distance?.toDouble() ?: 0.0 }
+                ActivityData(group.key, distances)
             }
     }
 

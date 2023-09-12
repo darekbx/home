@@ -20,7 +20,7 @@ enum class ButtonState { Pressed, Idle }
 // https://blog.canopas.com/jetpack-compose-cool-button-click-effects-c6bbecec7bcb
 fun Modifier.bounceClick() = composed {
     var buttonState by remember { mutableStateOf(ButtonState.Idle) }
-    val scale by animateFloatAsState(if (buttonState == ButtonState.Pressed) 0.70f else 1f)
+    val scale by animateFloatAsState(if (buttonState == ButtonState.Pressed) 0.75f else 1f)
 
     this
         .graphicsLayer {

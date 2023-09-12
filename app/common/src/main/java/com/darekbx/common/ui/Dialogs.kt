@@ -10,6 +10,19 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 
 @Composable
+fun InformationDialog(
+    message: String,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        text = { Text(text = message) },
+        confirmButton = { },
+        dismissButton = { Button(onClick = { onDismiss() }) { Text("Ok") } }
+    )
+}
+
+@Composable
 fun ConfirmationDialog(
     message: String,
     confirmButtonText: String,
