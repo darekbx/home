@@ -6,8 +6,9 @@ import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.darekbx.geotracker.R
-import com.darekbx.geotracker.location.AddLocationUseCase
+import com.darekbx.geotracker.domain.usecase.AddLocationUseCase
 import com.darekbx.geotracker.location.LocationCollector
+import com.darekbx.geotracker.repository.SettingsRepository
 import com.darekbx.geotracker.system.BaseLocationManager
 import com.darekbx.geotracker.utils.NotificationUtils
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,9 +30,14 @@ class LocationService : LifecycleService() {
     lateinit var locationCollector: LocationCollector
 
     @Inject
+    lateinit var settingsRepository: SettingsRepository
+
+    @Inject
     lateinit var addLocationUseCase: AddLocationUseCase
 
     private var locationFlow: Job? = null
+    private var sessionStartTime = 0L
+    private var lastSessionDistance = 0.0F
 
     override fun onCreate() {
         super.onCreate()
@@ -61,11 +67,25 @@ class LocationService : LifecycleService() {
             return super.onStartCommand(intent, flags, startId)
         }
 
+        sessionStartTime = System.currentTimeMillis()
+
         locationFlow = locationCollector.locationFlow()
-            .onEach { location -> addLocationUseCase(location) }
+            .onEach { location ->
+                val sessionDistance = addLocationUseCase(location)
+                updateNotification(sessionDistance)
+            }
             .launchIn(lifecycleScope)
 
         return START_STICKY
+    }
+
+
+    private suspend fun updateNotification(sessionDistance: Float) {
+        if (sessionDistance - lastSessionDistance > settingsRepository.gpsMinDistance()) {
+            val elapsedTimeInMs = (System.currentTimeMillis() - sessionStartTime)
+            notificationUtils.updateNotification(sessionDistance, elapsedTimeInMs)
+            lastSessionDistance = sessionDistance
+        }
     }
 
     companion object {

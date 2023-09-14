@@ -2,7 +2,7 @@ package com.darekbx.geotracker.ui.trips.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darekbx.geotracker.ui.trips.FetchYearsUseCase
+import com.darekbx.geotracker.domain.usecase.FetchYearsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

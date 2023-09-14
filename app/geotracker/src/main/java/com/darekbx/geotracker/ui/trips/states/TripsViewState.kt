@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.darekbx.geotracker.repository.model.Track
 import com.darekbx.geotracker.ui.trips.viewmodels.TripsUiState
 import com.darekbx.geotracker.ui.trips.viewmodels.TripsViewModel
 
@@ -15,6 +16,10 @@ class TripsViewState(
 
     fun loadTrips(year: Int) {
         tripsViewModel.loadTrips(year)
+    }
+
+    fun delete(track: Track) {
+        tripsViewModel.deleteTrack(track)
     }
 }
 

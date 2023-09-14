@@ -1,6 +1,6 @@
-package com.darekbx.geotracker.ui.home.mappreview
+package com.darekbx.geotracker.domain.usecase
 
-import com.darekbx.geotracker.repository.BaseHomeRepository
+import com.darekbx.geotracker.repository.BaseRepository
 import com.darekbx.geotracker.repository.SettingsRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -13,7 +13,7 @@ class GetLatestTracksUseCaseTest {
     @Test
     fun `Successfully fetched map preview`() = runTest {
         // Given
-        val homeRepo = mockk<BaseHomeRepository>()
+        val homeRepo = mockk<BaseRepository>()
         val settingsRepo = mockk<SettingsRepository>()
 
         coEvery { homeRepo.fetchYearTrackPoints(any()) } returns emptyMap()

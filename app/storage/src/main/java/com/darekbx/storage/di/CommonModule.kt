@@ -181,6 +181,7 @@ class CommonModule {
         return database.placeDao()
     }
 
+    @Singleton
     @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): HomeDatabase {
         return Room

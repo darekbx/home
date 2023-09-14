@@ -1,4 +1,4 @@
-package com.darekbx.geotracker.ui.trips
+package com.darekbx.geotracker.domain.usecase
 
 import com.darekbx.geotracker.MainCoroutineRule
 import com.darekbx.geotracker.ui.trips.viewmodels.TripsUiState
@@ -19,12 +19,14 @@ class TripsViewModelTest {
     var coroutinesTestRule = MainCoroutineRule()
 
     @Test
-    fun loadTrips() = runTest {
+    fun `Load trips`() = runTest {
         // Given
         val tripsUseCase = mockk<FetchTripsUseCase>()
+        val fixEndTimestampUseCase = mockk<FixEndTimestampUseCase>()
+        val deleteTrackUseCase = mockk<DeleteTrackUseCase>()
         coEvery { tripsUseCase.invoke(2023) } returns TripsWrapper(10.0, emptyList())
 
-        val testViewModel = TripsViewModel(tripsUseCase)
+        val testViewModel = TripsViewModel(tripsUseCase, fixEndTimestampUseCase, deleteTrackUseCase)
 
         // When
         testViewModel.loadTrips(2023)

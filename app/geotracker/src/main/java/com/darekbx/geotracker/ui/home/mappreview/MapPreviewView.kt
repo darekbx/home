@@ -1,6 +1,5 @@
 package com.darekbx.geotracker.ui.home.mappreview
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import androidx.compose.foundation.layout.Box
@@ -8,21 +7,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.ui.LoadingProgress
 import com.darekbx.geotracker.ui.defaultCard
+import com.darekbx.geotracker.ui.rememberMapWithLifecycle
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -105,36 +100,3 @@ private fun MapView(data: Map<Long, List<SimplePointDto>>) {
         }
     }
 }
-
-@SuppressLint("ResourceType")
-@Composable
-private fun rememberMapWithLifecycle(): MapView {
-    val context = LocalContext.current
-    val mapView = remember {
-        MapView(context).apply {
-            id = 100
-        }
-    }
-    val lifecycleObserver = rememberMapLifecycleObserver(mapView = mapView)
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    DisposableEffect(lifecycle) {
-        lifecycle.addObserver(lifecycleObserver)
-        onDispose {
-            lifecycle.removeObserver(lifecycleObserver)
-        }
-    }
-    return mapView
-}
-
-@Composable
-private fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
-    remember {
-        LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> mapView.onResume()
-                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
-                Lifecycle.Event.ON_DESTROY -> mapView.onDetach()
-                else -> {}
-            }
-        }
-    }

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package com.darekbx.geotracker.ui.trips
 
 import androidx.compose.foundation.background
@@ -18,6 +20,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +45,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.darekbx.geotracker.domain.usecase.TripsWrapper
 import com.darekbx.geotracker.repository.model.Track
 import com.darekbx.geotracker.ui.LoadingProgress
 import com.darekbx.geotracker.ui.defaultCard
@@ -50,6 +58,8 @@ import com.darekbx.geotracker.ui.trips.states.rememberTripsViewState
 import com.darekbx.geotracker.ui.trips.states.rememberYearsViewState
 import com.darekbx.geotracker.ui.trips.viewmodels.TripsUiState
 import com.darekbx.geotracker.ui.trips.viewmodels.YearsUiState
+import de.charlex.compose.RevealDirection
+import de.charlex.compose.RevealSwipe
 
 @Composable
 fun TripsScreen(
@@ -60,6 +70,10 @@ fun TripsScreen(
 ) {
     var year by remember { mutableIntStateOf(yearsViewState.currentYear()) }
 
+    fun deleteTrack(track: Track) {
+        tripsViewState.delete(track)
+    }
+
     LaunchedEffect(year) {
         tripsViewState.loadTrips(year)
     }
@@ -69,7 +83,6 @@ fun TripsScreen(
     }
 
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-
         yearsViewState.state.let {
             when (it) {
                 is YearsUiState.Done -> YearsScroller(
@@ -92,7 +105,7 @@ fun TripsScreen(
 
         tripsViewState.state.let {
             when (it) {
-                is TripsUiState.Done -> TripsList(year, it.data, onTrackClick)
+                is TripsUiState.Done -> TripsList(year, it.data, onTrackClick, ::deleteTrack)
                 TripsUiState.InProgress -> LoadingProgress()
                 TripsUiState.Idle -> {}
             }
@@ -146,11 +159,36 @@ fun YearSummary(modifier: Modifier = Modifier, year: Int, distance: Double, coun
 }
 
 @Composable
-fun TripsList(year: Int, wrapper: TripsWrapper, onItemClick: (Track) -> Unit = { }) {
+fun TripsList(
+    year: Int,
+    wrapper: TripsWrapper,
+    onItemClick: (Track) -> Unit = { },
+    onItemDeleteClick: (Track) -> Unit = { }
+) {
     YearSummary(modifier = Modifier.fillMaxWidth(), year, wrapper.sumDistance, wrapper.trips.size)
-    LazyColumn(Modifier.fillMaxWidth()) {
+    LazyColumn(
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp)) {
         items(wrapper.trips) { track ->
-            TripListItem(modifier = Modifier.clickable { onItemClick(track) }, track = track)
+            RevealSwipe(
+                modifier = Modifier
+                    .padding(vertical = 5.dp)
+                    .padding(start = 8.dp, end = 8.dp),
+                backgroundCardEndColor = LocalColors.current.red,
+                onBackgroundEndClick = { onItemDeleteClick(track) },
+                directions = setOf(RevealDirection.EndToStart),
+                hiddenContentEnd = {
+                    Icon(
+                        modifier = Modifier.padding(horizontal = 25.dp),
+                        imageVector = Icons.Outlined.Delete,
+                        tint = Color.White,
+                        contentDescription = null
+                    )
+                }
+            ) {
+                TripListItem(modifier = Modifier.clickable { onItemClick(track) }, track = track)
+            }
         }
     }
 }
@@ -159,7 +197,10 @@ fun TripsList(year: Int, wrapper: TripsWrapper, onItemClick: (Track) -> Unit = {
 fun TripListItem(modifier: Modifier = Modifier, track: Track) {
     Box(
         modifier = modifier
-            .defaultCard()
+            .background(
+                MaterialTheme.colorScheme.primaryContainer,
+                RoundedCornerShape(8.dp)
+            )
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
         contentAlignment = Alignment.CenterStart

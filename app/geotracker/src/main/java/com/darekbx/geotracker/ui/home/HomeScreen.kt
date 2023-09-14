@@ -2,7 +2,6 @@ package com.darekbx.geotracker.ui.home
 
 import android.Manifest
 import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,6 +32,10 @@ import com.darekbx.common.ui.InformationDialog
 import com.darekbx.geotracker.service.LocationService
 import com.darekbx.geotracker.ui.home.activity.ActivityView
 import com.darekbx.geotracker.ui.home.mappreview.MapPreviewView
+import com.darekbx.geotracker.ui.home.recording.RecordingScreen
+import com.darekbx.geotracker.ui.home.recording.RecordingUiState
+import com.darekbx.geotracker.ui.home.recording.RecordingViewState
+import com.darekbx.geotracker.ui.home.recording.rememberRecordingViewState
 import com.darekbx.geotracker.ui.home.summary.SummaryView
 import com.darekbx.geotracker.ui.theme.bounceClick
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -43,10 +46,17 @@ import com.google.accompanist.permissions.rememberPermissionState
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(
-    homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
+    homeScreenViewModel: HomeScreenViewModel = hiltViewModel(),
+    recordingViewState: RecordingViewState = rememberRecordingViewState()
 ) {
+    val context = LocalContext.current
+    val intent = Intent(context, LocationService::class.java)
     val isLocationEnabled by remember { homeScreenViewModel.isLocationEnabled() }
     var locationDisabledDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        recordingViewState.checkIsRecording()
+    }
 
     LaunchedEffect(isLocationEnabled) {
         if (!isLocationEnabled) {
@@ -54,7 +64,11 @@ fun HomeScreen(
         }
     }
 
-    val context = LocalContext.current
+    if (recordingViewState.state is RecordingUiState.Recording) {
+        RecordingScreen()
+        // Don't show home screen while is recording
+        return
+    }
 
     val backgroundPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_BACKGROUND_LOCATION,
@@ -109,14 +123,10 @@ fun HomeScreen(
                 }
 
                 else -> {
-                    val intent = Intent(context, LocationService::class.java)
-                    if (LocationService.IS_RUNNING) {
-                        Log.v("darek", "stopService")
-                        context.stopService(intent)
-                    } else {
+                    if (!LocationService.IS_RUNNING) {
                         // Permissions granted, start service!
                         context.startForegroundService(intent)
-                        Log.v("darek", "startForegroundService")
+                        recordingViewState.setIsRecording()
                     }
                 }
             }

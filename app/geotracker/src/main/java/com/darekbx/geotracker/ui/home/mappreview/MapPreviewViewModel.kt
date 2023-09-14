@@ -3,6 +3,7 @@ package com.darekbx.geotracker.ui.home.mappreview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.geotracker.repository.entities.SimplePointDto
+import com.darekbx.geotracker.domain.usecase.GetLatestTracksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

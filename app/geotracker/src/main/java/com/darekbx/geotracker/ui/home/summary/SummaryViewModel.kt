@@ -3,6 +3,8 @@ package com.darekbx.geotracker.ui.home.summary
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.geotracker.repository.model.SummaryWrapper
+import com.darekbx.geotracker.domain.usecase.GetMaxSpeedUseCase
+import com.darekbx.geotracker.domain.usecase.GetSummaryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

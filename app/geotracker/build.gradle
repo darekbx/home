@@ -59,6 +59,8 @@ dependencies {
     implementation other.osmdroid
     implementation other.accompanist
 
+    implementation 'de.charlex.compose:revealswipe:1.0.0'
+
     testImplementation other.junit
     testImplementation other.mockk_android
     testImplementation other.mockk_agent

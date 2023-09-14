@@ -1,9 +1,11 @@
-package com.darekbx.geotracker.ui.home.summary
+package com.darekbx.geotracker.domain.usecase
 
-import com.darekbx.geotracker.repository.BaseHomeRepository
+import com.darekbx.geotracker.repository.BaseRepository
 import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.geotracker.MainCoroutineRule
+import com.darekbx.geotracker.ui.home.summary.SummaryUiState
+import com.darekbx.geotracker.ui.home.summary.SummaryViewModel
 import io.mockk.coEvery
 import io.mockk.mockk
 import junit.framework.TestCase.assertNotNull
@@ -24,7 +26,7 @@ class SummaryViewModelTest {
     @Test
     fun `First flow result is Idle`() = runTest {
         // Given
-        val repository = mockk<BaseHomeRepository>()
+        val repository = mockk<BaseRepository>()
         coEvery { repository.fetchAllTracks() } returns emptyList()
         coEvery { repository.fetchYearTracks() } returns emptyList()
         coEvery { repository.fetchMaxSpeed() } returns null
@@ -43,7 +45,7 @@ class SummaryViewModelTest {
     @Test
     fun `Summary was loaded on init`() = runTest {
         // Given
-        val repository = mockk<BaseHomeRepository>()
+        val repository = mockk<BaseRepository>()
         coEvery { repository.fetchAllTracks() } returns
                 listOf(TrackDto(null, null, 10000, 19000, 5000.0F))
         coEvery { repository.fetchYearTracks() } returns

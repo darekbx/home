@@ -1,6 +1,6 @@
-package com.darekbx.geotracker.ui.trips
+package com.darekbx.geotracker.domain.usecase
 
-import com.darekbx.geotracker.repository.BaseHomeRepository
+import com.darekbx.geotracker.repository.BaseRepository
 import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.geotracker.repository.model.Track
 import com.darekbx.storage.geotracker.TrackPointsDto
@@ -15,7 +15,7 @@ class FetchTripsUseCaseTest {
     @Test
     fun `Successfully fetched trips`() = runTest {
         // Given
-        val repo = mockk<BaseHomeRepository>()
+        val repo = mockk<BaseRepository>()
         val useCase = FetchTripsUseCase(repo)
 
         coEvery { repo.fetchYearTracks(2023) } returns mockTrips
@@ -28,7 +28,7 @@ class FetchTripsUseCaseTest {
         assert(wrapper.trips.first() is Track)
         assertEquals(wrapper.sumDistance, 25.6325, 0.1)
         assertEquals(wrapper.trips[0].pointsCount, 10)
-        assertEquals(wrapper.trips[0].timespan(), "00d 00h 18m")
+        assertEquals(wrapper.trips[0].timespan(), "00h 18m")
     }
 
     private val mockTrips = listOf(

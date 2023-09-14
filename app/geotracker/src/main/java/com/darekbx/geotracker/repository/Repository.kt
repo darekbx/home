@@ -8,10 +8,11 @@ import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.storage.geotracker.TrackPointsDto
 import com.darekbx.storage.legacy.GeoTrackerHelper
+import kotlinx.coroutines.flow.Flow
 import java.util.Calendar
 import javax.inject.Inject
 
-interface BaseHomeRepository {
+interface BaseRepository {
 
     suspend fun fetchAllTracks(): List<TrackDto>
 
@@ -23,19 +24,43 @@ interface BaseHomeRepository {
 
     suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>>
 
+    suspend fun fetchAllTrackPoints(nthPointsToSkip: Int): List<List<SimplePointDto>>
+
     suspend fun fetchMaxSpeed(): PointDto?
+
+    suspend fun fetchUnFinishedTracks(): List<TrackDto>
+
+    suspend fun add(trackDto: TrackDto): Long
+
+    suspend fun add(pointDto: PointDto): Long
+
+    suspend fun update(trackId: Long, endTimestamp: Long)
+
+    suspend fun fetch(trackId: Long): TrackDto?
+
+    suspend fun deleteTrack(trackId: Long)
+
+    fun fetchLivePoints(): Flow<List<PointDto>>
+
+    suspend fun appendDistance(trackId: Long, distance: Float)
+
+    suspend fun updateTrack(trackId: Long, endTimestamp: Long, label: String?)
 }
 
-class HomeRepository @Inject constructor(
+class Repository @Inject constructor(
     private val trackDao: TrackDao,
     private val placeDao: PlaceDao,
     private val routeDao: RouteDao,
     private val pointDao: PointDao,
     private val geoTrackerHelper: GeoTrackerHelper?
-) : BaseHomeRepository {
+) : BaseRepository {
 
     override suspend fun fetchMaxSpeed(): PointDto? {
         return pointDao.fetchMaxSpeed().firstOrNull()
+    }
+
+    override suspend fun fetchUnFinishedTracks(): List<TrackDto> {
+        return trackDao.fetchUnFinishedTracks()
     }
 
     override suspend fun fetchAllTracks(): List<TrackDto> {
@@ -61,8 +86,48 @@ class HomeRepository @Inject constructor(
             .groupBy { it.trackId }
     }
 
+    override suspend fun fetchAllTrackPoints(nthPointsToSkip: Int): List<List<SimplePointDto>> {
+        return pointDao
+            .fetchAllPoints(nthPointsToSkip)
+            .groupBy { it.trackId }
+            .map { it.value }
+    }
+
     override suspend fun fetchYears(): List<Int> {
         return trackDao.fetchDistinctYears()
+    }
+
+    override suspend fun add(pointDto: PointDto): Long {
+        return pointDao.add(pointDto)
+    }
+
+    override suspend fun add(trackDto: TrackDto): Long {
+        return trackDao.add(trackDto)
+    }
+
+    override suspend fun update(trackId: Long, endTimestamp: Long) {
+        trackDao.update(trackId, endTimestamp)
+    }
+
+    override suspend fun fetch(trackId: Long): TrackDto? {
+        return trackDao.fetch(trackId)
+    }
+
+    override suspend fun deleteTrack(trackId: Long) {
+        pointDao.deleteByTrack(trackId)
+        trackDao.delete(trackId)
+    }
+
+    override fun fetchLivePoints(): Flow<List<PointDto>> {
+        return pointDao.fetchLivePoints()
+    }
+
+    override suspend fun appendDistance(trackId: Long, distance: Float) {
+        trackDao.appendDistance(trackId, distance)
+    }
+
+    override suspend fun updateTrack(trackId: Long, endTimestamp: Long, label: String?) {
+        trackDao.update(trackId, label, endTimestamp)
     }
 
     /**
@@ -107,7 +172,6 @@ class HomeRepository @Inject constructor(
     }
 
     private suspend fun fillFromLegacyDatabase() {
-        Log.v("SIGMA", "fillFromLegacyDatabase")
         trackDao.addAll((geoTrackerHelper?.getTracks() ?: emptyList()).map {
             TrackDto(null, it.label, it.startTimestamp, it.endTimestamp, it.distance)
         })

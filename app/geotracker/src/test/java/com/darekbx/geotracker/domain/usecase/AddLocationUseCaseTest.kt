@@ -1,8 +1,8 @@
-package com.darekbx.geotracker.location
+package com.darekbx.geotracker.domain.usecase
 
 import android.location.Location
-import com.darekbx.geotracker.repository.PointDao
-import com.darekbx.geotracker.repository.TrackDao
+import com.darekbx.geotracker.repository.BaseRepository
+import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -16,46 +16,44 @@ class AddLocationUseCaseTest {
     @Test
     fun `Create new track`() = runTest {
         // Given
-        val pointDao = mockk<PointDao>()
-        val trackDao = mockk<TrackDao>()
-        val useCase = AddLocationUseCase(pointDao, trackDao)
+        val repo = mockk<BaseRepository>()
+        val useCase = AddLocationUseCase(repo)
 
         val location = mockLocation()
 
-        coEvery { trackDao.fetchUnFinishedTracks() } returns emptyList()
-        coEvery { pointDao.add(any()) } returns Unit
-        coEvery { trackDao.add(any()) } returns 1L
+        coEvery { repo.fetchUnFinishedTracks() } returns emptyList()
+        coEvery { repo.add(any<TrackDto>()) } returns 1L
+        coEvery { repo.add(any<PointDto>()) } returns 1L
 
         // When
         useCase(location)
 
         // Then
-        coVerify(exactly = 1) { trackDao.add(any()) }
-        coVerify(exactly = 1) { pointDao.add(any()) }
+        coVerify(exactly = 1) { repo.add(any<TrackDto>()) }
+        coVerify(exactly = 1) { repo.add(any<PointDto>()) }
     }
 
     @Test
     fun `Add points to track`() = runTest {
         // Given
-        val pointDao = mockk<PointDao>()
-        val trackDao = mockk<TrackDao>()
-        val useCase = AddLocationUseCase(pointDao, trackDao)
+        val repo = mockk<BaseRepository>()
+        val useCase = AddLocationUseCase(repo)
 
         val trackDto = mockk<TrackDto>()
         every { trackDto.id } returns 1L
 
         val location = mockLocation()
 
-        coEvery { trackDao.fetchUnFinishedTracks() } returns listOf(trackDto)
-        coEvery { pointDao.add(any()) } returns Unit
-        coEvery { trackDao.add(any()) } returns 1L
+        coEvery { repo.fetchUnFinishedTracks() } returns listOf(trackDto)
+        coEvery { repo.add(any<TrackDto>()) } returns 1L
+        coEvery { repo.add(any<PointDto>()) } returns 1L
 
         // When
         useCase(location)
 
         // Then
-        coVerify(exactly = 0) { trackDao.add(any()) }
-        coVerify(exactly = 1) { pointDao.add(any()) }
+        coVerify(exactly = 0) { repo.add(any<TrackDto>()) }
+        coVerify(exactly = 1) { repo.add(any<PointDto>()) }
     }
 
     private fun mockLocation(): Location {

@@ -1,6 +1,6 @@
-package com.darekbx.geotracker.ui.home.activity
+package com.darekbx.geotracker.domain.usecase
 
-import com.darekbx.geotracker.repository.BaseHomeRepository
+import com.darekbx.geotracker.repository.BaseRepository
 import com.darekbx.geotracker.repository.entities.TrackDto
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -13,7 +13,7 @@ class GetActivityUseCaseTest {
     @Test
     fun `Activity data successfully fetched`() = runTest {
         // Given
-        val repository = mockk<BaseHomeRepository>()
+        val repository = mockk<BaseRepository>()
         coEvery { repository.fetchYearTracks() } returns listOf(
             TrackDto(null, null, 1672579053, 1, 5000.0F),
             TrackDto(null, null, 1672599053, 1, 5000.0F),

@@ -39,6 +39,23 @@ GROUP BY geo_track.id
 ORDER BY geo_track.id DESC
     """)
     suspend fun fetchAll(fromTimestamp: Long, toTimestamp: Long): List<TrackPointsDto>
+
+    @Query("UPDATE geo_track SET end_timestamp = :endTimestamp WHERE id = :trackId")
+    suspend fun update(trackId: Long, endTimestamp: Long)
+
+    @Query("SELECT * FROM geo_track WHERE id = :trackId")
+    suspend fun fetch(trackId: Long): TrackDto?
+
+    @Query("DELETE FROM geo_track WHERE id = :trackId")
+    suspend fun delete(trackId: Long)
+
+    @Query("UPDATE geo_track SET distance = distance + :distance WHERE id = :trackId")
+    suspend fun appendDistance(trackId: Long, distance: Float)
+
+    @Query("UPDATE geo_track SET label = :label, end_timestamp = :endTimestamp WHERE id = :trackId")
+    suspend fun update(trackId: Long, label: String?, endTimestamp: Long)
+
+
     /*
         @Deprecated("Use fetchAllPoints")
         @Query("SELECT * FROM geo_track ORDER BY id ASC")
@@ -55,9 +72,6 @@ ORDER BY geo_track.id DESC
 
         @Query("UPDATE geo_track SET distance = :distance WHERE id = :trackId")
         fun updateDistance(trackId: Long, distance: Float)
-
-        @Query("UPDATE geo_track SET distance = distance + :distance WHERE id = :trackId")
-        fun appendDistance(trackId: Long, distance: Float)
 
         @Query("DELETE FROM geo_track WHERE id = :trackId")
         fun delete(trackId: Long)

@@ -16,7 +16,7 @@ fun GeoTrackerNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = TripsDestination.route,//HomeDestination.route,
+        startDestination = HomeDestination.route,
         modifier = modifier
     ) {
         composable(route = HomeDestination.route) {

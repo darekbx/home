@@ -1,16 +1,16 @@
-package com.darekbx.geotracker.ui.home.summary
+package com.darekbx.geotracker.domain.usecase
 
-import com.darekbx.geotracker.repository.BaseHomeRepository
+import com.darekbx.geotracker.repository.BaseRepository
 import com.darekbx.geotracker.repository.model.Summary
 import com.darekbx.geotracker.repository.model.SummaryWrapper
 import javax.inject.Inject
 
 class GetSummaryUseCase @Inject constructor(
-    private val homeRepository: BaseHomeRepository
+    private val repository: BaseRepository
 ) {
     suspend fun getSummary(): SummaryWrapper {
-        val allTracks = homeRepository.fetchAllTracks().filter { it.endTimestamp != null }
-        val yearTracks = homeRepository.fetchYearTracks().filter { it.endTimestamp != null }
+        val allTracks = repository.fetchAllTracks().filter { it.endTimestamp != null }
+        val yearTracks = repository.fetchYearTracks().filter { it.endTimestamp != null }
 
         val summary = Summary(
             allTracks.sumOf { it.distance?.toDouble() ?: 0.0 } / 1000,

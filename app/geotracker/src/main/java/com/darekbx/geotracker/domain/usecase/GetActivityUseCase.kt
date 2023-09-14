@@ -1,15 +1,15 @@
-package com.darekbx.geotracker.ui.home.activity
+package com.darekbx.geotracker.domain.usecase
 
-import com.darekbx.geotracker.repository.BaseHomeRepository
+import com.darekbx.geotracker.repository.BaseRepository
 import com.darekbx.geotracker.repository.model.ActivityData
 import java.util.Calendar
 import javax.inject.Inject
 
 class GetActivityUseCase @Inject constructor(
-    private val homeRepository: BaseHomeRepository
+    private val repository: BaseRepository
 ) {
     suspend fun getActivityData(): List<ActivityData> {
-        val yearTracks = homeRepository.fetchYearTracks()
+        val yearTracks = repository.fetchYearTracks()
         return yearTracks
             .groupBy { track -> getDayOfYearFromTimestamp(track.startTimestamp) }
             .map { group ->

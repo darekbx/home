@@ -1,6 +1,6 @@
-package com.darekbx.geotracker.ui.home.summary
+package com.darekbx.geotracker.domain.usecase
 
-import com.darekbx.geotracker.repository.BaseHomeRepository
+import com.darekbx.geotracker.repository.BaseRepository
 import com.darekbx.geotracker.repository.entities.TrackDto
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -13,7 +13,7 @@ class GetSummaryUseCaseTest {
     @Test
     fun `Successfull getSummary when there is no data`() = runTest {
         // Given
-        val repository = mockk<BaseHomeRepository>()
+        val repository = mockk<BaseRepository>()
         coEvery { repository.fetchYearTracks() } returns emptyList()
         coEvery { repository.fetchAllTracks() } returns emptyList()
         val useCase = GetSummaryUseCase(repository)
@@ -37,7 +37,7 @@ class GetSummaryUseCaseTest {
     @Test
     fun `Correct data for getSummary`() = runTest {
         // Given
-        val repository = mockk<BaseHomeRepository>()
+        val repository = mockk<BaseRepository>()
         coEvery { repository.fetchYearTracks() } returns listOf(
             TrackDto(null, null, 10000, 19000, 5000.0F),
             TrackDto(null, null, 10000, 20000, 2500.8F),

@@ -3,6 +3,7 @@ package com.darekbx.geotracker.ui.home.activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.geotracker.repository.model.ActivityData
+import com.darekbx.geotracker.domain.usecase.GetActivityUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

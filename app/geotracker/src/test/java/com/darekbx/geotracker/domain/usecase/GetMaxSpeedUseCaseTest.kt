@@ -1,6 +1,6 @@
-package com.darekbx.geotracker.ui.home.summary
+package com.darekbx.geotracker.domain.usecase
 
-import com.darekbx.geotracker.repository.BaseHomeRepository
+import com.darekbx.geotracker.repository.BaseRepository
 import com.darekbx.geotracker.repository.entities.PointDto
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -13,7 +13,7 @@ class GetMaxSpeedUseCaseTest {
     @Test
     fun `Speed is -1, because table is empty`() = runTest {
         // Given
-        val repository = mockk<BaseHomeRepository>()
+        val repository = mockk<BaseRepository>()
         coEvery { repository.fetchMaxSpeed() } returns null
 
         // When
@@ -26,7 +26,7 @@ class GetMaxSpeedUseCaseTest {
     @Test
     fun `Speed fetched successfully`() = runTest {
         // Given
-        val repository = mockk<BaseHomeRepository>()
+        val repository = mockk<BaseRepository>()
         coEvery { repository.fetchMaxSpeed() } returns PointDto(null, 1L, 1L, 0.0, 0.0, 52.2F, 0.0)
 
 
