@@ -24,9 +24,6 @@ class RecordingViewState(
         recordingViewModel.checkIsRecording()
     }
 
-    fun pointsFlow() =
-        recordingViewModel.listenForLocationUpdates()
-
     fun fetchAllTracks() = recordingViewModel.fetchAllTracks()
 }
 

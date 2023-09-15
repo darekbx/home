@@ -270,7 +270,7 @@ fun TripListItem(modifier: Modifier = Modifier, track: Track) {
                 }
                 track.label()?.let { label ->
                     Text(
-                        modifier = Modifier.padding(bottom = 0.dp),
+                        modifier = Modifier.padding(bottom = 0.dp, start = 8.dp),
                         text = label,
                         style = LocalStyles.current.grayLabel,
                         fontSize = 14.sp

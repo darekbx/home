@@ -31,6 +31,10 @@ interface PointDao {
     @Query("SELECT * FROM geo_point WHERE track_id = (SELECT id FROM geo_track WHERE end_timestamp IS NULL ORDER BY start_timestamp DESC LIMIT 1) ORDER BY timestamp DESC")
     fun fetchLivePoints(): Flow<List<PointDto>>
 
+    @Query("SELECT * FROM geo_point WHERE track_id = :trackId")
+    suspend fun fetchByTrack(trackId: Long): List<PointDto>
+
+
     /*
         @Query("SELECT * FROM geo_point WHERE track_id = :trackId")
         suspend fun fetchByTrack(trackId: Long): LiveData<List<PointDto>>

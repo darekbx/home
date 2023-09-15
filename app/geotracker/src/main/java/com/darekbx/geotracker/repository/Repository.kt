@@ -38,9 +38,13 @@ interface BaseRepository {
 
     suspend fun fetch(trackId: Long): TrackDto?
 
+    suspend fun fetchTrackPoints(trackId: Long): List<PointDto>
+
     suspend fun deleteTrack(trackId: Long)
 
     fun fetchLivePoints(): Flow<List<PointDto>>
+
+    fun fetchLiveTrack(): Flow<TrackDto?>
 
     suspend fun appendDistance(trackId: Long, distance: Float)
 
@@ -122,12 +126,20 @@ class Repository @Inject constructor(
         return pointDao.fetchLivePoints()
     }
 
+    override fun fetchLiveTrack(): Flow<TrackDto?> {
+        return trackDao.fetchActiveTrack()
+    }
+
     override suspend fun appendDistance(trackId: Long, distance: Float) {
         trackDao.appendDistance(trackId, distance)
     }
 
     override suspend fun updateTrack(trackId: Long, endTimestamp: Long, label: String?) {
         trackDao.update(trackId, label, endTimestamp)
+    }
+
+    override suspend fun fetchTrackPoints(trackId: Long): List<PointDto> {
+        return pointDao.fetchByTrack(trackId)
     }
 
     /**
@@ -173,7 +185,7 @@ class Repository @Inject constructor(
 
     private suspend fun fillFromLegacyDatabase() {
         trackDao.addAll((geoTrackerHelper?.getTracks() ?: emptyList()).map {
-            TrackDto(null, it.label, it.startTimestamp, it.endTimestamp, it.distance)
+            TrackDto(it.id, it.label, it.startTimestamp, it.endTimestamp, it.distance)
         })
         placeDao.addAll((geoTrackerHelper?.getPlaces() ?: emptyList()).map {
             PlaceDto(null, it.label, it.latitude, it.longitude, it.timestamp)

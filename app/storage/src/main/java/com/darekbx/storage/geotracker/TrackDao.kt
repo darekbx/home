@@ -3,6 +3,7 @@ package com.darekbx.geotracker.repository
 import androidx.room.*
 import com.darekbx.geotracker.repository.entities.TrackDto
 import com.darekbx.storage.geotracker.TrackPointsDto
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrackDao {
@@ -45,6 +46,9 @@ ORDER BY geo_track.id DESC
 
     @Query("SELECT * FROM geo_track WHERE id = :trackId")
     suspend fun fetch(trackId: Long): TrackDto?
+
+    @Query("SELECT * FROM geo_track WHERE end_timestamp IS NULL LIMIT 1")
+    fun fetchActiveTrack(): Flow<TrackDto?>
 
     @Query("DELETE FROM geo_track WHERE id = :trackId")
     suspend fun delete(trackId: Long)

@@ -15,13 +15,13 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class GetTrackPointsUseCaseTest {
+class GetActiveTrackPointsUseCaseTest {
 
     @Test
     fun `Empty flow when thres no unfinshed track`() = runTest {
         // Given
         val repo = mockk<BaseRepository>()
-        val useCase = GetTrackPointsUseCase(repo)
+        val useCase = GetActiveTrackPointsUseCase(repo)
         coEvery { repo.fetchLivePoints() } returns emptyFlow()
 
         // When
@@ -35,7 +35,7 @@ class GetTrackPointsUseCaseTest {
     fun `Collected track points`() = runTest {
         // Given
         val repo = mockk<BaseRepository>()
-        val useCase = GetTrackPointsUseCase(repo)
+        val useCase = GetActiveTrackPointsUseCase(repo)
         coEvery { repo.fetchLivePoints() } returns testFlow()
 
         // When

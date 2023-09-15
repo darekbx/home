@@ -10,6 +10,10 @@ class ActivityViewState(
 ) {
     val state: ActivityUiState
         @Composable get() = activityViewModel.uiState.collectAsState(initial = ActivityUiState.Idle).value
+
+    fun refresh() {
+        activityViewModel.refresh()
+    }
 }
 
 @Composable

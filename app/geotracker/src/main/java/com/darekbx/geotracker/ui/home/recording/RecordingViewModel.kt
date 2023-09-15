@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.geotracker.domain.usecase.GetAllTracksUseCase
 import com.darekbx.geotracker.domain.usecase.GetRecordingStateUseCase
-import com.darekbx.geotracker.domain.usecase.GetTrackPointsUseCase
+import com.darekbx.geotracker.domain.usecase.GetActiveTrackPointsUseCase
+import com.darekbx.geotracker.domain.usecase.GetActiveTrackUseCase
 import com.darekbx.geotracker.domain.usecase.StopRecordingUseCase
 import com.darekbx.geotracker.service.LocationService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +23,8 @@ sealed class RecordingUiState {
 @HiltViewModel
 class RecordingViewModel @Inject constructor(
     private val getRecordingStateUseCase: GetRecordingStateUseCase,
-    private val getTrackPointsUseCase: GetTrackPointsUseCase,
+    private val getActiveTrackPointsUseCase: GetActiveTrackPointsUseCase,
+    private val getActiveTrackUseCase: GetActiveTrackUseCase,
     private val stopRecordingUseCase: StopRecordingUseCase,
     private val getAllTracksUseCase: GetAllTracksUseCase
 ) : ViewModel() {
@@ -36,7 +38,10 @@ class RecordingViewModel @Inject constructor(
     }
 
     fun listenForLocationUpdates() =
-        getTrackPointsUseCase.invoke()
+        getActiveTrackPointsUseCase.invoke()
+
+    fun listenForActiveTrack() =
+        getActiveTrackUseCase.invoke()
 
     fun stopRecording(label: String? = null) {
         viewModelScope.launch {

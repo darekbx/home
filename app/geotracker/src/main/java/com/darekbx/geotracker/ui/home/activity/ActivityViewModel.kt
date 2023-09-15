@@ -26,6 +26,10 @@ class ActivityViewModel @Inject constructor(
         get() = _uiState
 
     init {
+        refresh()
+    }
+
+    fun refresh() {
         viewModelScope.launch {
             _uiState.value = ActivityUiState.InProgress
             val data = getActivityUseCase.getActivityData()

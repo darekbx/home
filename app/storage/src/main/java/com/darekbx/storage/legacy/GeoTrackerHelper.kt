@@ -103,6 +103,7 @@ class GeoTrackerHelper(private val context: Context) :
                 do {
                     items.add(
                         LegacyTrack(
+                            cursor.getLong(0),
                             cursor.getStringOrNull(1),
                             cursor.getLong(2),
                             cursor.getLongOrNull(3),

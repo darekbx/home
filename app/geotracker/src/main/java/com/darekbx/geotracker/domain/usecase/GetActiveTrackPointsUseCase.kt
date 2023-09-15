@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class GetTrackPointsUseCase @Inject constructor(
+class GetActiveTrackPointsUseCase @Inject constructor(
     private val repository: BaseRepository
 ) {
 

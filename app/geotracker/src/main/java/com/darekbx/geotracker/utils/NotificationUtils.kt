@@ -20,7 +20,7 @@ class NotificationUtils @Inject constructor(
         val notification = createNotification(
             context.getString(
                 R.string.notification_title,
-                SpeedUtils.msToKm(distance / 1000F),
+                distance / 1000F,
                 DateTimeUtils.getFormattedTime(elapsedTime)
             ),
             context.getString(R.string.notification_text)

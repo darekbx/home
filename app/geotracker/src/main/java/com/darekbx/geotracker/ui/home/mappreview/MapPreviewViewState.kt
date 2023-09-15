@@ -10,6 +10,10 @@ class MapPreviewViewState(
 ) {
     val state: MapPreviewUiState
         @Composable get() = mapPreviewViewModel.uiState.collectAsState(initial = MapPreviewUiState.Idle).value
+
+    fun refresh() {
+        mapPreviewViewModel.refresh()
+    }
 }
 
 @Composable

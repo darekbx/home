@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -45,6 +46,11 @@ fun ActivityView(
     activityViewState: ActivityViewState = rememberActivityViewState()
 ) {
     val state = activityViewState.state
+
+    LaunchedEffect(Unit) {
+        activityViewState.refresh()
+    }
+
     Box(
         modifier = modifier
             .defaultCard()
@@ -111,7 +117,9 @@ private fun Header(openCalendar: () -> Unit = { }) {
                 color = Color(0xFF3BA732)
             )
             Icon(
-                modifier = Modifier.padding(top = 3.dp).offset(x = 4.dp),
+                modifier = Modifier
+                    .padding(top = 3.dp)
+                    .offset(x = 4.dp),
                 painter = painterResource(id = R.drawable.ic_arrow_right),
                 tint = Color(0xFF3BA732),
                 contentDescription = "right"

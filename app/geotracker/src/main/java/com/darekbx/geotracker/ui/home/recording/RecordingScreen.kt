@@ -2,20 +2,17 @@ package com.darekbx.geotracker.ui.home.recording
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,8 +29,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.repository.entities.SimplePointDto
+import com.darekbx.geotracker.repository.model.Point
 import com.darekbx.geotracker.service.LocationService
 import com.darekbx.geotracker.ui.LoadingProgress
 import com.darekbx.geotracker.ui.defaultCard
@@ -47,7 +46,8 @@ import org.osmdroid.views.overlay.Polyline
 
 @Composable
 fun RecordingScreen(
-    recordingViewState: RecordingViewState = rememberRecordingViewState()
+    recordingViewState: RecordingViewState = rememberRecordingViewState(),
+    recordingViewModel: RecordingViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val intent = Intent(context, LocationService::class.java)
@@ -62,23 +62,31 @@ fun RecordingScreen(
         })
     }
 
+    var latestPoint by remember { mutableStateOf<Point?>(null) }
+
     LaunchedEffect(Unit) {
-        recordingViewState.pointsFlow().collect { points ->
+        recordingViewModel.listenForLocationUpdates().collect { points ->
             if (points.isNotEmpty()) {
                 isMapVisible = true
+
                 val mapPoints = points.map { point -> GeoPoint(point.latitude, point.longitude) }
                 polyline.setPoints(mapPoints)
+
                 map?.run {
                     overlays[overlays.size - 1] = polyline
                     controller?.setCenter(mapPoints[0])
                     invalidate()
                 }
+
+                latestPoint = points.first()
             }
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
-
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomEnd
+    ) {
         when (recordingViewState.state) {
             RecordingUiState.Stopped -> {}
             RecordingUiState.Recording -> {
@@ -90,17 +98,8 @@ fun RecordingScreen(
                 ) {
                     if (isMapVisible) {
                         Column(Modifier.fillMaxSize()) {
-                            Box(
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .fillMaxWidth()
-                                    .fillMaxHeight(0.8F),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                PreviewMap(allTracks) { map = it }
-                            }
-                            Summary()
+                            MapBox(Modifier.weight(1F)) { PreviewMap(allTracks) { map = it } }
+                            RecordingSummary(Modifier)
                         }
                     } else {
                         LoadingProgress()
@@ -113,6 +112,19 @@ fun RecordingScreen(
             context.stopService(intent)
             recordingViewState.stopRecording()
         }
+    }
+}
+
+@Composable
+fun MapBox(modifier: Modifier, contents: @Composable () -> Unit) {
+    Box(
+        modifier = modifier
+            .padding(8.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        contents()
     }
 }
 
@@ -170,16 +182,10 @@ fun PreviewMap(historicalTracks: List<List<SimplePointDto>>, ready: (MapView) ->
             drawLine(collection, map, android.graphics.Color.parseColor("#C4463B"))
         }
 
-        map.controller.setZoom(zoomToPlace)
         map.setTileSource(TileSourceFactory.MAPNIK)
+        map.controller.setZoom(zoomToPlace)
         map.overlays.add(Polyline())
 
         ready(map)
     }
-}
-
-@Composable
-fun Summary() {
-
-    Text(text = "Recording!")
 }

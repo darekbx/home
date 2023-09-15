@@ -26,6 +26,10 @@ class MapPreviewViewModel @Inject constructor(
         get() = _uiState
 
     init {
+        refresh()
+    }
+
+    fun refresh() {
         _uiState.value = MapPreviewUiState.InProgress
         viewModelScope.launch {
             val latestTracks = getLatestTracksUseCase()

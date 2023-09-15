@@ -1,5 +1,8 @@
 package com.darekbx.geotracker.navigation
 
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+
 interface GeoTrackerDestinations {
     val route: String
 }
@@ -14,6 +17,19 @@ object MapDestination : GeoTrackerDestinations {
 
 object TripsDestination : GeoTrackerDestinations {
     override val route = "trips"
+}
+
+object TripDestination : GeoTrackerDestinations {
+    override val route = "trip"
+    const val tripIdArg = "trip_id"
+    val routeWithArgs = "${route}?$tripIdArg={${tripIdArg}}"
+    val arguments = listOf(
+        navArgument(tripIdArg) {
+            nullable = false
+            defaultValue = 0
+            type = NavType.LongType
+        }
+    )
 }
 
 object PlacesToVisitDestination : GeoTrackerDestinations {

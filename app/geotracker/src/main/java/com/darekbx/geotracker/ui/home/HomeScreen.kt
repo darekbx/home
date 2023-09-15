@@ -16,6 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,6 +55,8 @@ fun HomeScreen(
     val intent = Intent(context, LocationService::class.java)
     val isLocationEnabled by remember { homeScreenViewModel.isLocationEnabled() }
     var locationDisabledDialog by remember { mutableStateOf(false) }
+    var refreshKey by remember { mutableIntStateOf(0) }
+    val state = recordingViewState.state
 
     LaunchedEffect(Unit) {
         recordingViewState.checkIsRecording()
@@ -64,7 +68,13 @@ fun HomeScreen(
         }
     }
 
-    if (recordingViewState.state is RecordingUiState.Recording) {
+    LaunchedEffect(state) {
+        if (state is RecordingUiState.Stopped) {
+            refreshKey++
+        }
+    }
+
+    if (state is RecordingUiState.Recording) {
         RecordingScreen()
         // Don't show home screen while is recording
         return
@@ -103,9 +113,11 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(top = 4.dp)
         ) {
-            SummaryView()
-            ActivityView()
-            MapPreviewView()
+            key(refreshKey) {
+                SummaryView()
+                ActivityView()
+                MapPreviewView()
+            }
         }
 
         RecordButton(enabled = isLocationEnabled) {

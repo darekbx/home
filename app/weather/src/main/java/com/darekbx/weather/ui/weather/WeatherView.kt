@@ -125,7 +125,6 @@ fun WeatherView(
 
 @Composable
 private fun AirQualityView(measurements: List<Measurements>) {
-
     measurements.lastOrNull()?.rateLimits?.run {
         Text(
             modifier = Modifier
