@@ -31,17 +31,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.geotracker.BuildConfig
+import com.darekbx.geotracker.R
 import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.repository.model.Point
 import com.darekbx.geotracker.service.LocationService
 import com.darekbx.geotracker.ui.LoadingProgress
 import com.darekbx.geotracker.ui.defaultCard
+import com.darekbx.geotracker.ui.drawDashedLine
 import com.darekbx.geotracker.ui.rememberMapWithLifecycle
 import com.darekbx.geotracker.ui.theme.bounceClick
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 
 @Composable
@@ -61,6 +64,9 @@ fun RecordingScreen(
             outlinePaint.strokeWidth = 10.0F
         })
     }
+    var positionMarker by remember {
+        mutableStateOf<Marker?>(null)
+    }
 
     var latestPoint by remember { mutableStateOf<Point?>(null) }
 
@@ -72,33 +78,42 @@ fun RecordingScreen(
                 val mapPoints = points.map { point -> GeoPoint(point.latitude, point.longitude) }
                 polyline.setPoints(mapPoints)
 
+                latestPoint = points.first()
+
                 map?.run {
+                    positionMarker?.position = GeoPoint(mapPoints.first())
                     overlays[overlays.size - 1] = polyline
                     controller?.setCenter(mapPoints[0])
                     invalidate()
                 }
-
-                latestPoint = points.first()
             }
         }
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 8.dp),
         contentAlignment = Alignment.BottomEnd
     ) {
-        when (recordingViewState.state) {
-            RecordingUiState.Stopped -> {}
-            RecordingUiState.Recording -> {
-                Box(
-                    modifier = Modifier
-                        .defaultCard()
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+        Box(
+            modifier = Modifier
+                .defaultCard()
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            when (recordingViewState.state) {
+                RecordingUiState.Stopping -> LoadingProgress()
+                RecordingUiState.Stopped -> {}
+                RecordingUiState.Recording -> {
                     if (isMapVisible) {
                         Column(Modifier.fillMaxSize()) {
-                            MapBox(Modifier.weight(1F)) { PreviewMap(allTracks) { map = it } }
+                            MapBox(Modifier.weight(1F)) {
+                                PreviewMap(allTracks) { mapView, marker ->
+                                    map = mapView
+                                    positionMarker = marker
+                                }
+                            }
                             RecordingSummary(Modifier)
                         }
                     } else {
@@ -153,25 +168,10 @@ fun StopButton(onClick: () -> Unit = { }) {
 }
 
 @Composable
-fun PreviewMap(historicalTracks: List<List<SimplePointDto>>, ready: (MapView) -> Unit) {
+fun PreviewMap(historicalTracks: List<List<SimplePointDto>>, ready: (MapView, Marker) -> Unit) {
     val context = LocalContext.current
     val mapView = rememberMapWithLifecycle()
     val zoomToPlace = 17.0
-
-    fun drawLine(
-        collection: List<SimplePointDto>,
-        map: MapView,
-        color: Int
-    ) {
-        val polyline = Polyline().apply {
-            outlinePaint.color = color
-            outlinePaint.strokeWidth = 4.0F
-        }
-
-        val mapPoints = collection.map { point -> GeoPoint(point.latitude, point.longitude) }
-        polyline.setPoints(mapPoints)
-        map.overlays.add(polyline)
-    }
 
     AndroidView(factory = { mapView }) { map ->
         Configuration.getInstance()
@@ -179,13 +179,19 @@ fun PreviewMap(historicalTracks: List<List<SimplePointDto>>, ready: (MapView) ->
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
         historicalTracks.forEach { collection ->
-            drawLine(collection, map, android.graphics.Color.parseColor("#C4463B"))
+            map.drawDashedLine(collection)
+        }
+
+        val positionMarker = Marker(map).apply {
+            icon = context.getDrawable(R.drawable.ic_marker)
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         }
 
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.controller.setZoom(zoomToPlace)
+        map.overlays.add(positionMarker)
         map.overlays.add(Polyline())
 
-        ready(map)
+        ready(map, positionMarker)
     }
 }

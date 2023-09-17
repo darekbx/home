@@ -24,4 +24,7 @@ interface RouteDao {
 
     @Insert
     fun add(routeDto: RouteDto)
+
+    @Query("DELETE FROM geo_route")
+    suspend fun deleteAll()
 }

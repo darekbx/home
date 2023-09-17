@@ -12,14 +12,6 @@ class GetTrackWithPoints @Inject constructor(
 ) {
     operator suspend fun invoke(trackId: Long): TrackWithPointsWrapper {
         val trackDto = repository.fetch(trackId)!!
-        val track = Track(
-            trackDto.id!!,
-            trackDto.label,
-            trackDto.startTimestamp,
-            trackDto.endTimestamp,
-            trackDto.distance,
-            pointsCount = 0
-        )
         val points = repository.fetchTrackPoints(trackId).map {
             Point(
                 it.timestamp,
@@ -29,6 +21,14 @@ class GetTrackWithPoints @Inject constructor(
                 it.altitude
             )
         }
+        val track = Track(
+            trackDto.id!!,
+            trackDto.label,
+            trackDto.startTimestamp,
+            trackDto.endTimestamp,
+            trackDto.distance,
+            pointsCount = points.size
+        )
         return TrackWithPointsWrapper(track, points)
     }
 }

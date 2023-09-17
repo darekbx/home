@@ -1,85 +1,332 @@
 package com.darekbx.geotracker.ui.trip
 
 import android.content.Context
-import android.graphics.Color
+import android.provider.SyncStateContract.Columns
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.geotracker.BuildConfig
+import com.darekbx.geotracker.R
 import com.darekbx.geotracker.repository.model.Point
+import com.darekbx.geotracker.repository.model.Track
+import com.darekbx.geotracker.ui.LoadingProgress
+import com.darekbx.geotracker.ui.defaultCard
+import com.darekbx.geotracker.ui.drawLine
 import com.darekbx.geotracker.ui.rememberMapWithLifecycle
+import com.darekbx.geotracker.ui.theme.GeoTrackerTheme
+import com.darekbx.geotracker.ui.theme.LocalStyles
+import com.darekbx.geotracker.ui.toGeoPoint
+import com.darekbx.geotracker.utils.DateTimeUtils
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
+import java.util.concurrent.TimeUnit
 
 @Composable
-fun TripScreen(trackId: Long,
+fun TripScreen(
+    trackId: Long,
+    tripState: TripViewState = rememberTripViewState()
+) {
+    val state = tripState.state
 
-               tripViewModel: TripViewModel = hiltViewModel()
-               ) {
+    var map by remember { mutableStateOf<MapView?>(null) }
+    val polyline by remember {
+        mutableStateOf(Polyline().apply {
+            outlinePaint.color = android.graphics.Color.parseColor("#3175A5")
+            outlinePaint.strokeWidth = 10.0F
+        })
+    }
 
-    val points by tripViewModel.data(trackId).collectAsState(initial = null)
-    points?.let {
-        Box(
-            modifier = Modifier
-                .padding(8.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            PreviewMap(points = it.points)
+    LaunchedEffect(trackId) {
+        tripState.fetch(trackId)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        when (state) {
+            is TripUiState.Done -> {
+                Column(Modifier.fillMaxSize()) {
+                    SummaryBox(state.data.track)
+                    if (state.data.points.isNotEmpty()) {
+                        SpeedChart(points = state.data.points)
+                        AltitudeChart(points = state.data.points)
+                        MapBox {
+                            PreviewMap(points = state.data.points) { mapView ->
+                                map = mapView
+                            }
+                        }
+                        PointsControll(state.data.points.size) { start, end ->
+                            val points = state.data.points.subList(start, end)
+                            polyline.setPoints(points.map { it.toGeoPoint() })
+                            map?.run {
+                                overlays[0] = polyline
+                                invalidate()
+                            }
+                        }
+                    }
+                }
+            }
+
+            TripUiState.Idle -> {}
+            TripUiState.InProgress -> LoadingProgress()
+        }
+
+        if (state is TripUiState.Done && state.data.points.isNotEmpty()){
+            ActionButtons()
         }
     }
 }
 
+@Composable
+private fun ActionButtons() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+        Column(
+            modifier = Modifier.padding(bottom = 128.dp, end = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FloatingActionButton(
+                onClick = { /*TODO*/ },
+                shape = RoundedCornerShape(50)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_save),
+                    contentDescription = "save"
+                )
+            }
+            FloatingActionButton(
+                onClick = { /*TODO*/ },
+                shape = RoundedCornerShape(50)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_delete),
+                    contentDescription = "delete"
+                )
+            }
+        }
+    }
+}
 
 @Composable
-fun PreviewMap(points: List<Point>) {
+fun PointsControll(pointsCount: Int, onRangeChanged: (Int, Int) -> Unit) {
+    var sliderPosition by remember { mutableStateOf(0f..pointsCount.toFloat()) }
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
+            .defaultCard()
+            .padding(8.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        RangeSlider(
+            value = sliderPosition,
+            onValueChange = { range ->
+                sliderPosition = range
+                onRangeChanged(range.start.toInt(), range.endInclusive.toInt())
+            },
+            valueRange = 0F..(pointsCount.toFloat()),
+            steps = pointsCount
+        )
+        Text(
+            text = "${(sliderPosition.endInclusive - sliderPosition.start).toInt()} points, from ${sliderPosition.start.toInt()} to ${sliderPosition.endInclusive.toInt()} ",
+            style = LocalStyles.current.grayLabel,
+            fontSize = 14.sp,
+        )
+    }
+}
+
+@Composable
+fun SpeedChart(points: List<Point>) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .defaultCard()
+            .padding(8.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(
+            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+            text = "Speed chart",
+            style = LocalStyles.current.grayLabel,
+            fontSize = 14.sp,
+        )
+    }
+}
+
+@Composable
+fun AltitudeChart(points: List<Point>) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .defaultCard()
+            .padding(8.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(
+            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+            text = "Altitude chart",
+            style = LocalStyles.current.grayLabel,
+            fontSize = 14.sp,
+        )
+    }
+}
+
+@Composable
+fun SummaryBox(track: Track) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .defaultCard()
+            .padding(8.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Row(verticalAlignment = Alignment.Bottom) {
+            val fullStartDate = DateTimeUtils.formattedDate(track.startTimestamp)
+            val fullEndDate = DateTimeUtils.formattedDate(track.endTimestamp ?: 0L)
+            Text(
+                text = fullStartDate.split(" ")[0],
+                style = LocalStyles.current.grayLabel,
+                fontSize = 16.sp,
+                color = Color.White
+            )
+            Text(
+                text = " from ",
+                style = LocalStyles.current.grayLabel,
+                fontSize = 14.sp,
+            )
+            Text(
+                text = fullStartDate.split(" ")[1],
+                style = LocalStyles.current.grayLabel,
+                fontSize = 16.sp,
+                color = Color.White
+            )
+            if (track.endTimestamp != null) {
+                Text(
+                    text = " to ",
+                    style = LocalStyles.current.grayLabel,
+                    fontSize = 14.sp,
+                )
+                Text(
+                    text = fullEndDate.split(" ")[1],
+                    style = LocalStyles.current.grayLabel,
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
+                Text(
+                    text = " (${track.timespanWithSeconds()}) ",
+                    style = LocalStyles.current.grayLabel,
+                    fontSize = 14.sp,
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier,
+            verticalAlignment = Alignment.Top
+        ) {
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = "%.2f".format((track.distance ?: 0F) / 1000.0),
+                    style = LocalStyles.current.grayLabel,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White
+                )
+                Text(
+                    text = "km (${track.pointsCount} points)",
+                    style = LocalStyles.current.grayLabel,
+                    fontSize = 18.sp,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ColumnScope.MapBox(contents: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier
+            .defaultCard()
+            .padding(8.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .fillMaxWidth()
+            .weight(1F),
+        contentAlignment = Alignment.Center
+    ) {
+        contents()
+    }
+}
+
+@Composable
+fun PreviewMap(points: List<Point>, onMapReady: (MapView) -> Unit) {
     val context = LocalContext.current
     val mapView = rememberMapWithLifecycle()
     val zoomToPlace = 17.0
-
-    fun drawLine(
-        collection: List<Point>,
-        map: MapView,
-        color: Int
-    ) {
-        val polyline = Polyline().apply {
-            outlinePaint.color = color
-            outlinePaint.strokeWidth = 4.0F
-        }
-
-        val mapPoints = collection.map { point -> GeoPoint(point.latitude, point.longitude) }
-        polyline.setPoints(mapPoints)
-        map.overlays.add(polyline)
-    }
 
     AndroidView(factory = { mapView }) { map ->
         Configuration.getInstance()
             .load(context, context.getSharedPreferences("osm", Context.MODE_PRIVATE))
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
-        drawLine(points, map, Color.parseColor("#C4463B"))
-
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.controller.setZoom(zoomToPlace)
         map.controller.setCenter(points.first().toGeoPoint())
-        map.overlays.add(Polyline())
+        map.drawLine(points, android.graphics.Color.parseColor("#C4463B"))
+
+        onMapReady(map)
     }
 }
 
-private fun Point.toGeoPoint() = GeoPoint(this.latitude, this.longitude)
+@Preview(widthDp = 410)
+@Composable
+fun SummaryBoxPreview() {
+    GeoTrackerTheme {
+        SummaryBox(
+            Track(
+                1L,
+                "Label",
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
+                        + TimeUnit.HOURS.toMillis(2)
+                        + TimeUnit.MINUTES.toMillis(13)
+                        + TimeUnit.SECONDS.toMillis(25),
+                5232F,
+                12
+            )
+        )
+    }
+}

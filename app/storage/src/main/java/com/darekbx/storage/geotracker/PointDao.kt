@@ -34,6 +34,8 @@ interface PointDao {
     @Query("SELECT * FROM geo_point WHERE track_id = :trackId")
     suspend fun fetchByTrack(trackId: Long): List<PointDto>
 
+    @Query("DELETE FROM geo_point")
+    suspend fun deleteAll()
 
     /*
         @Query("SELECT * FROM geo_point WHERE track_id = :trackId")

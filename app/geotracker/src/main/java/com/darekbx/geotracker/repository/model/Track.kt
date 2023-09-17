@@ -25,5 +25,13 @@ data class Track(
         DateTimeUtils.getFormattedTime((endTimestamp - startTimestamp) / 1000, short = true)
     }
 
+    fun timespanWithSeconds() = endTimestamp?.let {
+        DateTimeUtils.getFormattedTime(
+            (endTimestamp - startTimestamp) / 1000,
+            short = true,
+            withSeconds = true
+        )
+    }
+
     fun fromattedStartTime() = DateTimeUtils.formattedDate(startTimestamp)
 }

@@ -23,4 +23,7 @@ interface PlaceDao {
 
     @Insert
     fun add(placeDto: PlaceDto)
+
+    @Query("DELETE FROM geo_place")
+    suspend fun deleteAll()
 }

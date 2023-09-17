@@ -9,15 +9,28 @@ object DateTimeUtils {
 
     val dateFormatter by lazy { SimpleDateFormat(DATE_FORMAT) }
 
-    fun getFormattedTime(timeInSeconds: Long, short: Boolean = false): String {
+    fun getFormattedTime(
+        timeInSeconds: Long,
+        short: Boolean = false,
+        withSeconds: Boolean = false
+    ): String {
+        val seconds = timeInSeconds % 60
         val minutes = timeInSeconds % 3600 / 60
         val hours = timeInSeconds % 86400 / 3600
         val days = timeInSeconds / 86400
 
         if (short) {
-            return "${hours.pad()}h ${minutes.pad()}m"
+            if (withSeconds) {
+                return "${hours.pad()}h ${minutes.pad()}m ${seconds.pad()}s"
+            } else {
+                return "${hours.pad()}h ${minutes.pad()}m"
+            }
         } else {
-            return "${days.pad()}d ${hours.pad()}h ${minutes.pad()}m"
+            if (withSeconds) {
+                return "${days.pad()}d ${hours.pad()}h ${minutes.pad()}m ${seconds.pad()}s"
+            } else {
+                return "${hours.pad()}h ${minutes.pad()}m ${seconds.pad()}s"
+            }
         }
     }
 

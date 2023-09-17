@@ -49,8 +49,6 @@ import dagger.hilt.android.AndroidEntryPoint
  *      - trips
  *      - places to visit + GPX
  *      - settings
- *  - Tracker:
- *      - add actual track to map (new)
  *  - Trips list
  *      - add search filter by track ID
  *
@@ -135,7 +133,7 @@ fun BottomMenu(navController: NavHostController) {
             MenuItem(
                 modifier = Modifier
                     .weight(1f)
-                    .clickable { /*navController.navigateSingleTopTo(NavigationItem.List.route)*/ },
+                    .clickable { navController.navigateSingleTopTo(SettingsDestination.route) },
                 label = "Settings",
                 icon = painterResource(id = R.drawable.ic_settings),
                 selected = navBackStackEntry?.destination?.route == SettingsDestination.route

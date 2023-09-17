@@ -57,8 +57,8 @@ dependencies {
     implementation project(':app:common')
 
     // To change which app should be run at first, move to top correct one:
-    implementation project(':app:weight')
     implementation project(':app:geotracker')
+    implementation project(':app:weight')
     implementation project(':app:dotpad')
     implementation project(':app:riverstatus')
     implementation project(':app:vault')

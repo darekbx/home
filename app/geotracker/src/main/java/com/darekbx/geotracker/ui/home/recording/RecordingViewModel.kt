@@ -9,6 +9,7 @@ import com.darekbx.geotracker.domain.usecase.GetActiveTrackUseCase
 import com.darekbx.geotracker.domain.usecase.StopRecordingUseCase
 import com.darekbx.geotracker.service.LocationService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
@@ -17,6 +18,7 @@ import javax.inject.Inject
 
 sealed class RecordingUiState {
     object Stopped : RecordingUiState()
+    object Stopping : RecordingUiState()
     object Recording : RecordingUiState()
 }
 
@@ -45,11 +47,13 @@ class RecordingViewModel @Inject constructor(
 
     fun stopRecording(label: String? = null) {
         viewModelScope.launch {
+            _uiState.value = RecordingUiState.Stopping
+            delay(400L)
             getRecordingStateUseCase.invoke()?.let { activeTrack ->
                 stopRecordingUseCase.invoke(activeTrack.id!!, label)
             }
+            _uiState.value = RecordingUiState.Stopped
         }
-        _uiState.value = RecordingUiState.Stopped
     }
 
     fun setIsRecording() {

@@ -59,6 +59,8 @@ ORDER BY geo_track.id DESC
     @Query("UPDATE geo_track SET label = :label, end_timestamp = :endTimestamp WHERE id = :trackId")
     suspend fun update(trackId: Long, label: String?, endTimestamp: Long)
 
+    @Query("DELETE FROM geo_track")
+    suspend fun deleteAll()
 
     /*
         @Deprecated("Use fetchAllPoints")

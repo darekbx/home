@@ -74,7 +74,7 @@ fun HomeScreen(
         }
     }
 
-    if (state is RecordingUiState.Recording) {
+    if (!(state is RecordingUiState.Stopped)) {
         RecordingScreen()
         // Don't show home screen while is recording
         return
@@ -169,6 +169,7 @@ fun RecordButton(enabled: Boolean = true, onClick: () -> Unit = { }) {
         modifier
             .alpha(alpha)
             .padding(24.dp)
+            .padding(bottom = 8.dp)
             .size(72.dp)
             .clip(CircleShape)
             .background(Color.White)

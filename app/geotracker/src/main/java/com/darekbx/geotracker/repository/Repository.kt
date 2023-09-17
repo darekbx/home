@@ -49,6 +49,12 @@ interface BaseRepository {
     suspend fun appendDistance(trackId: Long, distance: Float)
 
     suspend fun updateTrack(trackId: Long, endTimestamp: Long, label: String?)
+
+    /**
+     * WARNING
+     * Deletes all data and restores from legacy db
+     */
+    suspend fun restoreLegacyDb()
 }
 
 class Repository @Inject constructor(
@@ -68,7 +74,6 @@ class Repository @Inject constructor(
     }
 
     override suspend fun fetchAllTracks(): List<TrackDto> {
-        prepareLegacyStorage()
         return trackDao.fetchAll()
     }
 
@@ -140,6 +145,14 @@ class Repository @Inject constructor(
 
     override suspend fun fetchTrackPoints(trackId: Long): List<PointDto> {
         return pointDao.fetchByTrack(trackId)
+    }
+
+    override suspend fun restoreLegacyDb() {
+        trackDao.deleteAll()
+        pointDao.deleteAll()
+        routeDao.deleteAll()
+        placeDao.deleteAll()
+        prepareLegacyStorage()
     }
 
     /**

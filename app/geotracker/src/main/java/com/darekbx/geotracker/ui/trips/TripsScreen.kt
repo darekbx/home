@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -82,7 +83,11 @@ fun TripsScreen(
         yearsViewState.loadYears()
     }
 
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
         yearsViewState.state.let {
             when (it) {
                 is YearsUiState.Done -> YearsScroller(
@@ -93,11 +98,12 @@ fun TripsScreen(
                     year = selectedYear
                 }
 
-                YearsUiState.InProgress -> LoadingProgress(
-                    Modifier
-                        .padding(4.dp)
-                        .size(32.dp)
-                )
+                YearsUiState.InProgress ->
+                    LoadingProgress(
+                        Modifier
+                            .padding(4.dp)
+                            .size(32.dp)
+                    )
 
                 YearsUiState.Idle -> {}
             }
@@ -106,7 +112,12 @@ fun TripsScreen(
         tripsViewState.state.let {
             when (it) {
                 is TripsUiState.Done -> TripsList(year, it.data, onTrackClick, ::deleteTrack)
-                TripsUiState.InProgress -> LoadingProgress()
+
+                TripsUiState.InProgress -> Box(
+                    Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { LoadingProgress() }
+
                 TripsUiState.Idle -> {}
             }
         }
@@ -169,7 +180,8 @@ fun TripsList(
     LazyColumn(
         Modifier
             .fillMaxWidth()
-            .padding(top = 4.dp)) {
+            .padding(top = 4.dp)
+    ) {
         items(wrapper.trips) { track ->
             RevealSwipe(
                 modifier = Modifier
