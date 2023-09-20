@@ -1,5 +1,8 @@
 package com.darekbx.geotracker.ui.theme
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 
@@ -8,6 +11,18 @@ data class Colors(
     val green: Color = Color(0xFF4CAF50),
     val blue: Color = Color(0xFF0A247D),
     val red: Color = Color(0xFFE75B52),
+)
+
+
+
+@Composable
+fun inputColors() = TextFieldDefaults.colors(
+    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+    unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+    disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+    focusedIndicatorColor = Color.Transparent,
+    unfocusedIndicatorColor = Color.Transparent,
+    errorIndicatorColor = Color.Transparent,
 )
 
 val LocalColors = compositionLocalOf { Colors() }

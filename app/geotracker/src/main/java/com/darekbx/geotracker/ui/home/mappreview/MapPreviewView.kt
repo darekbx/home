@@ -87,6 +87,7 @@ private fun MapView(data: Map<Long, List<SimplePointDto>>) {
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
         map.setTileSource(TileSourceFactory.MAPNIK)
+        map.setMultiTouchControls(true)
         map.overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS)
 
         // Draw tracks

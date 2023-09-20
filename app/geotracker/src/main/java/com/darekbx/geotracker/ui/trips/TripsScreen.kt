@@ -27,14 +27,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -53,6 +57,7 @@ import com.darekbx.geotracker.ui.defaultCard
 import com.darekbx.geotracker.ui.theme.GeoTrackerTheme
 import com.darekbx.geotracker.ui.theme.LocalColors
 import com.darekbx.geotracker.ui.theme.LocalStyles
+import com.darekbx.geotracker.ui.theme.inputColors
 import com.darekbx.geotracker.ui.trips.states.TripsViewState
 import com.darekbx.geotracker.ui.trips.states.YearsViewState
 import com.darekbx.geotracker.ui.trips.states.rememberTripsViewState
@@ -176,13 +181,25 @@ fun TripsList(
     onItemClick: (Track) -> Unit = { },
     onItemDeleteClick: (Track) -> Unit = { }
 ) {
+    val filter = remember { mutableStateOf("") }
+
     YearSummary(modifier = Modifier.fillMaxWidth(), year, wrapper.sumDistance, wrapper.trips.size)
+    SearchInputField(
+        modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp),
+        value = filter
+    )
     LazyColumn(
         Modifier
             .fillMaxWidth()
             .padding(top = 4.dp)
     ) {
-        items(wrapper.trips) { track ->
+        items(wrapper.trips.filter {
+            if (filter.value.isNotBlank()) {
+                it.filterById(filter.value) || it.filterByLabel(filter.value)
+            } else {
+                true
+            }
+        }) { track ->
             RevealSwipe(
                 modifier = Modifier
                     .padding(vertical = 5.dp)
@@ -203,6 +220,23 @@ fun TripsList(
             }
         }
     }
+}
+
+@Composable
+private fun SearchInputField(
+    modifier: Modifier = Modifier,
+    value: MutableState<String>
+) {
+    TextField(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp)),
+        value = value.value,
+        onValueChange = { value.value = it },
+        singleLine = true,
+        label = { Text("Search") },
+        colors = inputColors(),
+    )
 }
 
 @Composable
@@ -258,6 +292,7 @@ fun TripListItem(modifier: Modifier = Modifier, track: Track) {
             }
 
             Column(
+                modifier = Modifier,
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -266,7 +301,8 @@ fun TripListItem(modifier: Modifier = Modifier, track: Track) {
                     verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
-                        modifier = Modifier.width(84.dp),
+                        modifier = Modifier
+                            .width(84.dp),
                         text = "%.2fkm".format(track.distance),
                         style = LocalStyles.current.title,
                         textAlign = TextAlign.End,
@@ -282,8 +318,9 @@ fun TripListItem(modifier: Modifier = Modifier, track: Track) {
                 }
                 track.label()?.let { label ->
                     Text(
-                        modifier = Modifier.padding(bottom = 0.dp, start = 8.dp),
+                        modifier = Modifier.padding(start = 18.dp),
                         text = label,
+                        textAlign = TextAlign.End,
                         style = LocalStyles.current.grayLabel,
                         fontSize = 14.sp
                     )
@@ -296,25 +333,26 @@ fun TripListItem(modifier: Modifier = Modifier, track: Track) {
 @Composable
 private fun TripTime(track: Track) {
     val greyStyle = SpanStyle(color = Color.Gray)
-    val chunks = track.timespan()?.split(" ") ?: run {
-        return Text(
+    track.timespan()?.split(" ")?.let { chunks ->
+        Text(
+            text = buildAnnotatedString {
+                withStyle(style = if (track.emptyHours()) greyStyle else SpanStyle()) {
+                    append(chunks[0])
+                }
+                append(" ")
+                append(chunks[1])
+            },
+            style = LocalStyles.current.title,
+            fontSize = 16.sp,
+        )
+    } ?: run {
+        Text(
             text = "n/a",
             style = LocalStyles.current.title,
             fontSize = 16.sp,
             color = LocalColors.current.red
         )
     }
-    Text(
-        text = buildAnnotatedString {
-            withStyle(style = if (track.emptyHours()) greyStyle else SpanStyle()) {
-                append(chunks[0])
-            }
-            append(" ")
-            append(chunks[1])
-        },
-        style = LocalStyles.current.title,
-        fontSize = 16.sp,
-    )
 }
 
 @Composable

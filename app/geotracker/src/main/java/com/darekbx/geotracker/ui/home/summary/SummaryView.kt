@@ -129,7 +129,7 @@ private fun SummaryRow(summary: Summary, fscale: Float = 1.0F) {
         verticalAlignment = Alignment.Bottom
     ) {
         Text(
-            text = "%.2f km".format(summary.distance),
+            text = "${summary.distance.toInt()}km",
             style = LocalStyles.current.boldLabel
         )
         Text(

@@ -15,6 +15,9 @@ class SettingsViewState(
         settingsViewModel.deleteAndRestore()
     }
 
+    fun save(nthPointsToSkip: Int, gpsMinDistance: Float, gpsUpdateInterval: Long) {
+        settingsViewModel.save(nthPointsToSkip, gpsMinDistance, gpsUpdateInterval)
+    }
 }
 
 @Composable

@@ -37,7 +37,7 @@ import com.darekbx.geotracker.repository.model.Point
 import com.darekbx.geotracker.service.LocationService
 import com.darekbx.geotracker.ui.LoadingProgress
 import com.darekbx.geotracker.ui.defaultCard
-import com.darekbx.geotracker.ui.drawDashedLine
+import com.darekbx.geotracker.ui.drawLine
 import com.darekbx.geotracker.ui.rememberMapWithLifecycle
 import com.darekbx.geotracker.ui.theme.bounceClick
 import org.osmdroid.config.Configuration
@@ -179,7 +179,7 @@ fun PreviewMap(historicalTracks: List<List<SimplePointDto>>, ready: (MapView, Ma
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
         historicalTracks.forEach { collection ->
-            map.drawDashedLine(collection)
+            map.drawLine(collection)
         }
 
         val positionMarker = Marker(map).apply {
@@ -188,6 +188,7 @@ fun PreviewMap(historicalTracks: List<List<SimplePointDto>>, ready: (MapView, Ma
         }
 
         map.setTileSource(TileSourceFactory.MAPNIK)
+        map.setMultiTouchControls(true)
         map.controller.setZoom(zoomToPlace)
         map.overlays.add(positionMarker)
         map.overlays.add(Polyline())

@@ -15,6 +15,10 @@ data class Track(
         private const val TRASA_MARK = "Trasa"
     }
 
+    fun filterById(filter: String) = "$id".contains(filter, true)
+
+    fun filterByLabel(filter: String) = "$label".contains(filter, true)
+
     fun emptyHours() = timespan()?.startsWith("00h") ?: false
 
     fun hasPoints() = pointsCount > 0

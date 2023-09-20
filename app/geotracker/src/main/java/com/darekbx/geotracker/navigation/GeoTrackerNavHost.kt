@@ -6,7 +6,9 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.darekbx.geotracker.ui.alltracks.AllTracksScreen
 import com.darekbx.geotracker.ui.home.HomeScreen
+import com.darekbx.geotracker.ui.placestovisit.PlacesToVisitScreen
 import com.darekbx.geotracker.ui.settings.SettingsScreen
 import com.darekbx.geotracker.ui.trip.TripScreen
 import com.darekbx.geotracker.ui.trips.TripsScreen
@@ -25,8 +27,20 @@ fun GeoTrackerNavHost(
             HomeScreen()
         }
 
+        composable(route = MapDestination.route) {
+            AllTracksScreen()
+        }
+
+        composable(route = PlacesToVisitDestination.route) {
+            PlacesToVisitScreen {
+                navController.navigateUp()
+            }
+        }
+
         composable(route = SettingsDestination.route) {
-            SettingsScreen()
+            SettingsScreen {
+                navController.navigateUp()
+            }
         }
 
         composable(route = TripsDestination.route) {

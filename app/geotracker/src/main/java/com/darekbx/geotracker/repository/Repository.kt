@@ -26,13 +26,17 @@ interface BaseRepository {
 
     suspend fun fetchAllTrackPoints(nthPointsToSkip: Int): List<List<SimplePointDto>>
 
-    suspend fun fetchMaxSpeed(): PointDto?
+    suspend fun fetchMaxSpeed(exceptions: List<Long>): PointDto?
 
     suspend fun fetchUnFinishedTracks(): List<TrackDto>
 
     suspend fun add(trackDto: TrackDto): Long
 
     suspend fun add(pointDto: PointDto): Long
+
+    suspend fun add(pointDtos: List<PointDto>)
+
+    suspend fun add(placeDto: PlaceDto)
 
     suspend fun update(trackId: Long, endTimestamp: Long)
 
@@ -42,6 +46,8 @@ interface BaseRepository {
 
     suspend fun deleteTrack(trackId: Long)
 
+    suspend fun deleteAllPoints(trackId: Long)
+
     fun fetchLivePoints(): Flow<List<PointDto>>
 
     fun fetchLiveTrack(): Flow<TrackDto?>
@@ -49,6 +55,14 @@ interface BaseRepository {
     suspend fun appendDistance(trackId: Long, distance: Float)
 
     suspend fun updateTrack(trackId: Long, endTimestamp: Long, label: String?)
+
+    suspend fun saveLabel(trackId: Long, label: String?)
+
+    suspend fun fetchPlacesToVisit(): List<PlaceDto>
+
+    suspend fun deletePlaceToVisit(id: Long)
+
+    suspend fun countPlacesToVisit(): Int
 
     /**
      * WARNING
@@ -65,8 +79,9 @@ class Repository @Inject constructor(
     private val geoTrackerHelper: GeoTrackerHelper?
 ) : BaseRepository {
 
-    override suspend fun fetchMaxSpeed(): PointDto? {
-        return pointDao.fetchMaxSpeed().firstOrNull()
+    override suspend fun fetchMaxSpeed(exceptions: List<Long>): PointDto? {
+        return pointDao.fetchMaxSpeed(exceptions.toLongArray())
+            .firstOrNull()
     }
 
     override suspend fun fetchUnFinishedTracks(): List<TrackDto> {
@@ -110,8 +125,16 @@ class Repository @Inject constructor(
         return pointDao.add(pointDto)
     }
 
+    override suspend fun add(pointDtos: List<PointDto>) {
+        pointDao.addAll(pointDtos)
+    }
+
     override suspend fun add(trackDto: TrackDto): Long {
         return trackDao.add(trackDto)
+    }
+
+    override suspend fun add(placeDto: PlaceDto) {
+        placeDao.add(placeDto)
     }
 
     override suspend fun update(trackId: Long, endTimestamp: Long) {
@@ -143,6 +166,10 @@ class Repository @Inject constructor(
         trackDao.update(trackId, label, endTimestamp)
     }
 
+    override suspend fun saveLabel(trackId: Long, label: String?) {
+        trackDao.update(trackId, label)
+    }
+
     override suspend fun fetchTrackPoints(trackId: Long): List<PointDto> {
         return pointDao.fetchByTrack(trackId)
     }
@@ -153,6 +180,22 @@ class Repository @Inject constructor(
         routeDao.deleteAll()
         placeDao.deleteAll()
         prepareLegacyStorage()
+    }
+
+    override suspend fun deleteAllPoints(trackId: Long) {
+        pointDao.deleteByTrack(trackId)
+    }
+
+    override suspend fun fetchPlacesToVisit(): List<PlaceDto> {
+        return placeDao.fetchAllPlaces()
+    }
+
+    override suspend fun deletePlaceToVisit(id: Long) {
+        placeDao.delete(id)
+    }
+
+    override suspend fun countPlacesToVisit(): Int {
+        return placeDao.countAll()
     }
 
     /**

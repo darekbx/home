@@ -3,6 +3,8 @@ package com.darekbx.geotracker.di
 import android.app.NotificationManager
 import android.content.Context
 import android.location.LocationManager
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.darekbx.geotracker.location.LocationCollector
 import com.darekbx.geotracker.repository.BaseRepository
 import com.darekbx.geotracker.repository.Repository
@@ -23,6 +25,11 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 class CommonModule {
+
+    @Provides
+    fun provideSettingsRepository(dataStore: DataStore<Preferences>): SettingsRepository {
+        return SettingsRepository(dataStore)
+    }
 
     @Provides
     fun provideBaseHomeRepository(

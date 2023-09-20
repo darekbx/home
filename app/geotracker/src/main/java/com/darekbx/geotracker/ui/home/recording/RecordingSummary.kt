@@ -31,11 +31,11 @@ import com.darekbx.geotracker.utils.SpeedUtils
 fun RecordingSummary(modifier: Modifier, recordingViewModel: RecordingViewModel = hiltViewModel()) {
     val activeTrack by recordingViewModel.listenForActiveTrack().collectAsState(initial = null)
     val activePoints by recordingViewModel.listenForLocationUpdates().collectAsState(initial = null)
-    SummaryWrapper(modifier, activePoints?.firstOrNull(), activeTrack)
+    SummaryWrapper(modifier, activePoints, activeTrack)
 }
 
 @Composable
-fun SummaryWrapper(modifier: Modifier, point: Point?, track: Track?) {
+fun SummaryWrapper(modifier: Modifier, points: List<Point>?, track: Track?) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -45,7 +45,7 @@ fun SummaryWrapper(modifier: Modifier, point: Point?, track: Track?) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = 8.dp),
             verticalArrangement = Arrangement.Center,
         ) {
             Row(
@@ -53,7 +53,7 @@ fun SummaryWrapper(modifier: Modifier, point: Point?, track: Track?) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Bottom
             ) {
-                point?.let {
+                points?.firstOrNull()?.let {
                     Text(
                         text = "%.1f".format(SpeedUtils.msToKm(it.speed)),
                         style = LocalStyles.current.title,
@@ -92,6 +92,19 @@ fun SummaryWrapper(modifier: Modifier, point: Point?, track: Track?) {
                     )
                 }
             }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                track?.let { track ->
+                    Text(
+                        modifier = Modifier.padding(top = 8.dp),
+                        text = "${points?.size ?: 0} points",
+                        style = LocalStyles.current.grayLabel,
+                        fontSize = 14.sp,
+                    )
+                }
+            }
         }
 
     }
@@ -103,7 +116,7 @@ private fun SummaryPreview() {
     GeoTrackerTheme {
         SummaryWrapper(
             modifier = Modifier,
-            point = Point(100L, 0.0, 0.0, 12.4F, 100.0),
+            points = listOf(Point(100L, 0.0, 0.0, 12.4F, 100.0)),
             track = Track(1L, null, 1694770269000L, null, 12142.23F, 0)
         )
     }

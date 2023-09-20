@@ -2,11 +2,19 @@ package com.darekbx.geotracker.ui
 
 import android.annotation.SuppressLint
 import android.graphics.DashPathEffect
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.darekbx.geotracker.repository.entities.SimplePointDto
@@ -14,6 +22,20 @@ import com.darekbx.geotracker.repository.model.Point
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
+
+@Composable
+fun MapBox(modifier: Modifier = Modifier, contents: @Composable () -> Unit) {
+    Box(
+        modifier = modifier
+            .defaultCard()
+            .padding(8.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        contents()
+    }
+}
 
 @SuppressLint("ResourceType")
 @Composable
@@ -50,11 +72,12 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
 
 fun MapView.drawLine(
     collection: List<Point>,
-    color: Int
+    color: Int,
+    width: Float = 6.0F
 ) {
     val polyline = Polyline().apply {
         outlinePaint.color = color
-        outlinePaint.strokeWidth = 4.0F
+        outlinePaint.strokeWidth = width
     }
 
     val mapPoints = collection.map { point -> GeoPoint(point.latitude, point.longitude) }
@@ -62,13 +85,16 @@ fun MapView.drawLine(
     overlays.add(polyline)
 }
 
-fun MapView.drawDashedLine(
-    collection: List<SimplePointDto>
+fun MapView.drawLine(
+    collection: List<SimplePointDto>,
+    dashed: Boolean = true
 ) {
     val polyline = Polyline().apply {
         outlinePaint.color = android.graphics.Color.parseColor("#C4463B")
-        outlinePaint.strokeWidth = 4.0F
-        outlinePaint.pathEffect = DashPathEffect(floatArrayOf(10f, 15f, 10f), 0F)
+        outlinePaint.strokeWidth = 6.0F
+        if (dashed) {
+            outlinePaint.pathEffect = DashPathEffect(floatArrayOf(20f, 10f, 20f), 0F)
+        }
     }
     val mapPoints = collection.map { point -> GeoPoint(point.latitude, point.longitude) }
     polyline.setPoints(mapPoints)
@@ -77,3 +103,5 @@ fun MapView.drawDashedLine(
 
 
 fun Point.toGeoPoint() = GeoPoint(this.latitude, this.longitude)
+
+fun SimplePointDto.toGeoPoint() = GeoPoint(this.latitude, this.longitude)

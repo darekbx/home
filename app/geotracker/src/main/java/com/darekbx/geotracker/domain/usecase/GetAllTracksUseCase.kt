@@ -9,10 +9,10 @@ class GetAllTracksUseCase @Inject constructor(
     private val repository: BaseRepository,
     private val settingsRepository: SettingsRepository
 ) {
-    suspend operator fun invoke(): List<List<SimplePointDto>> {
+    suspend operator fun invoke(skipActual: Boolean = false): List<List<SimplePointDto>> {
         val pointsToSkip = settingsRepository.nthPointsToSkip()
         return repository
             .fetchAllTrackPoints(pointsToSkip)
-            .drop(1) // Skip actual track
+            .drop(if (skipActual) 1 else 0) // Skip actual track
     }
 }
