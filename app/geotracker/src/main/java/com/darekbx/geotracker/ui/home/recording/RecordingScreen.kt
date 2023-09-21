@@ -2,6 +2,7 @@ package com.darekbx.geotracker.ui.home.recording
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -32,6 +33,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
+import com.darekbx.geotracker.gpx.Gpx
 import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.repository.model.Point
 import com.darekbx.geotracker.service.LocationService
@@ -49,12 +51,14 @@ import org.osmdroid.views.overlay.Polyline
 
 @Composable
 fun RecordingScreen(
+    gpxUri: Uri? = null,
     recordingViewState: RecordingViewState = rememberRecordingViewState(),
     recordingViewModel: RecordingViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val intent = Intent(context, LocationService::class.java)
     val allTracks by recordingViewState.fetchAllTracks().collectAsState(initial = emptyList())
+    val gpxTrack by recordingViewState.loadGpx(gpxUri).collectAsState(initial = null)
 
     var isMapVisible by remember { mutableStateOf(false) }
     var map by remember { mutableStateOf<MapView?>(null) }
@@ -109,7 +113,7 @@ fun RecordingScreen(
                     if (isMapVisible) {
                         Column(Modifier.fillMaxSize()) {
                             MapBox(Modifier.weight(1F)) {
-                                PreviewMap(allTracks) { mapView, marker ->
+                                PreviewMap(allTracks, gpxTrack) { mapView, marker ->
                                     map = mapView
                                     positionMarker = marker
                                 }
@@ -168,7 +172,11 @@ fun StopButton(onClick: () -> Unit = { }) {
 }
 
 @Composable
-fun PreviewMap(historicalTracks: List<List<SimplePointDto>>, ready: (MapView, Marker) -> Unit) {
+fun PreviewMap(
+    historicalTracks: List<List<SimplePointDto>>,
+    gpxTrack: Gpx?,
+    ready: (MapView, Marker) -> Unit
+) {
     val context = LocalContext.current
     val mapView = rememberMapWithLifecycle()
     val zoomToPlace = 17.0
@@ -178,8 +186,14 @@ fun PreviewMap(historicalTracks: List<List<SimplePointDto>>, ready: (MapView, Ma
             .load(context, context.getSharedPreferences("osm", Context.MODE_PRIVATE))
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
+        map.overlays.clear()
+
         historicalTracks.forEach { collection ->
             map.drawLine(collection)
+        }
+
+        gpxTrack?.let {
+            map.drawLine(it.points, android.graphics.Color.parseColor("#0A247D"), 8F)
         }
 
         val positionMarker = Marker(map).apply {

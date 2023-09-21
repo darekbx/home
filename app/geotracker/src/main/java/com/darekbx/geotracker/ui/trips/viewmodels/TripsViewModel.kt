@@ -8,7 +8,6 @@ import com.darekbx.geotracker.domain.usecase.FixEndTimestampUseCase
 import com.darekbx.geotracker.domain.usecase.TripsWrapper
 import com.darekbx.geotracker.repository.model.Track
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

@@ -1,6 +1,5 @@
 package com.darekbx.geotracker.domain.usecase
 
-import android.util.Log
 import com.darekbx.geotracker.repository.BaseRepository
 import com.darekbx.geotracker.repository.model.Track
 import javax.inject.Inject

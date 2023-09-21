@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.darekbx.geotracker.ui.alltracks.AllTracksScreen
+import com.darekbx.geotracker.ui.calendar.CalendarScreen
 import com.darekbx.geotracker.ui.home.HomeScreen
 import com.darekbx.geotracker.ui.placestovisit.PlacesToVisitScreen
 import com.darekbx.geotracker.ui.settings.SettingsScreen
@@ -24,11 +25,17 @@ fun GeoTrackerNavHost(
         modifier = modifier
     ) {
         composable(route = HomeDestination.route) {
-            HomeScreen()
+            HomeScreen {
+                navController.navigate(CalendarDestination.route)
+            }
         }
 
         composable(route = MapDestination.route) {
             AllTracksScreen()
+        }
+
+        composable(route = CalendarDestination.route) {
+            CalendarScreen()
         }
 
         composable(route = PlacesToVisitDestination.route) {

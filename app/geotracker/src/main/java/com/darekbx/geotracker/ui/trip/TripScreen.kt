@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,6 +58,8 @@ import com.darekbx.geotracker.ui.rememberMapWithLifecycle
 import com.darekbx.geotracker.ui.theme.GeoTrackerTheme
 import com.darekbx.geotracker.ui.theme.LocalStyles
 import com.darekbx.geotracker.ui.toGeoPoint
+import com.darekbx.geotracker.ui.trip.charts.AltitudeDataChart
+import com.darekbx.geotracker.ui.trip.charts.SpeedDataChart
 import com.darekbx.geotracker.utils.DateTimeUtils
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -99,8 +102,8 @@ fun TripScreen(
                 Column(Modifier.fillMaxSize()) {
                     SummaryBox(state.data.track) { labelDialog = true }
                     if (state.data.points.isNotEmpty()) {
-                        SpeedChart(points = state.data.points)
-                        AltitudeChart(points = state.data.points)
+                        SpeedChart(trackId)
+                        AltitudeChart(trackId)
                         MapBox {
                             PreviewMap(
                                 points = state.data.points,
@@ -248,7 +251,7 @@ fun PointsControl(pointsCount: Int, onRangeChanged: (Int, Int) -> Unit) {
 }
 
 @Composable
-fun SpeedChart(points: List<Point>) {
+fun SpeedChart(tripId: Long) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -256,17 +259,12 @@ fun SpeedChart(points: List<Point>) {
             .padding(8.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        Text(
-            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
-            text = "Speed chart",
-            style = LocalStyles.current.grayLabel,
-            fontSize = 14.sp,
-        )
+        SpeedDataChart(modifier = Modifier.fillMaxWidth().height(56.dp), tripId = tripId)
     }
 }
 
 @Composable
-fun AltitudeChart(points: List<Point>) {
+fun AltitudeChart(tripId: Long) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -274,12 +272,7 @@ fun AltitudeChart(points: List<Point>) {
             .padding(8.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        Text(
-            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
-            text = "Altitude chart",
-            style = LocalStyles.current.grayLabel,
-            fontSize = 14.sp,
-        )
+        AltitudeDataChart(modifier = Modifier.fillMaxWidth().height(56.dp), tripId = tripId)
     }
 }
 

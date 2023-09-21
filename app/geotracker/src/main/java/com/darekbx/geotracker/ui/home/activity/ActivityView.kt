@@ -43,7 +43,8 @@ import kotlin.random.Random
 @Composable
 fun ActivityView(
     modifier: Modifier = Modifier,
-    activityViewState: ActivityViewState = rememberActivityViewState()
+    activityViewState: ActivityViewState = rememberActivityViewState(),
+    openCalendar: () -> Unit = { }
 ) {
     val state = activityViewState.state
 
@@ -59,7 +60,7 @@ fun ActivityView(
     ) {
         when (state) {
             is ActivityUiState.InProgress -> LoadingProgress()
-            is ActivityUiState.Done -> ActivityBox(activityData = state.data)
+            is ActivityUiState.Done -> ActivityBox(activityData = state.data) { openCalendar() }
             else -> {}
         }
     }
@@ -68,14 +69,15 @@ fun ActivityView(
 @Composable
 private fun ActivityBox(
     modifier: Modifier = Modifier,
-    activityData: List<ActivityData>
+    activityData: List<ActivityData>,
+    openCalendar: () -> Unit = { }
 ) {
     Column(
         modifier = modifier
             .padding(8.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        Header()
+        Header { openCalendar() }
         Spacer(modifier = Modifier.height(12.dp))
         if (activityData.isNotEmpty()) {
             Chart(

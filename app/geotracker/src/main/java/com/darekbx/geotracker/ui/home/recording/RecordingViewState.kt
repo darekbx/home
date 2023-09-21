@@ -1,5 +1,6 @@
 package com.darekbx.geotracker.ui.home.recording
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -25,6 +26,8 @@ class RecordingViewState(
     }
 
     fun fetchAllTracks() = recordingViewModel.fetchAllTracks()
+
+    fun loadGpx(uri: Uri?) = recordingViewModel.loadGpx(uri)
 }
 
 @Composable

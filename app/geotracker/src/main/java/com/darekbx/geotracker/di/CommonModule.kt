@@ -1,10 +1,12 @@
 package com.darekbx.geotracker.di
 
 import android.app.NotificationManager
+import android.content.ContentResolver
 import android.content.Context
 import android.location.LocationManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.darekbx.geotracker.gpx.GpxReader
 import com.darekbx.geotracker.location.LocationCollector
 import com.darekbx.geotracker.repository.BaseRepository
 import com.darekbx.geotracker.repository.Repository
@@ -25,6 +27,16 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 class CommonModule {
+
+    @Provides
+    fun provideContentResolver(@ApplicationContext context: Context): ContentResolver {
+        return context.contentResolver
+    }
+
+    @Provides
+    fun provideGpxReader(): GpxReader {
+        return GpxReader()
+    }
 
     @Provides
     fun provideSettingsRepository(dataStore: DataStore<Preferences>): SettingsRepository {

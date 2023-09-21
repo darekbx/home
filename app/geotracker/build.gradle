@@ -61,6 +61,7 @@ dependencies {
     implementation other.accompanist
 
     implementation 'de.charlex.compose:revealswipe:1.0.0'
+    implementation "io.github.boguszpawlowski.composecalendar:composecalendar:1.1.1"
 
     testImplementation other.junit
     testImplementation other.mockk_android

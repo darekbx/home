@@ -53,8 +53,6 @@ import javax.inject.Inject
 
 /**
  * TODO:
- *  - calendar view
- *  - pick GPX
  *  - add ability to edit track
  *  - add ability to add new track (without points)
  */

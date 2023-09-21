@@ -8,6 +8,8 @@ data class Point(
     val altitude: Double
 ) {
 
+    constructor(latitude: Double, longitude: Double) : this(0L, latitude, longitude, 0F, 0.0)
+
     override fun toString(): String {
         return "$timestamp, ($latitude, $longitude), ${speed}ms, ${altitude}m"
     }
