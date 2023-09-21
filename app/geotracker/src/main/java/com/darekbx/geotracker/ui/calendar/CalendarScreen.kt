@@ -1,5 +1,6 @@
 package com.darekbx.geotracker.ui.calendar
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,6 +56,7 @@ import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Calendar
 import java.util.Locale
+import kotlin.system.measureTimeMillis
 
 @Composable
 fun CalendarScreen(
@@ -121,6 +123,15 @@ fun YearCalendar(
     //
     // TODO move to viewmodel
     //
+    val t = measureTimeMillis {
+        val months = wrapper.trips.groupBy {
+            Calendar.getInstance()
+                .apply { timeInMillis = it.startTimestamp }
+                .get(Calendar.MONTH)
+        }
+    }
+    Log.v("SIGMA", "Time: ${t}ms")
+
     val months = wrapper.trips.groupBy {
         Calendar.getInstance()
             .apply { timeInMillis = it.startTimestamp }
@@ -129,6 +140,9 @@ fun YearCalendar(
 
     LazyColumn(modifier) {
         items(months.keys.toList()) { month ->
+            val distance = months[month]
+                ?.sumOf { (it.distance?:0F).toDouble() }
+                ?: 0.0
             StaticCalendar(
                 modifier = Modifier.fillMaxWidth(),
                 calendarState = CalendarState(
@@ -142,7 +156,7 @@ fun YearCalendar(
                 },
                 showAdjacentMonths = false,
                 horizontalSwipeEnabled = false,
-                monthHeader = { monthState -> MonthHeader(monthState, month) },
+                monthHeader = { monthState -> MonthHeader(monthState, month, distance) },
                 daysOfWeekHeader = { daysOfWeek -> WeekHeader(daysOfWeek) }
             )
         }
@@ -166,14 +180,14 @@ private fun WeekHeader(daysOfWeek: List<DayOfWeek>) {
 }
 
 @Composable
-private fun MonthHeader(monthState: MonthState, month: Int) {
+private fun MonthHeader(monthState: MonthState, month: Int, distance: Double) {
     Text(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth(),
         textAlign = TextAlign.Center,
         fontWeight = FontWeight.Bold,
-        text = Month.of(month + 1).name,
+        text = "${Month.of(month + 1).name} (%.1fkm)".format(distance),
         color = Color.White,
     )
 }

@@ -1,6 +1,5 @@
 package com.darekbx.geotracker.repository
 
-import android.util.Log
 import com.darekbx.geotracker.repository.entities.PlaceDto
 import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.repository.entities.RouteDto
@@ -215,7 +214,7 @@ class Repository @Inject constructor(
         return Calendar.getInstance().apply {
             set(Calendar.YEAR, year)
             set(Calendar.MONTH, Calendar.JANUARY)
-            set(Calendar.DAY_OF_YEAR, 0)
+            set(Calendar.DAY_OF_YEAR, 1)
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
