@@ -38,6 +38,10 @@ class StocksRepository @Inject constructor(
 
     suspend fun rates(currencyId: Long) = stocksDao.getRates(currencyId)
 
+    suspend fun deleteCurrancy(id: Long) {
+        stocksDao.deleteCurrency(id)
+    }
+
     suspend fun clearDataForImport() {
         stocksDao.deleteCurrencies()
         stocksDao.deleteRates()
@@ -50,10 +54,14 @@ class StocksRepository @Inject constructor(
         return stocksDao.add(CurrencyDto(label = label, queryParam = queryParam))
     }
 
-    suspend fun addRates(currencyId:Long, data: List<Double>) {
+    suspend fun addRates(currencyId: Long, data: List<Double>) {
         data.forEach { rate ->
             stocksDao.add(RateDto(currencyId = currencyId, value = rate))
         }
+    }
+
+    suspend fun addRate(currencyId: Long, rate: Double) {
+        stocksDao.add(RateDto(currencyId = currencyId, value = rate))
     }
 
     suspend fun getStocksInfo(delay: Long = Random.nextInt(1, 3) * 1000L): StocksInfo {

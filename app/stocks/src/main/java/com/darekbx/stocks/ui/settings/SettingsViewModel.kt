@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.stocks.data.ArdustocksImport
+import com.darekbx.stocks.data.StockType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,13 +24,18 @@ class SettingsViewModel @Inject constructor(
     val uiState: State<UiState>
         get() = _uiState
 
+    fun addCustom() {
+        viewModelScope.launch {
+            _uiState.value = UiState.InProgress
+            ardustocksImport.addCustom(StockType.ALLEGRO, "ale")
+            _uiState.value = UiState.Idle
+        }
+    }
+
     fun importFromArdustocks() {
         viewModelScope.launch {
             _uiState.value = UiState.InProgress
-
-            ardustocksImport.importFromArdustocks()
-
-            delay(2000L)
+            //ardustocksImport.importFromCsv()
             _uiState.value = UiState.Idle
         }
     }

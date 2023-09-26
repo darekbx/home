@@ -9,5 +9,6 @@ class DeleteTrackUseCase @Inject constructor(
 
     suspend operator fun invoke(trackId: Long) {
         repository.deleteTrack(trackId)
+        repository.deleteAllPoints(trackId)
     }
 }

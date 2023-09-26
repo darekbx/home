@@ -120,18 +120,6 @@ fun YearCalendar(
     year: Int,
     wrapper: TripsWrapper
 ) {
-    //
-    // TODO move to viewmodel
-    //
-    val t = measureTimeMillis {
-        val months = wrapper.trips.groupBy {
-            Calendar.getInstance()
-                .apply { timeInMillis = it.startTimestamp }
-                .get(Calendar.MONTH)
-        }
-    }
-    Log.v("SIGMA", "Time: ${t}ms")
-
     val months = wrapper.trips.groupBy {
         Calendar.getInstance()
             .apply { timeInMillis = it.startTimestamp }

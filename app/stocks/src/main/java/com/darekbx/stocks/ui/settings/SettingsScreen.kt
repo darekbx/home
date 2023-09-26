@@ -22,14 +22,20 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = hiltViewModel()) {
         val state by settingsViewModel.uiState
         when (state) {
             UiState.InProgress -> ProcessingView(Modifier.fillMaxHeight())
-            else -> SettingsView { settingsViewModel.importFromArdustocks() }
+            else -> SettingsView(
+                onImportClick = { settingsViewModel.importFromArdustocks() },
+                onAddCustomClick = { settingsViewModel.addCustom() }
+            )
         }
     }
 }
 
 @Preview(showSystemUi = true, device = Devices.PIXEL_2_XL)
 @Composable
-private fun SettingsView(onImportClick: () -> Unit = { }) {
+private fun SettingsView(
+    onImportClick: () -> Unit = { },
+    onAddCustomClick: () -> Unit = { }
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,7 +45,9 @@ private fun SettingsView(onImportClick: () -> Unit = { }) {
         Spacer(modifier = Modifier.height(32.dp))
         Text(text = "Please update Ardustocks assets before import!", fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
-        ImportButton { onImportClick() }
+        ImportButton("Import from Ardustocks") { onImportClick() }
+        Spacer(modifier = Modifier.height(16.dp))
+        ImportButton("Add custom") { onAddCustomClick() }
     }
 }
 
@@ -59,13 +67,13 @@ fun ProcessingView(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-private fun ImportButton(onClick: () -> Unit = { }) {
+private fun ImportButton(label: String = "Import", onClick: () -> Unit = { }) {
     Button(onClick = onClick) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Import from Ardustocks")
+            Text(text = label)
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 modifier = Modifier

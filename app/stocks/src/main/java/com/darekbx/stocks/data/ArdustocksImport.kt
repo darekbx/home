@@ -1,6 +1,7 @@
 package com.darekbx.stocks.data
 
 import android.content.Context
+import android.util.Log
 import com.darekbx.stocks.BuildConfig
 import java.io.BufferedReader
 
@@ -18,6 +19,27 @@ class ArdustocksImport(
             Source(StockType.BTC, "btc.v", "btc.txt"),
             Source(StockType.GOLD, "xaupln", "gold.txt")
         )
+    }
+
+    suspend fun addCustom(stockType: StockType, query: String) {
+        stocksRepository.addCurrency(stockType.label, query)
+    }
+
+    suspend fun importFromCsv() {
+        stocksRepository.clearDataForImport()
+        val idMap = mutableMapOf<Long, Long>()
+        var index = 1L
+        for (source in SOURCES) {
+            val currencyId = stocksRepository.addCurrency(source.type.label, source.queryParam)
+            idMap.put(index++, currencyId)
+        }
+
+        // id, currency_id, value
+        val contents = readAssetContents("rates.csv")
+        contents?.lines()?.forEach { line ->
+            val data = line.split(',')
+            stocksRepository.addRate(idMap[data[1].toLong()]!!, data[2].toDouble())
+        }
     }
 
     /**

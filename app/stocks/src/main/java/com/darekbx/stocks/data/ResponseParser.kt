@@ -2,10 +2,20 @@ package com.darekbx.stocks.data
 
 class ResponseParser {
 
-    fun parseResponse(response: String): Double? {
-        val start = response.indexOf("cy~")
-        val end = response.indexOf("~", start + 3)
-        val value = response.substring(start + 3, end)
-        return value.toDoubleOrNull()
+    fun parseResponse(response: String, partIndex: Int = 0): Double? {
+        val start = response.indexOf("(")
+        val end = response.indexOf(")", start + 1)
+        val value = response.substring(start + 1, end)
+        return (if (value.contains("|")) {
+            val parts = value.split("|")
+            extractFromPart(parts[partIndex])
+        } else {
+            extractFromPart(response)
+        }).toDoubleOrNull()
+    }
+
+    private fun extractFromPart(part: String): String {
+        val start = part.split("~")
+        return start[3]
     }
 }

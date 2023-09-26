@@ -145,7 +145,6 @@ class Repository @Inject constructor(
     }
 
     override suspend fun deleteTrack(trackId: Long) {
-        pointDao.deleteByTrack(trackId)
         trackDao.delete(trackId)
     }
 

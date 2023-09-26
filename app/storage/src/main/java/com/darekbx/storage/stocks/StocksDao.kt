@@ -7,6 +7,9 @@ import androidx.room.Query
 @Dao
 interface StocksDao {
 
+    @Query("DELETE FROM currency WHERE id = :id")
+    suspend fun deleteCurrency(id: Long)
+
     @Query("DELETE FROM currency")
     suspend fun deleteCurrencies()
 

@@ -32,14 +32,19 @@ class StocksViewModel @Inject constructor(
     fun loadRates() {
         viewModelScope.launch {
             _uiState.value = UiState.InProgress
+            rateInfoList.clear()
 
+            val color = Color(160, 160, 160)
             val currencies = stocksRepository.currencies()
             currencies.forEach { currency ->
                 stocksRepository.refreshCurrency(currency)
                 val rates = stocksRepository.rates(currency.id!!).map { it.value }
-                val step = calculateStep(rates[0])
-                val status = obtainStatus(rates)
-                rateInfoList.add(0, RateInfo(rates, currency.label, step, Color(160, 160, 160), status))
+                if (rates.isNotEmpty()) {
+                    val step = calculateStep(rates[0])
+                    val status = obtainStatus(rates)
+                    val rateInfo = RateInfo(rates, currency.label, step, color, status)
+                    rateInfoList.add(0, rateInfo)
+                }
                 _uiState.value = UiState.Idle
             }
         }
@@ -54,6 +59,9 @@ class StocksViewModel @Inject constructor(
     }
 
     private fun obtainStatus(rates: List<Double>): Status {
+        if (rates.size < 3) {
+            return Status.EQUAL
+        }
         val last = rates.last()
         val penultimate = rates[rates.size - 2]
         return when {

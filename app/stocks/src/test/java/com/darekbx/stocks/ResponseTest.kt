@@ -30,6 +30,6 @@ class ResponseTest {
 
         // Then
         assertNotNull(value)
-        assertEquals(29.971, value!!, 0.0001)
+        assertEquals(30.74, value!!, 0.0001)
     }
 }

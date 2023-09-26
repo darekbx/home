@@ -74,10 +74,7 @@ fun PlacesToVisitScreen(
             PlacesToVisitUiState.Idle -> {}
             PlacesToVisitUiState.InProgress -> LoadingProgress()
         }
-        ActionButtons(
-            onAddClick = { showAddLocation = true },
-            onGpxClick = {}
-        )
+        ActionButtons { showAddLocation = true }
     }
 
     if (selectedLocation != null) {
@@ -106,7 +103,7 @@ fun PlacesToVisitScreen(
 }
 
 @Composable
-private fun ActionButtons(onAddClick: () -> Unit, onGpxClick: () -> Unit) {
+private fun ActionButtons(onAddClick: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
@@ -124,12 +121,6 @@ private fun ActionButtons(onAddClick: () -> Unit, onGpxClick: () -> Unit) {
                     contentDescription = "add",
                     tint = Color.White
                 )
-            }
-            FloatingActionButton(
-                shape = RoundedCornerShape(50),
-                onClick = { onGpxClick() }
-            ) {
-                Text(text = "GPX", color = Color.White)
             }
         }
     }
