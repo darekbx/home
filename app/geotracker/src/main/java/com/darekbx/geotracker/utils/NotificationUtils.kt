@@ -38,6 +38,7 @@ class NotificationUtils @Inject constructor(
             .setContentTitle(title)
             .setContentText(text)
             .setContentIntent(tracksPendingIntent)
+            .setOngoing(true)
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
