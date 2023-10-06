@@ -13,7 +13,7 @@ data class Colors(
     val red: Color = Color(0xFFE75B52),
 )
 
-
+val LocalColors = compositionLocalOf { Colors() }
 
 @Composable
 fun inputColors() = TextFieldDefaults.colors(
@@ -24,5 +24,3 @@ fun inputColors() = TextFieldDefaults.colors(
     unfocusedIndicatorColor = Color.Transparent,
     errorIndicatorColor = Color.Transparent,
 )
-
-val LocalColors = compositionLocalOf { Colors() }

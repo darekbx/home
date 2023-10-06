@@ -9,17 +9,14 @@ import com.darekbx.geotracker.domain.usecase.GetRecordingStateUseCase
 import com.darekbx.geotracker.domain.usecase.GetActiveTrackPointsUseCase
 import com.darekbx.geotracker.domain.usecase.GetActiveTrackUseCase
 import com.darekbx.geotracker.domain.usecase.StopRecordingUseCase
-import com.darekbx.geotracker.gpx.Gpx
 import com.darekbx.geotracker.gpx.GpxReader
 import com.darekbx.geotracker.service.LocationService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 sealed class RecordingUiState {

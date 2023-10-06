@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
-
 package com.darekbx.stocks.ui.stocks
 
 import androidx.compose.foundation.layout.*
