@@ -16,3 +16,7 @@ object SettingsDestination : AppDestination {
 object LoginDestination : AppDestination {
     override val route: String = "login"
 }
+
+object CreatorsDestination : AppDestination {
+    override val route: String = "creators"
+}

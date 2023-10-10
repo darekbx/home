@@ -62,6 +62,7 @@ dependencies {
     implementation other.okhttp
     implementation other.okhttp_logging_interceptor
     implementation other.coil
+    implementation other.markdown
 
     testImplementation other.junit
     testImplementation other.mockk_android

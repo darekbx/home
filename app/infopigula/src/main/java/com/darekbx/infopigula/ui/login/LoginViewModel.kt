@@ -1,13 +1,11 @@
 package com.darekbx.infopigula.ui.login
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.infopigula.domain.LoginUseCase
-import com.darekbx.infopigula.repository.Session
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,8 +38,7 @@ interface LoginViewModel {
 
 @HiltViewModel
 class DefaultLoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase,
-    private val session: Session
+    private val loginUseCase: LoginUseCase
 ) : ViewModel(), LoginViewModel {
 
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
@@ -68,11 +65,6 @@ class DefaultLoginViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = LoginUiState.InProgress
             val result = loginUseCase.invoke(email, password)
-
-            if (result.isSuccess) {
-                session.setUserActive()
-            }
-
             _uiState.value =
                 if (result.isSuccess) {
                     LoginUiState.Done

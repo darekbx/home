@@ -6,6 +6,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.darekbx.infopigula.ui.creators.CreatorsScreen
 import com.darekbx.infopigula.ui.home.HomeScreen
 import com.darekbx.infopigula.ui.login.LoginScreen
 import com.darekbx.infopigula.ui.settings.SettingsScreen
@@ -33,6 +34,10 @@ fun AppNavHost(
 
         composable(route = SettingsDestination.route) {
             SettingsScreen()
+        }
+
+        composable(route = CreatorsDestination.route) {
+            CreatorsScreen()
         }
     }
 }

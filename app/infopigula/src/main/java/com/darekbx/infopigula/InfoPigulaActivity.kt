@@ -44,14 +44,9 @@ import javax.inject.Inject
 
 /**
  * TODO:
- * - light/dark theme set from settings
  * - settings screen
- *   - logout button
  *   - dark/light theme
- * - na start sprawdzenie czy sa nowi tworcy, pokazanie czerwonej kroki jak sa + oznaczenie nowego tworcy
- * - na glownym ekranie pokazac czy user jest zalogowany
- *   - jak user jest zalogowany to pokazac jest plan
- *   - jak plan premium to czas kiedy wygasa (progress??)
+ *   - filtered groups
  */
 @AndroidEntryPoint
 class InfoPigulaActivity : LauncherActivity() {

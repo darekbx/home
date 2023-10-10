@@ -1,8 +1,10 @@
 package com.darekbx.common.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,7 +20,14 @@ fun InformationDialog(
         onDismissRequest = { onDismiss() },
         text = { Text(text = message) },
         confirmButton = { },
-        dismissButton = { Button(onClick = { onDismiss() }) { Text("Ok") } }
+        dismissButton = {
+            Button(onClick = { onDismiss() }) {
+                Text(
+                    "Ok",
+                    color = MaterialTheme.colorScheme.background
+                )
+            }
+        }
     )
 }
 

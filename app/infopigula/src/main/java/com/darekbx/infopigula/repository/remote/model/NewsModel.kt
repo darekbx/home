@@ -3,13 +3,13 @@ package com.darekbx.infopigula.repository.remote.model
 import com.google.gson.annotations.SerializedName
 
 data class NewsResponse(
-    val pager: Pager,
+    val pager: RemotePager,
     @SerializedName("form_options")
     val formOptions: FormOptions,
     val rows: List<Row>
 )
 
-data class Pager(
+data class RemotePager(
     @SerializedName("items_per_page")
     val itemsPerPage: Int,
     @SerializedName("current_page")
@@ -21,12 +21,12 @@ data class Pager(
 )
 
 data class FormOptions(
-    val groups: List<Group>,
+    val groups: List<RemoteGroup>,
     @SerializedName("last_releases")
-    val lastReleases: List<LastRelease>
+    val lastReleases: List<RemoteLastRelease>
 )
 
-data class Group(
+data class RemoteGroup(
     @SerializedName("target_id")
     val targetId: String,
     val value: String,
@@ -34,7 +34,7 @@ data class Group(
     val access: String
 )
 
-data class LastRelease(
+data class RemoteLastRelease(
     @SerializedName("target_id")
     val targetId: String,
     val value: String
@@ -43,7 +43,7 @@ data class LastRelease(
 data class Row(
     val nid: Int,
     @SerializedName("group_target_id")
-    val groupTargetId: Int,
+    val groupTargetId: String,
     @SerializedName("title_news")
     val titleNews: String,
     @SerializedName("title_release")

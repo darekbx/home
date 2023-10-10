@@ -2,10 +2,6 @@ package com.darekbx.infopigula.repository.remote.model
 
 import com.google.gson.annotations.SerializedName
 
-data class CreatorsResponse(
-    val creators: List<Creator>
-)
-
 data class Creator(
     val name: String,
     val tid: String,

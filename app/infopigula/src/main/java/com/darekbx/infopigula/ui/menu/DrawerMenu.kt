@@ -23,9 +23,11 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.ExitToApp
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,12 +38,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,12 +55,11 @@ import androidx.navigation.NavController
 import com.darekbx.common.ui.InformationDialog
 import com.darekbx.infopigula.R
 import com.darekbx.infopigula.model.User
+import com.darekbx.infopigula.navigation.CreatorsDestination
 import com.darekbx.infopigula.navigation.LoginDestination
 import com.darekbx.infopigula.navigation.SettingsDestination
 import com.darekbx.infopigula.ui.ProgressIndicator
 import com.darekbx.infopigula.ui.theme.InfoPigulaTheme
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun DrawerMenu(
@@ -63,37 +67,23 @@ fun DrawerMenu(
     navController: NavController,
     closeDrawer: () -> Unit
 ) {
-    DrawerMenuView(
-        drawerMenuViewModel = drawerMenuViewModel,
-        navigate = { route ->
-            closeDrawer()
-            navController.navigate(route)
-        },
-        close = { closeDrawer() }
-    )
-}
-
-@Composable
-private fun DrawerMenuView(
-    drawerMenuViewModel: DrawerMenuViewModel,
-    navigate: (route: String) -> Unit = { },
-    close: () -> Unit = { },
-) {
     val state by drawerMenuViewModel.uiState.collectAsState(initial = DrawerMenuUiState.Idle)
     var loggedUser by remember { mutableStateOf<User?>(null) }
     var isInProgress by remember { mutableStateOf(false) }
     var userFetchFailed by remember { mutableStateOf(false) }
-    
+
     state.let { safeState ->
         when (safeState) {
             is DrawerMenuUiState.Done -> {
                 isInProgress = false
                 loggedUser = safeState.user
             }
+
             is DrawerMenuUiState.Failed -> {
                 isInProgress = false
                 userFetchFailed = true
             }
+
             DrawerMenuUiState.Idle -> isInProgress = false
             DrawerMenuUiState.InProgress -> isInProgress = true
             DrawerMenuUiState.NotLoggedIn -> isInProgress = false
@@ -111,39 +101,15 @@ private fun DrawerMenuView(
             .background(MaterialTheme.colorScheme.surface)
             .padding(start = 16.dp, top = 8.dp, end = 16.dp)
     ) {
-        Column {
-            TopBar(close)
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Text(text = "TODO: Display subscription plan details", color = Color.Red,
-                fontSize = 11.sp)
-
-            loggedUser?.let {
-                ProfileView(it)
-                Spacer(modifier = Modifier.height(32.dp))
-            }
-
-            if (loggedUser == null) {
-                MenuItem(
-                    Modifier.clickable { navigate(LoginDestination.route) },
-                    "Login",
-                    Icons.Default.AccountCircle
-                )
-            }
-            MenuItem(
-                Modifier.clickable { navigate(SettingsDestination.route) },
-                "Settings",
-                Icons.Default.Settings
-            )
-
-            if (loggedUser != null) {
-                MenuItem(
-                    Modifier.clickable { drawerMenuViewModel.logout() },
-                    "Logout",
-                    Icons.Outlined.ExitToApp
-                )
-            }
-        }
+        MenuContents(
+            loggedUser,
+            navigate = { route ->
+                closeDrawer()
+                navController.navigate(route)
+            },
+            closeDrawer,
+            drawerMenuViewModel::logout
+        )
 
         if (isInProgress) {
             ProgressIndicator()
@@ -155,6 +121,84 @@ private fun DrawerMenuView(
                 userFetchFailed = false
             }
         }
+    }
+}
+
+@Composable
+private fun MenuContents(
+    loggedUser: User? = null,
+    navigate: (route: String) -> Unit = { },
+    close: () -> Unit = { },
+    logout: () -> Unit = { }
+) {
+    Column {
+        TopBar(close)
+        Spacer(modifier = Modifier.height(32.dp))
+
+        loggedUser?.let {
+            ProfileView(it)
+            Spacer(modifier = Modifier.height(8.dp))
+            SubscriptionInfo(it)
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+
+        if (loggedUser == null) {
+            MenuItem(
+                Modifier.clickable { navigate(LoginDestination.route) },
+                "Login",
+                Icons.Default.AccountCircle
+            )
+        }
+        MenuItem(
+            Modifier.clickable { navigate(SettingsDestination.route) },
+            "Settings",
+            Icons.Default.Settings
+        )
+
+        if (loggedUser != null) {
+            MenuItem(
+                Modifier.clickable { navigate(CreatorsDestination.route) },
+                "Creators",
+                Icons.Outlined.Person
+            )
+            MenuItem(
+                Modifier.clickable { logout() },
+                "Logout",
+                Icons.Outlined.ExitToApp
+            )
+        }
+    }
+}
+
+@Composable
+private fun SubscriptionInfo(it: User) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            modifier = Modifier.size(14.dp),
+            painter = painterResource(id = R.drawable.ic_premium),
+            contentDescription = "premium",
+            tint = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(modifier = Modifier.width(2.dp))
+        Text(
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append(it.subscriptionPlanName)
+                }
+                append(" until ")
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append(it.subscriptionEnd)
+                }
+            },
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 11.sp
+        )
     }
 }
 
@@ -258,11 +302,13 @@ private fun TopBar(close: () -> Unit) {
 @Composable
 fun MenuPreviewLight() {
     InfoPigulaTheme(isDarkTheme = false) {
-        Box(Modifier.height(340.dp)) {
-            DrawerMenuView(drawerMenuViewModel = object : DrawerMenuViewModel {
-                override val uiState: Flow<DrawerMenuUiState> = emptyFlow()
-                override fun logout() {}
-            })
+        Surface {
+            Box(
+                Modifier
+                    .height(380.dp)
+                    .padding(16.dp)) {
+                MenuContents(loggedUser = User("39469", "email@proton.me", "Premium", "04.11.2023"))
+            }
         }
     }
 }
@@ -271,11 +317,13 @@ fun MenuPreviewLight() {
 @Composable
 fun MenuPreviewDark() {
     InfoPigulaTheme(isDarkTheme = true) {
-        Box(Modifier.height(340.dp)) {
-            DrawerMenuView(drawerMenuViewModel = object : DrawerMenuViewModel {
-                override val uiState: Flow<DrawerMenuUiState> = emptyFlow()
-                override fun logout() {}
-            })
+        Surface {
+            Box(
+                Modifier
+                    .height(340.dp)
+                    .padding(16.dp)) {
+                MenuContents()
+            }
         }
     }
 }

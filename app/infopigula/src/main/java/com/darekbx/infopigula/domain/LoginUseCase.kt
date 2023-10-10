@@ -2,6 +2,7 @@ package com.darekbx.infopigula.domain
 
 import com.darekbx.infopigula.BuildConfig
 import com.darekbx.infopigula.repository.RemoteRepository
+import com.darekbx.infopigula.repository.Session
 import com.darekbx.infopigula.repository.SettingsRepository
 import com.darekbx.infopigula.repository.remote.model.UserLogin
 import javax.inject.Inject
@@ -9,6 +10,7 @@ import javax.inject.Inject
 class LoginUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val remoteRepository: RemoteRepository,
+    private val session: Session
 ) {
 
     operator suspend fun invoke(email: String, password: String): Result<Boolean> {
@@ -16,6 +18,7 @@ class LoginUseCase @Inject constructor(
             val userLogin = UserLogin(email, password)
             val result = remoteRepository.login(userLogin)
             settingsRepository.saveAuthCredentials(result.currentUser.uid, result.accessToken)
+            session.setUserActive()
             return Result.success(true)
         } catch (e: Exception) {
             if (BuildConfig.DEBUG) {

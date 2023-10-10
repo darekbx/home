@@ -8,10 +8,10 @@ import com.darekbx.infopigula.domain.UserNotLoggedInException
 import com.darekbx.infopigula.model.User
 import com.darekbx.infopigula.repository.Session
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -50,14 +50,11 @@ class DefaultDrawerMenuViewModel @Inject constructor(
              * Listen for sesison changes.
              * When user is authorized, fetch current user
              */
-            session
-                .isUserActive
-                .receiveAsFlow()
-                .collect { isUserActive ->
-                    if (isUserActive) {
-                        initializeUser()
-                    }
+            session.isUserActive.consumeEach { isUserActive ->
+                if (isUserActive) {
+                    initializeUser()
                 }
+            }
         }
     }
 
@@ -82,7 +79,6 @@ class DefaultDrawerMenuViewModel @Inject constructor(
             _uiState.value = DrawerMenuUiState.InProgress
             delay(500L)
             logoutUseCase.invoke()
-            session.setLoggedOut()
             _uiState.value = DrawerMenuUiState.LoggedOut
         }
     }
