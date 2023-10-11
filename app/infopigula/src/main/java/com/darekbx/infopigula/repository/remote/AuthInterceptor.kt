@@ -12,11 +12,12 @@ class AuthInterceptor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         var accessToken = runBlocking { settingsRepository.accessToken() }
+        var csrfToken = runBlocking { settingsRepository.csrfToken() }
         if (accessToken.isNullOrBlank()) {
             return chain.proceed(request)
         }
 
-        val response = chain.proceed(newRequestWithAccessToken(accessToken, request))
+        val response = chain.proceed(newRequestWithAccessToken(accessToken, csrfToken, request))
         if (response.code == HttpURLConnection.HTTP_FORBIDDEN) {
             runBlocking { settingsRepository.clearCredentials() }
         }
@@ -24,8 +25,9 @@ class AuthInterceptor(
         return response
     }
 
-    private fun newRequestWithAccessToken(accessToken: String?, request: Request): Request =
+    private fun newRequestWithAccessToken(accessToken: String?, csrfToken: String?, request: Request): Request =
         request.newBuilder()
             .header("Authorization", "Bearer $accessToken")
+            .header("X-CSRF-Token", csrfToken ?: "")
             .build()
 }

@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.infopigula.domain.LoginUseCase
+import com.darekbx.infopigula.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,9 +25,11 @@ interface LoginViewModel {
 
     var email: String
     var password: String
+    var hasRememberMe: Boolean
 
     fun updateEmail(input: String)
     fun updatePassword(input: String)
+    fun setRememberMe(value: Boolean)
 
     fun isEmailValid(): Boolean
     fun isPasswordValid(): Boolean
@@ -38,7 +41,8 @@ interface LoginViewModel {
 
 @HiltViewModel
 class DefaultLoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel(), LoginViewModel {
 
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
@@ -48,6 +52,15 @@ class DefaultLoginViewModel @Inject constructor(
     override var email by mutableStateOf("")
 
     override var password by mutableStateOf("")
+
+    override var hasRememberMe by mutableStateOf(false)
+
+    override fun setRememberMe(value: Boolean) {
+        viewModelScope.launch {
+            hasRememberMe = value
+            settingsRepository.setRememberMe(value)
+        }
+    }
 
     override fun updateEmail(input: String) {
         email = input
@@ -61,12 +74,29 @@ class DefaultLoginViewModel @Inject constructor(
 
     override fun isPasswordValid(): Boolean = password.isNotBlank()
 
+    init {
+        viewModelScope.launch {
+            hasRememberMe = settingsRepository.hasRememberMe()
+            if (hasRememberMe) {
+                settingsRepository.loginCredential()?.let {
+                    email = it
+                }
+                settingsRepository.passwordCredential()?.let {
+                    password = it
+                }
+            }
+        }
+    }
+
     override fun login() {
         viewModelScope.launch {
             _uiState.value = LoginUiState.InProgress
             val result = loginUseCase.invoke(email, password)
             _uiState.value =
                 if (result.isSuccess) {
+                    if (hasRememberMe) {
+                        settingsRepository.saveLoginCredentials(email, password)
+                    }
                     LoginUiState.Done
                 } else {
                     LoginUiState.Failed(result.exceptionOrNull()?.message ?: "Unknown error")

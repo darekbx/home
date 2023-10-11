@@ -4,15 +4,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -108,6 +112,24 @@ fun LoginScreenWrapper(
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(x = (-12).dp),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = loginViewModel.hasRememberMe,
+                        onCheckedChange = { loginViewModel.setRememberMe(it) },
+                        colors = CheckboxDefaults.colors(
+                            checkmarkColor = MaterialTheme.colorScheme.background
+                        )
+                    )
+                    Text(text = "Remember me")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
@@ -148,8 +170,10 @@ fun LoginPreviewLight() {
                 override val uiState = emptyFlow<LoginUiState>()
                 override var email: String = ""
                 override var password: String = ""
+                override var hasRememberMe = false
                 override fun updateEmail(input: String) {}
                 override fun updatePassword(input: String) {}
+                override fun setRememberMe(value: Boolean) {  }
                 override fun login() {}
                 override fun reset() {}
                 override fun isEmailValid() = true
@@ -168,8 +192,10 @@ fun LoginPreviewDark() {
                 override val uiState = emptyFlow<LoginUiState>()
                 override var email: String = ""
                 override var password: String = ""
+                override var hasRememberMe: Boolean = true
                 override fun updateEmail(input: String) {}
                 override fun updatePassword(input: String) {}
+                override fun setRememberMe(value: Boolean) { }
                 override fun login() {}
                 override fun reset() {}
                 override fun isEmailValid() = true

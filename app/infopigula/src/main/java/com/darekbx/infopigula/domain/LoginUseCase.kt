@@ -17,7 +17,11 @@ class LoginUseCase @Inject constructor(
         try {
             val userLogin = UserLogin(email, password)
             val result = remoteRepository.login(userLogin)
-            settingsRepository.saveAuthCredentials(result.currentUser.uid, result.accessToken)
+            settingsRepository.saveAuthCredentials(
+                result.currentUser.uid,
+                result.accessToken,
+                result.csrfToken
+            )
             session.setUserActive()
             return Result.success(true)
         } catch (e: Exception) {

@@ -84,14 +84,12 @@ fun HomeScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
         Column(Modifier.fillMaxSize()) {
-
             lastReleases
                 .firstOrNull {
                     it.targetId == (activeReleaseId
-                        ?: lastReleases?.firstOrNull()?.targetId)
+                        ?: lastReleases.firstOrNull()?.targetId)
                 }
                 ?.let { lastRelease ->
                     Text(
@@ -115,36 +113,42 @@ fun HomeScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .weight(1F), contentAlignment = Alignment.Center
+                    .weight(1F),
+                contentAlignment = Alignment.TopStart
             ) {
                 LazyColumn(state = state) {
                     items(items = newsStream) { item ->
                         NewsItem(news = item)
                     }
                 }
-
-                if (newsStream.isEmpty() && uiState is HomeUiState.Done) {
-                    Text(
-                        text = "Nothing to show...",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
             }
         }
 
-        when (uiState) {
-            HomeUiState.InProgress -> LoadingProgress()
-            is HomeUiState.Failed -> errorDialogVisible = true
-            HomeUiState.Idle -> {}
-            HomeUiState.Done -> {}
-        }
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            when (uiState) {
+                HomeUiState.InProgress -> LoadingProgress()
+                is HomeUiState.Failed -> errorDialogVisible = true
+                HomeUiState.Idle -> {}
+                HomeUiState.Done -> {}
+            }
 
-        if (errorDialogVisible) {
-            val failedState = uiState as HomeUiState.Failed
-            InformationDialog(message = "Failed to fetch data! (${failedState.message})") {
-                homeViewModel.resetState()
-                errorDialogVisible = false
+            if (errorDialogVisible) {
+                val failedState = uiState as HomeUiState.Failed
+                InformationDialog(message = "Failed to fetch data! (${failedState.message})") {
+                    homeViewModel.resetState()
+                    errorDialogVisible = false
+                }
+            }
+
+            if (newsStream.isEmpty() && uiState is HomeUiState.Done) {
+                Text(
+                    text = "Nothing to show...",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
         }
     }
@@ -165,7 +169,9 @@ fun NewsItem(news: News) {
             color = MaterialTheme.colorScheme.onSurface
         )
         Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
