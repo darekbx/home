@@ -49,6 +49,7 @@ class HomeViewModel @Inject constructor(
              */
             session.isUserActive.consumeEach { isActive ->
                 if (isActive) {
+                    clear()
                     loadNews()
                 }
             }
@@ -79,19 +80,19 @@ class HomeViewModel @Inject constructor(
 
             if (result.isSuccess) {
                 result.getOrNull()
-                    ?.let {
-                        val groupsFiltered = it.groups
+                    ?.let { newsWrapper ->
+                        val groupsFiltered = newsWrapper.groups
                             .filter { !filteredGroups.contains(it.targetId) }
                             .toMutableList()
 
-                        // TODO refactor this hack
-                        groupsFiltered.add(Group(CREATORS_GROUP, "Twórcy", true))
+                        // Creators are no a part of a Group, but behaves like a group
+                        addCreators(groupsFiltered)
 
-                        lastReleases.replace(it.releases)
+                        lastReleases.replace(newsWrapper.releases)
                         groups.replace(groupsFiltered)
-                        news.addAll(it.news)
+                        news.addAll(newsWrapper.news)
 
-                        hasNextPage = (page + 1) < it.pager.pages
+                        hasNextPage = (page + 1) < newsWrapper.pager.pages
                         _uiState.value = HomeUiState.Done
                     }
                     ?: run { _uiState.value = HomeUiState.Failed("Data is empty!") }
@@ -100,6 +101,10 @@ class HomeViewModel @Inject constructor(
                     HomeUiState.Failed(result.exceptionOrNull()?.message ?: "Unknown error")
             }
         }
+    }
+
+    private fun addCreators(groupsFiltered: MutableList<Group>) {
+        groupsFiltered.add(Group(CREATORS_GROUP, "Twórcy", true))
     }
 
     private fun <T> SnapshotStateList<T>.replace(elements: Collection<T>) {

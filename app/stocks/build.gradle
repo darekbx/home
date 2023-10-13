@@ -67,7 +67,6 @@ dependencies {
     implementation other.okhttp
     implementation other.okhttp_logging_interceptor
 
-    implementation androidx.work
     implementation androidx.core_ktx
     implementation androidx.lifecycle_runtime_ktx
     implementation androidx.compose_navigation

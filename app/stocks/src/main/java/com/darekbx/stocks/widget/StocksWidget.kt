@@ -139,6 +139,5 @@ class UpdateStocksAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters
     ) {
-        StocksWorker.enqueue(context = context, force = true)
     }
 }

@@ -11,11 +11,9 @@ class StocksWidgetReceiver : GlanceAppWidgetReceiver() {
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-        StocksWorker.enqueue(context)
     }
 
     override fun onDisabled(context: Context) {
         super.onDisabled(context)
-        StocksWorker.cancel(context)
     }
 }

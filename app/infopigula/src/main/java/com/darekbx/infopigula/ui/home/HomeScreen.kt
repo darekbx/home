@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -117,8 +118,8 @@ fun HomeScreen(
                 contentAlignment = Alignment.TopStart
             ) {
                 LazyColumn(state = state) {
-                    items(items = newsStream) { item ->
-                        NewsItem(news = item)
+                    itemsIndexed(items = newsStream) { index, item ->
+                        NewsItem(news = item, index = index)
                     }
                 }
             }
@@ -156,14 +157,14 @@ fun HomeScreen(
 }
 
 @Composable
-fun NewsItem(news: News) {
+fun NewsItem(news: News, index: Int) {
     Column(
         Modifier
             .fillMaxWidth()
     ) {
         MarkdownText(
             modifier = Modifier
-                .padding(8.dp),
+                .padding(16.dp),
             markdown = news.content,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
@@ -175,16 +176,19 @@ fun NewsItem(news: News) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            Text(
+                modifier = Modifier.padding(start = 16.dp).width(80.dp),
+                text = "#${index + 1}",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
 
             MarkdownText(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .width(100.dp),
                 markdown = news.sourceLogo
             )
 
             Row(
-                modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                modifier = Modifier.padding(end = 16.dp).width(80.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(

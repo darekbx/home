@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -65,12 +66,17 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = hiltViewModel()) {
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onBackground,
             )
-            Switch(checked = isDarkMode, onCheckedChange = {
-                settingsViewModel.setDarkTheme(it)
-            })
+            Switch(
+                checked = isDarkMode,
+                onCheckedChange = { settingsViewModel.setDarkTheme(it) },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.onBackground,
+                    checkedTrackColor = MaterialTheme.colorScheme.background,
+                    checkedBorderColor = MaterialTheme.colorScheme.onBackground
+                )
+            )
         }
         Spacer(modifier = Modifier.height(16.dp))
-
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = "Excluded groups",
