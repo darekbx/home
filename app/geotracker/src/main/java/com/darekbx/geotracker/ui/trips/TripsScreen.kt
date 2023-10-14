@@ -130,44 +130,68 @@ fun TripsScreen(
 }
 
 @Composable
-fun YearSummary(modifier: Modifier = Modifier, year: Int, distance: Double, count: Int) {
+fun YearSummary(
+    modifier: Modifier = Modifier,
+    year: Int,
+    distance: Double,
+    count: Int,
+    longestTripDistance: Float
+) {
     Box(
         modifier = modifier
             .defaultCard()
-            .height(40.dp)
+            .height(80.dp)
             .padding(start = 16.dp, end = 16.dp),
         contentAlignment = Alignment.CenterStart
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(
-                    text = "%.1fkm".format(distance),
-                    style = LocalStyles.current.title,
-                    fontSize = 22.sp,
-                )
-                Text(
-                    modifier = Modifier.padding(bottom = 0.dp),
-                    text = " in ",
-                    style = LocalStyles.current.grayLabel,
-                    fontSize = 20.sp
-                )
-                Text(
-                    text = "$year",
-                    style = LocalStyles.current.title,
-                    fontSize = 22.sp,
-                )
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text(
+                        text = "%.1fkm".format(distance),
+                        style = LocalStyles.current.title,
+                        fontSize = 22.sp,
+                    )
+                    Text(
+                        modifier = Modifier.padding(bottom = 0.dp),
+                        text = " in ",
+                        style = LocalStyles.current.grayLabel,
+                        fontSize = 20.sp
+                    )
+                    Text(
+                        text = "$year",
+                        style = LocalStyles.current.title,
+                        fontSize = 22.sp,
+                    )
+                }
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text(
+                        text = "$count",
+                        style = LocalStyles.current.title,
+                        fontSize = 22.sp,
+                    )
+                    Text(
+                        text = " trips",
+                        style = LocalStyles.current.grayLabel,
+                        fontSize = 20.sp,
+                    )
+                }
             }
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
-                    text = "$count",
+                    text = "%.1fkm".format(longestTripDistance),
                     style = LocalStyles.current.title,
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                 )
                 Text(
-                    text = " trips",
+                    text = " (longest single trip)",
                     style = LocalStyles.current.grayLabel,
-                    fontSize = 20.sp,
+                    fontSize = 22.sp,
                 )
             }
         }
@@ -182,8 +206,15 @@ fun TripsList(
     onItemDeleteClick: (Track) -> Unit = { }
 ) {
     val filter = remember { mutableStateOf("") }
+    val longestTripDistance = wrapper.trips.maxBy { it.distance ?: 0F }.distance ?: 0F
 
-    YearSummary(modifier = Modifier.fillMaxWidth(), year, wrapper.sumDistance, wrapper.trips.size)
+    YearSummary(
+        modifier = Modifier.fillMaxWidth(),
+        year,
+        wrapper.sumDistance,
+        wrapper.trips.size,
+        longestTripDistance
+    )
     SearchInputField(
         modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp),
         value = filter
@@ -420,6 +451,6 @@ fun TripListItemNoEndTimePreview() {
 @Composable
 fun YearSummaryPreview() {
     GeoTrackerTheme {
-        YearSummary(year = 2023, distance = 431241.0, count = 412)
+        YearSummary(year = 2023, distance = 431241.0, count = 412, longestTripDistance = 31.0F)
     }
 }
