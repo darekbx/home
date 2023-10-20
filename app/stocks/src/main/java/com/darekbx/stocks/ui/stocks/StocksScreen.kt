@@ -55,7 +55,7 @@ fun StocksScreen(
 
 @Composable
 private fun StockCharts(modifier: Modifier, ratesInfos: List<RateInfo>) {
-    LazyColumn(modifier.padding(top = 8.dp, bottom = 8.dp)) {
+    LazyColumn(modifier.padding(top = 4.dp, bottom = 4.dp)) {
         items(ratesInfos, key = { it.label }) { ratesInfo ->
             ChartCard(
                 modifier = Modifier,
@@ -78,7 +78,7 @@ private fun ChartCard(
     )
 ) {
     Card(
-        modifier = modifier.padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp),
+        modifier = modifier.padding(top = 8.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF101111)
         ),
@@ -88,7 +88,7 @@ private fun ChartCard(
     ) {
         CommonChart(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(8.dp)
                 .fillMaxWidth()
                 .height(150.dp),
             data = ratesInfo.rates,

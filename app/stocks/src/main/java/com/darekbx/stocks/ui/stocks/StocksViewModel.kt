@@ -52,7 +52,7 @@ class StocksViewModel @Inject constructor(
 
     private fun calculateStep(first: Double): Float {
         return when {
-            first < 10.0 -> 0.025f
+            first < 10.0 -> 0.05f
             first < 100.0 -> 0.5F
             first < 10000.0 -> 100F
             else -> 1000F

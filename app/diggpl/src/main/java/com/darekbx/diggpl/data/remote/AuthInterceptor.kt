@@ -25,6 +25,13 @@ class AuthInterceptor(
 
                 return response
             }
+            try {
+                response.close()
+            } catch (e: Exception) {
+                if(BuildConfig.DEBUG) {
+                    e.printStackTrace()
+                }
+            }
             tokenRepository.saveAccessToken(accessToken)
             return chain.proceed(newRequestWithAccessToken(accessToken, request))
         }

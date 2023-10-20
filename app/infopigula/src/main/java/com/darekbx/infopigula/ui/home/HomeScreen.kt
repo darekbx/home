@@ -74,7 +74,6 @@ fun HomeScreen(
 
     LaunchedEffect(activeGroup, activeReleaseId) {
         page = 0
-        homeViewModel.clear()
         homeViewModel.loadNews(activeGroup, page, activeReleaseId)
     }
 

@@ -7,7 +7,7 @@ import com.darekbx.infopigula.repository.DefaultSettingsRepository
 import com.darekbx.infopigula.repository.RemoteRepository
 import com.darekbx.infopigula.repository.Session
 import com.darekbx.infopigula.repository.SettingsRepository
-import com.darekbx.infopigula.repository.remote.AuthInterceptor
+import com.darekbx.infopigula.repository.remote.PigulaAuthInterceptor
 import com.darekbx.infopigula.repository.remote.InfopigulaService
 import com.darekbx.storage.di.dataStore
 import dagger.Module
@@ -48,23 +48,23 @@ class CommonModule {
     }
 
     @Provides
-    fun provideTokenAuthenticator(settingsRepository: SettingsRepository): AuthInterceptor {
-        return AuthInterceptor(settingsRepository)
+    fun provideTokenAuthenticator(settingsRepository: SettingsRepository): PigulaAuthInterceptor {
+        return PigulaAuthInterceptor(settingsRepository)
     }
 
     @Provides
-    fun provideInfopigulaService(authInterceptor: AuthInterceptor): InfopigulaService {
+    fun provideInfopigulaService(pigulaAuthInterceptor: PigulaAuthInterceptor): InfopigulaService {
         return Retrofit.Builder()
             .baseUrl(API_BASE_URL)
-            .client(getRetrofitClient(authInterceptor))
+            .client(getRetrofitClient(pigulaAuthInterceptor))
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(InfopigulaService::class.java)
     }
 
-    private fun getRetrofitClient(authInterceptor: AuthInterceptor): OkHttpClient {
+    private fun getRetrofitClient(pigulaAuthInterceptor: PigulaAuthInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(authInterceptor)
+            .addInterceptor(pigulaAuthInterceptor)
             .also { client ->
                 if (BuildConfig.DEBUG) {
                     val logging = HttpLoggingInterceptor()

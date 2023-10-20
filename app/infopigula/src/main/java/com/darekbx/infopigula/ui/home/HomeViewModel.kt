@@ -49,7 +49,6 @@ class HomeViewModel @Inject constructor(
              */
             session.isUserActive.consumeEach { isActive ->
                 if (isActive) {
-                    clear()
                     loadNews()
                 }
             }
@@ -62,16 +61,18 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun clear() {
-        news.clear()
-    }
-
     fun loadNews(
         groupId: Int = GetNewsUseCase.DEFAULT_GROUP,
         page: Int = 0,
         lastReleaseId: Int? = null
     ) {
         viewModelScope.launch {
+
+            // Always clear news list when page is zero, to avoid duplications
+            if (page == 0) {
+                news.clear()
+            }
+
             _uiState.value = HomeUiState.InProgress
 
             val filteredGroups = settingsRepository.filteredGroups()

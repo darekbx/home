@@ -5,7 +5,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import java.net.HttpURLConnection
 
-class AuthInterceptor(
+class PigulaAuthInterceptor(
     private val settingsRepository: SettingsRepository
 ) : Interceptor {
 
