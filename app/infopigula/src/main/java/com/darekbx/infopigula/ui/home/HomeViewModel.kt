@@ -49,7 +49,8 @@ class HomeViewModel @Inject constructor(
              */
             session.isUserActive.consumeEach { isActive ->
                 if (isActive) {
-                    loadNews()
+                    // Commented out to prevent duplicated news
+                    //loadNews()
                 }
             }
         }
@@ -67,7 +68,6 @@ class HomeViewModel @Inject constructor(
         lastReleaseId: Int? = null
     ) {
         viewModelScope.launch {
-
             // Always clear news list when page is zero, to avoid duplications
             if (page == 0) {
                 news.clear()
@@ -91,6 +91,7 @@ class HomeViewModel @Inject constructor(
 
                         lastReleases.replace(newsWrapper.releases)
                         groups.replace(groupsFiltered)
+
                         news.addAll(newsWrapper.news)
 
                         hasNextPage = (page + 1) < newsWrapper.pager.pages
