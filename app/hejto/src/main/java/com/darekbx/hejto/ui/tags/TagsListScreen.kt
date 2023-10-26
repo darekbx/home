@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
@@ -18,7 +19,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,6 +38,23 @@ import com.darekbx.hejto.ui.HejtoTheme
 import com.darekbx.hejto.ui.posts.ErrorIcon
 import com.darekbx.hejto.ui.posts.LoadingProgress
 import com.darekbx.hejto.ui.tags.viewmodel.TagsViewModel
+
+class TagVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        return TransformedText(buildAnnotatedString {
+            append('#')
+            append(text)
+        }, object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                return offset + 1
+            }
+
+            override fun transformedToOriginal(offset: Int): Int {
+                return offset - 1
+            }
+        })
+    }
+}
 
 @Composable
 fun TagsListScreen(tagsViewModel: TagsViewModel = hiltViewModel()) {
@@ -50,16 +73,40 @@ fun TagsListScreen(tagsViewModel: TagsViewModel = hiltViewModel()) {
                         .padding(top = 4.dp, bottom = 4.dp)
                 ) {
                     stickyHeader {
-                        TextField(
-                            modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                            value = tagName,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-                            keyboardActions = KeyboardActions(onSend = {
-                                tagsViewModel.addRemoveFavouriteTag(tagName)
-                            }),
-                            label = { Text("Enter tag name, without '#'") },
-                            onValueChange = { tagName = it }
-                        )
+                        Row {
+                            TextField(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .fillMaxWidth()
+                                    .weight(1F),
+                                value = tagName,
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                                keyboardActions = KeyboardActions(onSend = {
+                                    tagsViewModel.addRemoveFavouriteTag(tagName)
+                                }),
+                                visualTransformation = TagVisualTransformation(),
+                                label = { Text("Enter tag name") },
+                                onValueChange = { tagName = it }
+                            )
+                            Button(
+                                modifier = Modifier
+                                    .padding(
+                                        top = 8.dp,
+                                        end = 8.dp,
+                                        bottom = 8.dp
+                                    )
+                                    .height(57.dp)
+                                    .background(
+                                        MaterialTheme.colorScheme.primary,
+                                        RoundedCornerShape(4.dp)
+                                    ),
+                                onClick = { tagsViewModel.addRemoveFavouriteTag(tagName) }) {
+                                Icon(
+                                    imageVector = Icons.Default.AddCircle,
+                                    contentDescription = "add"
+                                )
+                            }
+                        }
                     }
                     items(items = tags) { item ->
                         item?.let {
