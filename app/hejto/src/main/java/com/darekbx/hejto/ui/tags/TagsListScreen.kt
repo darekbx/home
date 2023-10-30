@@ -18,6 +18,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
@@ -78,8 +79,18 @@ fun TagsListScreen(tagsViewModel: TagsViewModel = hiltViewModel()) {
                                 modifier = Modifier
                                     .padding(8.dp)
                                     .fillMaxWidth()
+                                    .height(56.dp)
                                     .weight(1F),
                                 value = tagName,
+                                shape = RoundedCornerShape(4.dp),
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    errorIndicatorColor = Color.Transparent,
+                                ),
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                                 keyboardActions = KeyboardActions(onSend = {
                                     tagsViewModel.addRemoveFavouriteTag(tagName)
@@ -95,7 +106,7 @@ fun TagsListScreen(tagsViewModel: TagsViewModel = hiltViewModel()) {
                                         end = 8.dp,
                                         bottom = 8.dp
                                     )
-                                    .height(57.dp)
+                                    .height(56.dp)
                                     .background(
                                         MaterialTheme.colorScheme.primary,
                                         RoundedCornerShape(4.dp)
@@ -189,6 +200,31 @@ private fun TagView(tag: Tag, onFavouriteClick: (name: String) -> Unit = { }) {
             tint = MaterialTheme.colorScheme.onPrimary
         )
     }
+}
+
+@Preview
+@Composable
+private fun InputPreview() {
+    TextField(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        value = "Tag",
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            errorIndicatorColor = Color.Transparent,
+        ),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+        keyboardActions = KeyboardActions(onSend = {
+        }),
+        visualTransformation = TagVisualTransformation(),
+        label = { Text("Enter tag name") },
+        onValueChange = {  }
+    )
 }
 
 @Preview

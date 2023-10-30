@@ -16,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,7 +54,16 @@ fun TagsListScreen(savedTagsViewModel: SavedTagsViewModel = hiltViewModel()) {
                     modifier = Modifier.padding(8.dp).fillMaxWidth(),
                     value = text,
                     label = { Text("Enter tag name") },
-                    onValueChange = { text = it }
+                    onValueChange = { text = it },
+                    shape = RoundedCornerShape(4.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent,
+                    ),
                 )
             }
             items(items = autocompleteTags) { item ->
