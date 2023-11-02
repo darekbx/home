@@ -43,6 +43,9 @@ import com.darekbx.storage.riverstatus.WaterLevelDao
 import com.darekbx.storage.riverstatus.WaterLevelDto
 import com.darekbx.storage.task.TaskDao
 import com.darekbx.storage.task.TaskDto
+import com.darekbx.storage.timeline.TimelineCategoryDto
+import com.darekbx.storage.timeline.TimelineDao
+import com.darekbx.storage.timeline.TimelineEntryDto
 import com.darekbx.storage.vault.VaultDao
 import com.darekbx.storage.vault.VaultDto
 import com.darekbx.storage.weight.WeightDao
@@ -87,10 +90,13 @@ import com.darekbx.storage.weight.WeightDto
         PointDto::class,
         TrackDto::class,
         PlaceDto::class,
-        RouteDto::class
+        RouteDto::class,
+        // Timeline
+        TimelineEntryDto::class,
+        TimelineCategoryDto::class
     ],
     exportSchema = true,
-    version = 15
+    version = 16
 )
 abstract class HomeDatabase : RoomDatabase() {
 
@@ -142,6 +148,9 @@ abstract class HomeDatabase : RoomDatabase() {
     abstract fun placeDao(): PlaceDao
 
     abstract fun routeDao(): RouteDao
+
+    // Timeline
+    abstract fun timelineDao(): TimelineDao
 
     companion object {
         const val DB_NAME = "home_db"
@@ -257,6 +266,13 @@ abstract class HomeDatabase : RoomDatabase() {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `geo_track` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `label` TEXT, `start_timestamp` INTEGER NOT NULL, `end_timestamp` INTEGER, `distance` REAL)")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `geo_place` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `label` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `timestamp` INTEGER NOT NULL)")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `geo_route` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `label` TEXT NOT NULL, `url` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)")
+            }
+        }
+
+        val MIGRATION_15_16 = object : Migration(15, 17) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS timeline_entry (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `category_id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS timeline_category (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `color` INTEGER NOT NULL)")
             }
         }
     }

@@ -15,6 +15,7 @@ import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_11_12
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_12_13
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_13_14
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_14_15
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_15_16
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_1_2
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_2_3
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_3_4
@@ -39,6 +40,7 @@ import com.darekbx.storage.stocks.StocksDao
 import com.darekbx.storage.notes.NotesDao
 import com.darekbx.storage.riverstatus.WaterLevelDao
 import com.darekbx.storage.task.TaskDao
+import com.darekbx.storage.timeline.TimelineDao
 import com.darekbx.storage.vault.VaultDao
 import com.darekbx.storage.weight.WeightDao
 import dagger.Module
@@ -181,6 +183,11 @@ class CommonModule {
         return database.placeDao()
     }
 
+    @Provides
+    fun provideTimelineDao(database: HomeDatabase): TimelineDao {
+        return database.timelineDao()
+    }
+
     @Singleton
     @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): HomeDatabase {
@@ -204,6 +211,7 @@ class CommonModule {
             .addMigrations(MIGRATION_12_13)
             .addMigrations(MIGRATION_13_14)
             .addMigrations(MIGRATION_14_15)
+            .addMigrations(MIGRATION_15_16)
             .build()
     }
 }

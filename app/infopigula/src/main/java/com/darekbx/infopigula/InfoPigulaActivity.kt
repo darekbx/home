@@ -45,7 +45,6 @@ import javax.inject.Inject
 /**
  * TODO:
  * - settings screen
- *   - dark/light theme
  *   - filtered groups
  */
 @AndroidEntryPoint
