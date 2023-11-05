@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.timeline.repository.TimelineRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,4 +20,11 @@ class CategoriesViewModel @Inject constructor(
             timelineRepository.addCategory(name, color)
         }
     }
+
+    fun usedColors() =
+        timelineRepository
+            .categoriesFlow()
+            .map { list ->
+                list.map { it.color }
+            }
 }

@@ -1,6 +1,8 @@
 package com.darekbx.timeline.ui.categories
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,15 +10,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,16 +42,35 @@ import com.darekbx.timeline.ui.theme.TimelineTheme
 @Composable
 fun CategoriesScreen(categoriesViewModel: CategoriesViewModel = hiltViewModel()) {
     val categories by categoriesViewModel.categories.collectAsState(initial = null)
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    val usedColors by categoriesViewModel.usedColors().collectAsState(initial = emptyList())
+    var dialogVisible by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         categories
             ?.let { list ->
                 if (list.isEmpty()) {
-                    EmptyView()
+                    EmptyView(Modifier.align(Alignment.Center))
                 } else {
                     CategoryList(modifier = Modifier.fillMaxWidth(), items = list)
                 }
             }
-            ?: run { LoadingView() }
+            ?: run { LoadingView(Modifier.align(Alignment.Center)) }
+
+        FloatingActionButton(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            onClick = { dialogVisible = true }) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "add")
+        }
+    }
+
+    if (dialogVisible) {
+        CategoryDialog(
+            usedColors = usedColors,
+            onSave = { name, color -> categoriesViewModel.add(name, color) },
+            onDismiss = { dialogVisible = false }
+        )
     }
 }
 
@@ -47,20 +78,27 @@ fun CategoriesScreen(categoriesViewModel: CategoriesViewModel = hiltViewModel())
 fun CategoryList(modifier: Modifier = Modifier, items: List<Category>) {
     LazyColumn(modifier = modifier.padding(8.dp)) {
         items(items) {
-            CategoryRow(category = it)
+            CategoryRow(Modifier.fillMaxWidth(), category = it)
         }
     }
 }
 
 @Composable
-fun CategoryRow(category: Category) {
-    Row {
+fun CategoryRow(modifier: Modifier, category: Category) {
+    Row(
+        modifier = modifier.padding(start = 4.dp, end = 4.dp, top = 4.dp, bottom = 4.dp)
+            .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(4.dp))
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
         Text(text = category.name)
-        Spacer(modifier = Modifier
-            .padding(4.dp)
-            .size(24.dp)
-            .clip(CircleShape)
-            .background(Color(color = category.color))
+        Spacer(
+            modifier = Modifier
+                .size(16.dp)
+                .clip(CircleShape)
+                .background(Color(color = category.color))
+                .border(0.5.dp, Color.White, RoundedCornerShape(16.dp))
         )
     }
 }
@@ -73,16 +111,19 @@ fun EmptyView(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-fun LoadingView(modifier: Modifier = Modifier.size(48.dp)) {
+fun LoadingView(modifier: Modifier = Modifier) {
     CircularProgressIndicator(modifier)
 }
 
 @Preview
-@Composable§
+@Composable
 fun CategoryRowPreview() {
     TimelineTheme {
         Surface {
-            CategoryRow(category = Category(1L, "Companies", Color.Magenta.value))
+            CategoryRow(
+                modifier = Modifier.width(200.dp),
+                category = Category(1L, "Companies", android.graphics.Color.MAGENTA)
+            )
         }
     }
 }

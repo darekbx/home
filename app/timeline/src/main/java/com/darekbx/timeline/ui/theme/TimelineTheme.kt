@@ -21,7 +21,7 @@ fun TimelineTheme(content: @Composable () -> Unit) {
             surface = Color(18, 18, 19),
             primaryContainer = Color(34, 34, 37),
             secondaryContainer = Color(60, 60, 60),
-            onPrimary = Color(189, 189, 199),
+            onPrimary = Color.Black,
             onSurface = Color(225, 225, 227)
         ),
         typography = Typography(
