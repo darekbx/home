@@ -7,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.darekbx.timeline.ui.categories.CategoriesScreen
 import com.darekbx.timeline.ui.home.HomeScreen
-import com.darekbx.timeline.ui.newtimeline.NewTimelineScreen
 
 @Composable
 fun TimelineNavHost(
@@ -21,17 +20,12 @@ fun TimelineNavHost(
     ) {
         composable(route = Home.route) {
             HomeScreen(
-                onCategoriesClick = { navController.navigate(Categories.route) },
-                onNewTimelineClick = { navController.navigate(NewTimeline.route) }
+                onCategoriesClick = { navController.navigate(Categories.route) }
             )
         }
 
         composable(route = Categories.route) {
             CategoriesScreen()
-        }
-
-        composable(route = NewTimeline.route) {
-            NewTimelineScreen()
         }
     }
 }

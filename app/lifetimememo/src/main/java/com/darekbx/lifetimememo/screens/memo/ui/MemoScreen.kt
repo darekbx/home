@@ -251,7 +251,7 @@ private fun Modifier.inputPadding() =
     padding(top = Paddings.Default, start = Paddings.Big, end = Paddings.Big)
 
 @Composable
-fun CategorySelection(
+fun     CategorySelection(
     categoryViewModel: CategoryViewModel = hiltViewModel(),
     memoState: MemoState
 ) {

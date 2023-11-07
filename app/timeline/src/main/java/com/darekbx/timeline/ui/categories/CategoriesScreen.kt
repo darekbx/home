@@ -1,5 +1,6 @@
 package com.darekbx.timeline.ui.categories
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -74,11 +75,16 @@ fun CategoriesScreen(categoriesViewModel: CategoriesViewModel = hiltViewModel())
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CategoryList(modifier: Modifier = Modifier, items: List<Category>) {
     LazyColumn(modifier = modifier.padding(8.dp)) {
         items(items) {
-            CategoryRow(Modifier.fillMaxWidth(), category = it)
+            CategoryRow(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 4.dp, top = 4.dp, bottom = 4.dp)
+                    .animateItemPlacement(), category = it)
         }
     }
 }
@@ -86,7 +92,7 @@ fun CategoryList(modifier: Modifier = Modifier, items: List<Category>) {
 @Composable
 fun CategoryRow(modifier: Modifier, category: Category) {
     Row(
-        modifier = modifier.padding(start = 4.dp, end = 4.dp, top = 4.dp, bottom = 4.dp)
+        modifier = modifier
             .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(4.dp))
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,

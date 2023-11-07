@@ -18,7 +18,7 @@ interface TimelineDao {
     fun categoriesFlow(): Flow<List<TimelineCategoryDto>>
 
     @Query("SELECT * FROM timeline_entry ORDER BY timestamp")
-    suspend fun getEntries(): List<TimelineEntryDto>
+    fun getEntriesFlow(): Flow<List<TimelineEntryDto>>
 
     @Query("SELECT * FROM timeline_entry WHERE category_id = :categoryId ORDER BY timestamp")
     suspend fun getEntries(categoryId: Long): List<TimelineEntryDto>

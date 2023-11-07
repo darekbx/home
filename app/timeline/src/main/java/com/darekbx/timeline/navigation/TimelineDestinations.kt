@@ -11,7 +11,3 @@ object Home : TimelineDestinations {
 object Categories : TimelineDestinations {
     override val route = "categories"
 }
-
-object NewTimeline : TimelineDestinations {
-    override val route = "new_timeline"
-}

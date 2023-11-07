@@ -4,6 +4,7 @@ import com.darekbx.storage.timeline.TimelineCategoryDto
 import com.darekbx.storage.timeline.TimelineDao
 import com.darekbx.storage.timeline.TimelineEntryDto
 import com.darekbx.timeline.model.Category
+import com.darekbx.timeline.model.Entry
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -35,8 +36,13 @@ class TimelineRepository @Inject constructor(
                 }
             }
 
-    suspend fun getEntries() =
-        timelineDao.getEntries()
+    fun getEntriesFlow() =
+        timelineDao.getEntriesFlow()
+            .map { list ->
+                list.map { dto ->
+                    Entry(dto.id!!, dto.categoryId, dto.title, dto.description, dto.timestamp)
+                }
+            }
 
     suspend fun getEntries(categoryId: Long) =
         timelineDao.getEntries(categoryId)
