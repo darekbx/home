@@ -269,7 +269,7 @@ abstract class HomeDatabase : RoomDatabase() {
             }
         }
 
-        val MIGRATION_15_16 = object : Migration(15, 17) {
+        val MIGRATION_15_16 = object : Migration(15, 16) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS timeline_entry (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `category_id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)")
                 database.execSQL("CREATE TABLE IF NOT EXISTS timeline_category (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `color` INTEGER NOT NULL)")

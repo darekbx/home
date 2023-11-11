@@ -15,6 +15,12 @@ class HomeViewModel @Inject constructor(
     val categories = timelineRepository.categoriesFlow()
     val entries = timelineRepository.getEntriesFlow()
 
+    init {
+        /*viewModelScope.launch {
+            timelineRepository.deleteAll()
+        }*/
+    }
+
     fun add(categoryId: Long, title: String, description: String, timestamp: Long) {
         viewModelScope.launch {
             timelineRepository.addEntry(categoryId, title, description, timestamp)

@@ -17,7 +17,10 @@ interface TimelineDao {
     @Query("SELECT * FROM timeline_category")
     fun categoriesFlow(): Flow<List<TimelineCategoryDto>>
 
-    @Query("SELECT * FROM timeline_entry ORDER BY timestamp")
+    @Query("SELECT * FROM timeline_category")
+    suspend fun categories(): List<TimelineCategoryDto>
+
+    @Query("SELECT * FROM timeline_entry ORDER BY timestamp DESC")
     fun getEntriesFlow(): Flow<List<TimelineEntryDto>>
 
     @Query("SELECT * FROM timeline_entry WHERE category_id = :categoryId ORDER BY timestamp")
@@ -28,4 +31,7 @@ interface TimelineDao {
 
     @Query("DELETE FROM timeline_entry WHERE id = :entryId")
     suspend fun deleteEntry(entryId: Long)
+
+    @Query("DELETE FROM timeline_entry")
+    suspend fun deleteEntries()
 }

@@ -127,7 +127,7 @@ private fun DialogContents(
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(onClick = {
                     if (title.isNotBlank() && selectedCategory != -1L && selectedTimestamp != -1L) {
-                        onSave(selectedTimestamp, title, description, selectedTimestamp)
+                        onSave(selectedCategory, title, description, selectedTimestamp)
                     } else {
                         Toast
                             .makeText(context, "Please fill all fields!", Toast.LENGTH_SHORT)

@@ -14,13 +14,13 @@ class Colors(
 )
 
 val CategoryColors = listOf(
-    android.graphics.Color.parseColor("#E57373"),
-    android.graphics.Color.parseColor("#26C6DA"),
-    android.graphics.Color.parseColor("#8BC34A"),
-    android.graphics.Color.parseColor("#FFC107"),
-    android.graphics.Color.parseColor("#7E57C2"),
-    android.graphics.Color.parseColor("#26A69A"),
-    android.graphics.Color.parseColor("#78909C"),
+    android.graphics.Color.parseColor("#D32F2F"),
+    android.graphics.Color.parseColor("#8E24AA"),
+    android.graphics.Color.parseColor("#5E35B1"),
+    android.graphics.Color.parseColor("#3949AB"),
+    android.graphics.Color.parseColor("#388E3C"),
+    android.graphics.Color.parseColor("#F57C00"),
+    android.graphics.Color.parseColor("#455A64"),
 )
 
 val LocalColors = compositionLocalOf { Colors() }

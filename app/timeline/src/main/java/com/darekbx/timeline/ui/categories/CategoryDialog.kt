@@ -1,5 +1,6 @@
 package com.darekbx.timeline.ui.categories
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -81,14 +83,17 @@ private fun DialogContents(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                itemsIndexed(CategoryColors - usedColors) { index, color ->
+                itemsIndexed(CategoryColors) { index, color ->
                     Spacer(
                         modifier = Modifier
                             .padding(end = 8.dp)
                             .size(32.dp)
+                            .then(
+                                if (usedColors.contains(color)) Modifier.alpha(0.0F)
+                                else Modifier.clickable { selectedColor = index }
+                            )
                             .clip(CircleShape)
                             .background(Color(color))
-                            .clickable { selectedColor = index }
                             .then(if (selectedColor == index) selectedColorModifier else Modifier)
                     )
                 }
