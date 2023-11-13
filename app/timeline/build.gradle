@@ -56,6 +56,8 @@ dependencies {
     implementation androidx.lifecycle_runtime_ktx
     implementation androidx.lifecycle_service
 
+    implementation 'de.charlex.compose:revealswipe:1.0.0'
+
     testImplementation other.junit
     testImplementation other.mockk_android
     testImplementation other.mockk_agent

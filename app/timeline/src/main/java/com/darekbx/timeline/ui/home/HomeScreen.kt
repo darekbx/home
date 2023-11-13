@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
@@ -43,6 +44,7 @@ import com.darekbx.timeline.ui.theme.CategoryColors
 fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
     onCategoriesClick: () -> Unit = { },
+    onEntriesListClick: () -> Unit = { },
 ) {
     var addDialogVisible by remember { mutableStateOf(false) }
 
@@ -73,6 +75,9 @@ fun HomeScreen(
         ) {
             FloatingActionButton(onClick = onCategoriesClick) {
                 Icon(imageVector = Icons.Default.Settings, contentDescription = "categories")
+            }
+            FloatingActionButton(onClick = onEntriesListClick) {
+                Icon(imageVector = Icons.Default.List, contentDescription = "list")
             }
             FloatingActionButton(onClick = { addDialogVisible = true }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "add")

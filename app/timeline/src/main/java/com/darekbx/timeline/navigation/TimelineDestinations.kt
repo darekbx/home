@@ -11,3 +11,7 @@ object Home : TimelineDestinations {
 object Categories : TimelineDestinations {
     override val route = "categories"
 }
+
+object List : TimelineDestinations {
+    override val route = "list"
+}
