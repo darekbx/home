@@ -11,10 +11,6 @@ import com.darekbx.timeline.navigation.TimelineNavHost
 import com.darekbx.timeline.ui.theme.TimelineTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-/**
- * TODO:
- *  - display list of entries with ability to remove them
- */
 @AndroidEntryPoint
 class TimelineActivity : LauncherActivity() {
 

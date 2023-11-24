@@ -394,6 +394,10 @@ fun MarkdownContent(content: String) {
 
 @Composable
 fun CommonImage(mediaPhoto: MediaPhoto, isNsfw: Boolean, onClick: (() -> Unit)? = null) {
+
+    // Override
+    val isNsfw = false
+
     val maxImageHeigth = 1920
     var errorWidthFraction by remember { mutableStateOf(1F) }
     var imageBlur by remember { mutableStateOf(10.dp) }
