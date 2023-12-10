@@ -29,7 +29,6 @@ import com.darekbx.common.LauncherActivity
 import com.darekbx.common.ui.theme.HomeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-@OptIn(ExperimentalMaterial3Api::class)
 @AndroidEntryPoint
 class BooksActivity : LauncherActivity() {
 

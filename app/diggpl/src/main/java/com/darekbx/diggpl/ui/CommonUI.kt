@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 
 package com.darekbx.diggpl.ui
 
@@ -56,12 +56,14 @@ fun StreamView(
                     onLongClick = { onLongClick(streamItem) }
                 )
             }
+
             ResourceType.LINK.type -> {
                 LinkView(
                     streamItem,
                     onClick = { openStreamItem(streamItem) },
                     onLongClick = { onLongClick(streamItem) })
             }
+
             ResourceType.ENTRY_COMMENT.type -> Text(
                 text = streamItem.resource,
                 color = MaterialTheme.colorScheme.onSurface
@@ -86,6 +88,7 @@ fun LinkView(
                 SurveyView(survey = it)
             }
             LinkImages(streamItem)
+            LinkTags(tags = streamItem.tags)
             LinkSource(streamItem)
             Spacer(modifier = Modifier.height(8.dp))
             LinkFooter(streamItem, onClick, onLongClick)
@@ -102,6 +105,20 @@ fun LinkView(
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun LinkTags(tags: List<String>) {
+    FlowRow {
+        tags.forEach { tag ->
+            Text(
+                modifier = Modifier.padding(start = 4.dp),
+                text = "#$tag",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
         }
     }
 }
@@ -336,7 +353,7 @@ private fun EntryViewPreview() {
                 Author("user name", "", null, null),
                 Comments(10),
                 Votes(10, 4),
-                listOf("#lego", "#tag"),
+                listOf("lego", "tag"),
                 adult = false,
                 hot = true,
                 Media(

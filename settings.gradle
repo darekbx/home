@@ -15,7 +15,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Home"
+rootProject.name = "home"
 include ':app'
 include ':app:storage'
 include ':app:common'
