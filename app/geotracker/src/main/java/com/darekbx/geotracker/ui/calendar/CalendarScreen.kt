@@ -56,7 +56,6 @@ import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Calendar
 import java.util.Locale
-import kotlin.system.measureTimeMillis
 
 @Composable
 fun CalendarScreen(
@@ -129,8 +128,10 @@ fun YearCalendar(
     LazyColumn(modifier) {
         items(months.keys.toList()) { month ->
             val distance = months[month]
-                ?.sumOf { (it.distance?:0F).toDouble() }
+                ?.sumOf { (it.distance ?: 0F).toDouble() }
                 ?: 0.0
+            val tripsCount = months[month]?.size ?: 0
+            val daysRidden = months[month]?.countDays() ?: 0
             StaticCalendar(
                 modifier = Modifier.fillMaxWidth(),
                 calendarState = CalendarState(
@@ -144,7 +145,7 @@ fun YearCalendar(
                 },
                 showAdjacentMonths = false,
                 horizontalSwipeEnabled = false,
-                monthHeader = { monthState -> MonthHeader(monthState, month, distance) },
+                monthHeader = { monthState -> MonthHeader(month, distance, tripsCount, daysRidden) },
                 daysOfWeekHeader = { daysOfWeek -> WeekHeader(daysOfWeek) }
             )
         }
@@ -168,14 +169,14 @@ private fun WeekHeader(daysOfWeek: List<DayOfWeek>) {
 }
 
 @Composable
-private fun MonthHeader(monthState: MonthState, month: Int, distance: Double) {
+private fun MonthHeader(month: Int, distance: Double, trips: Int, days: Int) {
     Text(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth(),
         textAlign = TextAlign.Center,
         fontWeight = FontWeight.Bold,
-        text = "${Month.of(month + 1).name} (%.1fkm)".format(distance),
+        text = "${Month.of(month + 1).name} (%.1fkm) $trips trips in $days days".format(distance),
         color = Color.White,
     )
 }
@@ -256,3 +257,9 @@ private fun List<Track>.filterByDay(
     val day = timeStamp.get(Calendar.DAY_OF_YEAR)
     year == dayState.date.year && day == dayState.date.dayOfYear
 }
+
+private fun List<Track>.countDays() = groupBy {
+    val timeStamp = Calendar.getInstance().apply { timeInMillis = it.startTimestamp }
+    val day = timeStamp.get(Calendar.DAY_OF_YEAR)
+    day
+}.count()

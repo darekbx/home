@@ -158,7 +158,7 @@ fun SummaryPreview() {
     GeoTrackerTheme {
         SummaryBox(
             summaryWrapper = SummaryWrapper(
-                Summary(5213.27, 187800, 213),
+                Summary(5213.27, 8287800, 213),
                 Summary(2430.02, 21004, 81),
             ),
             maxSpeed = 52.4F

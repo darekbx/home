@@ -205,6 +205,17 @@ fun TripsList(
     onItemClick: (Track) -> Unit = { },
     onItemDeleteClick: (Track) -> Unit = { }
 ) {
+    if (wrapper.trips.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Text(
+                text = "No trips in this year...",
+                style = LocalStyles.current.grayLabel,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+        return
+    }
+
     val filter = remember { mutableStateOf("") }
     val longestTripDistance = wrapper.trips.maxBy { it.distance ?: 0F }.distance ?: 0F
 

@@ -23,13 +23,21 @@ object DateTimeUtils {
             if (withSeconds) {
                 return "${hours.pad()}h ${minutes.pad()}m ${seconds.pad()}s"
             } else {
-                return "${hours.pad()}h ${minutes.pad()}m"
+                if (days > 0) {
+                    return "${days.pad()}d ${hours.pad()}h"
+                }else {
+                    return "${hours.pad()}h ${minutes.pad()}m"
+                }
             }
         } else {
             if (withSeconds) {
                 return "${days.pad()}d ${hours.pad()}h ${minutes.pad()}m ${seconds.pad()}s"
             } else {
-                return "${hours.pad()}h ${minutes.pad()}m ${seconds.pad()}s"
+                if (days > 0) {
+                    return "${days.pad()}d ${hours.pad()}h ${minutes.pad()}m"
+                } else {
+                    return "${hours.pad()}h ${minutes.pad()}m ${seconds.pad()}s"
+                }
             }
         }
     }
