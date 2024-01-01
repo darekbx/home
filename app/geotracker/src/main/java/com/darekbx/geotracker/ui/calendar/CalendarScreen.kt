@@ -1,6 +1,6 @@
 package com.darekbx.geotracker.ui.calendar
 
-import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,8 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.darekbx.geotracker.domain.usecase.TripsWrapper
@@ -80,13 +83,14 @@ fun CalendarScreen(
     ) {
         yearsViewState.state.let {
             when (it) {
-                is YearsUiState.Done -> YearsScroller(
-                    modifier = Modifier.fillMaxWidth(),
-                    years = it.years,
-                    currentYear = year
-                ) { selectedYear ->
-                    year = selectedYear
-                }
+                is YearsUiState.Done ->
+                    YearsScroller(
+                        modifier = Modifier.fillMaxWidth(),
+                        years = it.years,
+                        currentYear = year
+                    ) { selectedYear ->
+                        year = selectedYear
+                    }
 
                 YearsUiState.InProgress ->
                     LoadingProgress(
@@ -113,6 +117,7 @@ fun CalendarScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun YearCalendar(
     modifier: Modifier,
@@ -124,8 +129,28 @@ fun YearCalendar(
             .apply { timeInMillis = it.startTimestamp }
             .get(Calendar.MONTH)
     }
+    val daysOnBike = wrapper.trips.countDays()
 
     LazyColumn(modifier) {
+        stickyHeader {
+            Text(
+                modifier = Modifier.background(Color.Black).fillMaxWidth().padding(16.dp),
+                textAlign = TextAlign.Center,
+                text = buildAnnotatedString {
+                    withStyle(
+                        SpanStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = LocalColors.current.red
+                        )
+                    ) {
+                        append("$daysOnBike ")
+                    }
+                    append("days on bike")
+                },
+                fontSize = 24.sp,
+                color = Color.White,
+            )
+        }
         items(months.keys.toList()) { month ->
             val distance = months[month]
                 ?.sumOf { (it.distance ?: 0F).toDouble() }
