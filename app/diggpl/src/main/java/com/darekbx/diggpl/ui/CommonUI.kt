@@ -28,7 +28,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import coil.size.Dimension
 import com.darekbx.diggpl.R
@@ -458,6 +461,7 @@ fun CommonImage(mediaPhoto: MediaPhoto, isNsfw: Boolean, onClick: (() -> Unit)? 
             painter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
                     .data(image)
+                    .decoderFactory(GifDecoder.Factory())
                     .size(Dimension.Undefined, Dimension(maxImageHeigth))
                     .build(),
                 onLoading = { isLoading = true },

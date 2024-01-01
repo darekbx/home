@@ -1,7 +1,6 @@
 package com.darekbx.hejto.ui.posts
 
 import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -29,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import coil.decode.GifDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 import com.darekbx.hejto.R
@@ -121,6 +121,7 @@ fun CommonImage(remoteImage: RemoteImage, isNsfw: Boolean, onClick: (() -> Unit)
             painter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
                     .data(image)
+                    .decoderFactory(GifDecoder.Factory())
                     .size(Size.ORIGINAL)
                     .build(),
                 onLoading = { isLoading = true },

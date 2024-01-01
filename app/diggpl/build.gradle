@@ -66,6 +66,7 @@ dependencies {
     implementation other.okhttp_logging_interceptor
     implementation other.markdown
     implementation other.coil
+    implementation other.coil_gif
 
     implementation androidx.data_store
     implementation androidx.core_ktx
