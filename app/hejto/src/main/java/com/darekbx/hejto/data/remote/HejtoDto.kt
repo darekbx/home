@@ -87,7 +87,8 @@ data class PostDetails(
     @SerializedName("created_at")
     val createdAt: String,
     val community: Community,
-    val link: String?
+    val link: String?,
+    val uuid: String
 ) {
     val hasContentVideo = true// contentLinks.any { it.type == "video" }
 

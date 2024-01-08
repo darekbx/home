@@ -109,6 +109,7 @@ data class Author(
 }
 
 data class Comment(
+    val id: Int,
     @SerializedName("created_at")
     val date: String,
     val content: String,

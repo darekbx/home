@@ -23,7 +23,9 @@ fun StreamScreen(
     openStreamItem: (StreamItem) -> Unit = { }
 ) {
     val tagStream = streamViewModel.streamItems
-    var page by remember { mutableStateOf(1) }
+    var page by remember { mutableIntStateOf(1) }
+    val viewedIds = remember { mutableSetOf<Int>() }
+    var viewedCount by remember { mutableIntStateOf(0) }
     val state = rememberLazyListState()
     val isAtBottom by remember { derivedStateOf { state.isScrolledToEnd() } }
     val uiState by streamViewModel.uiState
@@ -44,6 +46,8 @@ fun StreamScreen(
         val context = LocalContext.current
         LazyColumn(state = state) {
             items(items = tagStream) { item ->
+                viewedIds.add(item.id)
+                viewedCount = viewedIds.size
                 StreamView(
                     item,
                     openStreamItem = { openStreamItem(it) },
@@ -57,7 +61,9 @@ fun StreamScreen(
         when (uiState) {
             is UiState.InProgress -> LoadingProgress()
             is UiState.Error -> ErrorMessage((uiState as UiState.Error).message)
-            is UiState.Idle -> { /* Do nothing */}
+            is UiState.Idle -> { /* Do nothing */ }
         }
+
+        ItemsViewedCount(viewedCount)
     }
 }

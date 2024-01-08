@@ -149,18 +149,19 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>) {
         val colors = listOf(red, orange, yellow, yellow2, yellow3, yellow4)
 
         val itemsToMark = 10
-        val yScale = 0.85F
+        val yScale = 0.95F
         val leftOffset = 50F
 
         val maximum = data.maxOf { it.sumDistance() }
         val minimum = data.minOf { it.sumDistance() }
 
+        val count = data.size
         val highestItems = data
             .sortedByDescending { it.sumDistance() }
             .take(itemsToMark) + data.first() + data.last()
 
         val widthStep = (size.width - leftOffset) / data.size
-        val heightStep = (size.height * yScale) / (maximum - minimum)
+        val heightStep = ((size.height - widthStep ) * yScale) / (maximum - minimum)
 
         var prevHighest: Offset? = null
         var start = leftOffset
@@ -198,11 +199,14 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>) {
                     innerTop += (distance * heightStep).toFloat()
                     index++
                 }
-                drawCircle(
-                    colors[index - 1],
-                    radius = widthStep / 2F,
-                    Offset(start + widthStep / 2F, (item.sumDistance() * heightStep).toFloat())
-                )
+
+                if (count > 20) {
+                    drawCircle(
+                        colors[index - 1],
+                        radius = widthStep / 2F,
+                        Offset(start + widthStep / 2F, (item.sumDistance() * heightStep).toFloat())
+                    )
+                }
 
                 start += widthStep
             }
@@ -245,7 +249,23 @@ private fun DrawScope.drawLines(
 
 @Preview
 @Composable
-fun ChartPreview() {
+fun ChartPreview1() {
+    val r = Random(100)
+    val data = listOf(
+        ActivityData(1, listOf(7000.0)),
+        ActivityData(2, listOf(2000.0)),
+        ActivityData(3, listOf(13000.0)),
+        ActivityData(3, listOf(11000.0)),
+        ActivityData(3, listOf(13000.0)),
+        ActivityData(1, listOf(9000.0)),
+    )
+
+    Chart(Modifier.size(200.dp, 100.dp), data)
+}
+
+@Preview
+@Composable
+fun ChartPreview2() {
     val r = Random(100)
     val randomData = (0..100)
         .map { r.nextDouble() * 54120.0 }

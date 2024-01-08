@@ -10,10 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.common.ui.isScrolledToEnd
+import com.darekbx.diggpl.WebViewActivity
 import com.darekbx.diggpl.data.remote.Comment
 import com.darekbx.diggpl.data.remote.MediaPhoto
 import com.darekbx.diggpl.ui.*
@@ -27,8 +28,10 @@ fun CommentsLazyList(
     header: @Composable () -> Unit = { },
     commentsViewModel: CommentsViewModel = hiltViewModel()
 ) {
-    var page by remember { mutableStateOf(1) }
+    var page by remember { mutableIntStateOf(1) }
     val state = rememberLazyListState()
+    val viewedIds = remember { mutableSetOf<Int>() }
+    var viewedCount by remember { mutableIntStateOf(0) }
     val isAtBottom by remember { derivedStateOf { state.isScrolledToEnd() } }
     val uiState by commentsViewModel.uiState
 
@@ -47,6 +50,8 @@ fun CommentsLazyList(
         LazyColumn(state = state) {
             item { header() }
             items(items = commentsViewModel.commentItems) { item ->
+                viewedIds.add(item.id)
+                viewedCount = viewedIds.size
                 CommentView(item)
             }
         }
@@ -55,12 +60,14 @@ fun CommentsLazyList(
             is UiState.Error -> ErrorMessage((uiState as UiState.Error).message)
             is UiState.Idle -> { /* Do nothing */ }
         }
+
+        ItemsViewedCount(viewedCount)
     }
 }
 
 @Composable
 fun CommentView(comment: Comment) {
-    val localUriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     Column(modifier = Modifier.padding(4.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             // green, orange, burgundy
@@ -88,7 +95,7 @@ fun CommentView(comment: Comment) {
         Spacer(modifier = Modifier.height(8.dp))
         comment.media.photo?.let {
             CommonImage(it, comment.adult) {
-                localUriHandler.openUri(it.url)
+                WebViewActivity.openImage(context, it.url)
             }
         }
         comment.media.embed
@@ -96,7 +103,7 @@ fun CommentView(comment: Comment) {
             ?.let {
                 Box(contentAlignment = Alignment.BottomCenter) {
                     CommonImage(MediaPhoto("", it.thumbnail!!, ""), comment.adult) {
-                        localUriHandler.openUri(it.url!!)
+                        WebViewActivity.openImage(context, it.url!!)
                     }
                     Text(
                         modifier = Modifier

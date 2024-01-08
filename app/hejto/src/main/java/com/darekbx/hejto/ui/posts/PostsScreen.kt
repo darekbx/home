@@ -52,6 +52,8 @@ fun PostsScreen(
 ) {
     val localContext = LocalContext.current
     var page by remember { mutableStateOf(1) }
+    var viewedIds = remember { mutableSetOf<String>() }
+    var viewedCount by remember { mutableStateOf(0) }
     val posts = postsViewModel.postsList
     val state = rememberLazyListState()
     val isAtBottom by remember { derivedStateOf { state.isScrolledToEnd() } }
@@ -77,6 +79,8 @@ fun PostsScreen(
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         LazyColumn(state = state) {
             items(items = posts) { item ->
+                viewedIds.add(item.uuid)
+                viewedCount = viewedIds.size
                 PostView(item, openPost = openPost, onLongClick = {
                     savedViewModel.addSlug(item)
                     postAddedToast(localContext)
@@ -88,6 +92,16 @@ fun PostsScreen(
             is UiState.Error -> ErrorMessage((uiState as UiState.Error).message)
             is UiState.Idle -> { /* Do nothing */ }
         }
+
+        Text(
+            text = "$viewedCount",
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.BottomEnd)
+                .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+                .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
+        )
     }
 }
 

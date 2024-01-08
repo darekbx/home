@@ -6,12 +6,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.diggpl.R
+import com.darekbx.diggpl.WebViewActivity
 import com.darekbx.diggpl.data.remote.*
 import com.darekbx.diggpl.ui.*
 import com.darekbx.diggpl.ui.comments.CommentsLazyList
@@ -94,7 +96,7 @@ private fun LinkContent(link: StreamItem) {
 
 @Composable
 private fun RelatedView(relatedItems: List<Related>) {
-    val localUriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     relatedItems.forEach { item ->
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -105,7 +107,7 @@ private fun RelatedView(relatedItems: List<Related>) {
                 Box(modifier = Modifier.size(64.dp)) {
                     item.media.photo?.let {
                         CommonImage(it, item.adult) {
-                            localUriHandler.openUri(it.url)
+                            WebViewActivity.openImage(context, it.url)
                         }
                     }
                 }
@@ -137,7 +139,7 @@ private fun RelatedView(relatedItems: List<Related>) {
                     .padding(8.dp)
                     .clickable {
                         item.source?.url?.let {
-                            localUriHandler.openUri(it)
+                            WebViewActivity.openImage(context, it)
                         }
                     },
                 painter = painterResource(id = R.drawable.ic_open),

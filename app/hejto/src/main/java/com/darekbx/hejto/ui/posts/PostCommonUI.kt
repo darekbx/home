@@ -1,5 +1,6 @@
 package com.darekbx.hejto.ui.posts
 
+import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -32,6 +33,7 @@ import coil.decode.GifDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 import com.darekbx.hejto.R
+import com.darekbx.hejto.WebViewActivity
 import com.darekbx.hejto.data.remote.*
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
@@ -50,9 +52,9 @@ fun ContentLinkView(contentLink: ContentLink, isNsfw: Boolean) {
     Box(modifier = Modifier) {
         contentLink.images.firstOrNull()?.let { image ->
             val remoteImage = RemoteImage(mapOf("url" to image.url))
-            val localUriHandler = LocalUriHandler.current
+            val context = LocalContext.current
             CommonImage(remoteImage, isNsfw) {
-                localUriHandler.openUri(contentLink.url)
+                WebViewActivity.openImage(context, contentLink.url)
             }
         }
         Box(modifier = Modifier, contentAlignment = Alignment.Center) {
@@ -80,7 +82,7 @@ fun CommonImage(remoteImage: RemoteImage, isNsfw: Boolean, onClick: (() -> Unit)
     var errorWidthFraction by remember { mutableStateOf(1F) }
     var imageBlur by remember { mutableStateOf(100.dp) }
     var imageAlpha by remember { mutableStateOf(0.1F) }
-    val localUriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     val image = remoteImage.urls?.values?.last()
     var modifier = Modifier
         .padding(top = 8.dp, bottom = 8.dp)
@@ -94,7 +96,7 @@ fun CommonImage(remoteImage: RemoteImage, isNsfw: Boolean, onClick: (() -> Unit)
             } else {
                 image?.let {
                     if (onClick == null) {
-                        localUriHandler.openUri(it)
+                        WebViewActivity.openImage(context, it)
                     } else {
                         onClick()
                     }
@@ -324,6 +326,7 @@ object MockData {
         commentsCount = 3,
         createdAt = "2023-01-20T20:21:18+01:00",
         community = Community("Wiadomosci", "wiadomosci", "", null, 1),
+        uuid = "uuid",
         link = "https://streamable.com/gqsn7x"
     )
     val COMMENT = PostComment(

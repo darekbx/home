@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.common.ui.isScrolledToEnd
 import com.darekbx.diggpl.data.remote.StreamItem
 import com.darekbx.diggpl.ui.ErrorMessage
+import com.darekbx.diggpl.ui.ItemsViewedCount
 import com.darekbx.diggpl.ui.LoadingProgress
 import com.darekbx.diggpl.ui.StreamView
 import com.darekbx.diggpl.ui.saved.SavedViewModel
@@ -25,8 +26,10 @@ fun HomePageScreen(
     openStreamItem: (StreamItem) -> Unit = { }
 ) {
     val tagStream = homePageViewModel.linkStreamItems
-    var page by remember { mutableStateOf(1) }
+    var page by remember { mutableIntStateOf(1) }
     val state = rememberLazyListState()
+    val viewedIds = remember { mutableSetOf<Int>() }
+    var viewedCount by remember { mutableIntStateOf(0) }
     val isAtBottom by remember { derivedStateOf { state.isScrolledToEnd() } }
     val uiState by homePageViewModel.uiState
 
@@ -45,6 +48,8 @@ fun HomePageScreen(
         val context = LocalContext.current
         LazyColumn(state = state) {
             items(items = tagStream) { item ->
+                viewedIds.add(item.id)
+                viewedCount = viewedIds.size
                 StreamView(
                     item,
                     openStreamItem = { openStreamItem(it) },
@@ -60,5 +65,7 @@ fun HomePageScreen(
             is UiState.Error -> ErrorMessage((uiState as UiState.Error).message)
             is UiState.Idle -> { /* Do nothing */ }
         }
+
+        ItemsViewedCount(viewedCount)
     }
 }

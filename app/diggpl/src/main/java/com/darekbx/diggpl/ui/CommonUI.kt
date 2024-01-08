@@ -3,7 +3,9 @@
 package com.darekbx.diggpl.ui
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -28,15 +30,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import coil.size.Dimension
 import com.darekbx.diggpl.R
+import com.darekbx.diggpl.WebViewActivity
 import com.darekbx.diggpl.data.remote.*
 import dev.jeziellago.compose.markdowntext.MarkdownText
+
+@Composable
+fun BoxScope.ItemsViewedCount(viewedCount: Int) {
+    Text(
+        text = "$viewedCount",
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier
+            .padding(16.dp)
+            .align(Alignment.BottomEnd)
+            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+            .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
+    )
+}
 
 @Composable
 fun StreamView(
@@ -197,18 +211,20 @@ private fun LinkFooter(
 
 @Composable
 fun LinkImages(streamItem: StreamItem) {
-    val localUriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     Box(modifier = Modifier.fillMaxWidth()) {
         streamItem.media.photo?.let {
             CommonImage(it, streamItem.adult) {
-                localUriHandler.openUri(it.url)
+                WebViewActivity.openImage(context, it.url)
             }
         }
         streamItem.media.embed
             ?.takeIf { it.thumbnail != null }
             ?.let {
                 CommonImage(MediaPhoto("", it.thumbnail!!, ""), streamItem.adult) {
-                    localUriHandler.openUri(it.url!!)
+                    it.url?.let { url ->
+                        WebViewActivity.openImage(context, url)
+                    }
                 }
             }
     }
@@ -237,7 +253,7 @@ fun EntryView(
     onClick: () -> Unit = { },
     onLongClick: () -> Unit = { }
 ) {
-    val localUriHandler = LocalUriHandler.current
+    val context = LocalContext.current
     Box(Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -266,7 +282,7 @@ fun EntryView(
             Spacer(modifier = Modifier.height(8.dp))
             streamItem.media.photo?.let {
                 CommonImage(it, streamItem.adult) {
-                    localUriHandler.openUri(it.url)
+                    WebViewActivity.openImage(context, it.url)
                 }
             }
             streamItem.media.embed
@@ -274,7 +290,9 @@ fun EntryView(
                 ?.let {
                     Box(contentAlignment = Alignment.BottomCenter) {
                         CommonImage(MediaPhoto("", it.thumbnail!!, ""), streamItem.adult) {
-                            localUriHandler.openUri(it.url!!)
+                            it.url?.let { url ->
+                                WebViewActivity.openImage(context, url)
+                            }
                         }
                         Text(
                             modifier = Modifier
@@ -419,9 +437,9 @@ fun CommonImage(mediaPhoto: MediaPhoto, isNsfw: Boolean, onClick: (() -> Unit)? 
     val isNsfw = false
 
     val maxImageHeigth = 1920
-    var errorWidthFraction by remember { mutableStateOf(1F) }
+    var errorWidthFraction by remember { mutableFloatStateOf(1F) }
     var imageBlur by remember { mutableStateOf(10.dp) }
-    var imageAlpha by remember { mutableStateOf(0.1F) }
+    var imageAlpha by remember { mutableFloatStateOf(0.1F) }
     val localUriHandler = LocalUriHandler.current
     val image = mediaPhoto.url
     var modifier = Modifier
