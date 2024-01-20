@@ -38,6 +38,7 @@ import com.darekbx.geotracker.ui.LoadingProgress
 import com.darekbx.geotracker.ui.defaultCard
 import com.darekbx.geotracker.ui.theme.LocalColors
 import com.darekbx.geotracker.ui.theme.LocalStyles
+import kotlin.math.max
 import kotlin.random.Random
 
 @Composable
@@ -149,18 +150,18 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>) {
         val colors = listOf(red, orange, yellow, yellow2, yellow3, yellow4)
 
         val itemsToMark = 10
-        val yScale = 0.95F
+        val yScale = 0.85F
         val leftOffset = 50F
 
-        val maximum = data.maxOf { it.sumDistance() }
+        val maximum = max(50.0, data.maxOf { it.sumDistance() })
         val minimum = data.minOf { it.sumDistance() }
 
-        val count = data.size
+        val count = max(60, data.size)
         val highestItems = data
             .sortedByDescending { it.sumDistance() }
             .take(itemsToMark) + data.first() + data.last()
 
-        val widthStep = (size.width - leftOffset) / data.size
+        val widthStep = (size.width - leftOffset) / count
         val heightStep = ((size.height - widthStep ) * yScale) / (maximum - minimum)
 
         var prevHighest: Offset? = null
@@ -200,13 +201,11 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>) {
                     index++
                 }
 
-                if (count > 20) {
-                    drawCircle(
-                        colors[index - 1],
-                        radius = widthStep / 2F,
-                        Offset(start + widthStep / 2F, (item.sumDistance() * heightStep).toFloat())
-                    )
-                }
+                drawCircle(
+                    colors[index - 1],
+                    radius = widthStep / 2F,
+                    Offset(start + widthStep / 2F, (item.sumDistance() * heightStep).toFloat())
+                )
 
                 start += widthStep
             }

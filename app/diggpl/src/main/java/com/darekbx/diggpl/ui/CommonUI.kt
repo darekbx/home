@@ -211,6 +211,7 @@ private fun LinkFooter(
 
 @Composable
 fun LinkImages(streamItem: StreamItem) {
+    val localUriHandler = LocalUriHandler.current
     val context = LocalContext.current
     Box(modifier = Modifier.fillMaxWidth()) {
         streamItem.media.photo?.let {
@@ -223,7 +224,7 @@ fun LinkImages(streamItem: StreamItem) {
             ?.let {
                 CommonImage(MediaPhoto("", it.thumbnail!!, ""), streamItem.adult) {
                     it.url?.let { url ->
-                        WebViewActivity.openImage(context, url)
+                        localUriHandler.openUri(it.url)
                     }
                 }
             }
