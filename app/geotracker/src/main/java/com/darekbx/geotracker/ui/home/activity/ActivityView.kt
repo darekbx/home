@@ -138,8 +138,6 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>) {
     Canvas(
         modifier = modifier
     ) {
-        val drawLine = false
-
         // Chart line colors
         // TODO: will throw an exception when there will be more than 6 trips during one day
         val orange = Color(0xFFE87B52)
@@ -149,65 +147,49 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>) {
         val yellow4 = Color(0xFFE7FBE2)
         val colors = listOf(red, orange, yellow, yellow2, yellow3, yellow4)
 
-        val itemsToMark = 10
         val yScale = 0.85F
         val leftOffset = 50F
 
         val maximum = max(50.0, data.maxOf { it.sumDistance() })
         val minimum = data.minOf { it.sumDistance() }
 
-        val count = max(60, data.size)
-        val highestItems = data
-            .sortedByDescending { it.sumDistance() }
-            .take(itemsToMark) + data.first() + data.last()
-
+        val count = max(356, data.size)
         val widthStep = (size.width - leftOffset) / count
         val heightStep = ((size.height - widthStep ) * yScale) / (maximum - minimum)
 
-        var prevHighest: Offset? = null
         var start = leftOffset
 
         drawLines(maximum, textMeasurer, heightStep, leftOffset)
 
         this.scale(1F, -1F) {
-            data.forEach { item ->
-                if (drawLine) {
-                    highestItems
-                        .firstOrNull { it.dayOfYear == item.dayOfYear }
-                        ?.let { highestItem ->
-                            prevHighest?.let {
-                                drawLine(
-                                    Color(0xAAE75B52),
-                                    it,
-                                    Offset(start, (highestItem.sumDistance() * heightStep).toFloat())
-                                )
-                            }
-                            prevHighest = Offset(
-                                start + widthStep / 2F,
-                                (highestItem.sumDistance() * heightStep).toFloat()
-                            )
-                        }
-                }
+            (0..count).forEach { dayOfYear ->
 
-                var innerTop = 0.0F
-                var index = 0
-                item.distances.forEach { distance ->
-                    drawRect(
-                        color = colors[index],
-                        topLeft = Offset(start, innerTop + 0F),
-                        size = Size(widthStep, (distance * heightStep).toFloat())
+                val item = data.firstOrNull { it.dayOfYear == dayOfYear }
+
+                if (item == null) {
+                    start += widthStep
+                } else {
+
+                    var innerTop = 0.0F
+                    var index = 0
+                    item.distances.forEach { distance ->
+                        drawRect(
+                            color = colors[index],
+                            topLeft = Offset(start, innerTop + 0F),
+                            size = Size(widthStep, (distance * heightStep).toFloat())
+                        )
+                        innerTop += (distance * heightStep).toFloat()
+                        index++
+                    }
+
+                    drawCircle(
+                        colors[index - 1],
+                        radius = widthStep / 2F,
+                        Offset(start + widthStep / 2F, (item.sumDistance() * heightStep).toFloat())
                     )
-                    innerTop += (distance * heightStep).toFloat()
-                    index++
+
+                    start += widthStep
                 }
-
-                drawCircle(
-                    colors[index - 1],
-                    radius = widthStep / 2F,
-                    Offset(start + widthStep / 2F, (item.sumDistance() * heightStep).toFloat())
-                )
-
-                start += widthStep
             }
         }
     }

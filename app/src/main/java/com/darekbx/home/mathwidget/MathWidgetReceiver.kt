@@ -1,4 +1,4 @@
-package com.example.testapplication
+package com.darekbx.home.mathwidget
 
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
