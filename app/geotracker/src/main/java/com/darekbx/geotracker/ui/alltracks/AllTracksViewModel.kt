@@ -3,7 +3,9 @@ package com.darekbx.geotracker.ui.alltracks
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.geotracker.domain.usecase.GetAllTracksUseCase
+import com.darekbx.geotracker.domain.usecase.GetPlacesToVisitUseCase
 import com.darekbx.geotracker.repository.entities.SimplePointDto
+import com.darekbx.geotracker.repository.model.PlaceToVisit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,12 +15,16 @@ import javax.inject.Inject
 sealed class AllTracksUiState {
     object Idle : AllTracksUiState()
     object InProgress : AllTracksUiState()
-    class Done(val data: List<List<SimplePointDto>>) : AllTracksUiState()
+    class Done(
+        val data: List<List<SimplePointDto>>,
+        val placesToVisit: List<PlaceToVisit>
+    ) : AllTracksUiState()
 }
 
 @HiltViewModel
 class AllTracksViewModel @Inject constructor(
-    private val getAllTracksUseCase: GetAllTracksUseCase
+    private val getAllTracksUseCase: GetAllTracksUseCase,
+    private val getPlacesToVisitUseCase: GetPlacesToVisitUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AllTracksUiState>(AllTracksUiState.Idle)
@@ -32,8 +38,9 @@ class AllTracksViewModel @Inject constructor(
     fun refresh() {
         _uiState.value = AllTracksUiState.InProgress
         viewModelScope.launch {
+            val placesToVisit = getPlacesToVisitUseCase()
             val latestTracks = getAllTracksUseCase(skipActual = false)
-                _uiState.value = AllTracksUiState.Done(latestTracks)
+            _uiState.value = AllTracksUiState.Done(latestTracks, placesToVisit)
         }
     }
 }

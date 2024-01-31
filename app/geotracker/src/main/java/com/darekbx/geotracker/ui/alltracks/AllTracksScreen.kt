@@ -6,9 +6,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.repository.entities.SimplePointDto
+import com.darekbx.geotracker.repository.model.PlaceToVisit
+import com.darekbx.geotracker.repository.model.Point
 import com.darekbx.geotracker.ui.LoadingProgress
 import com.darekbx.geotracker.ui.MapBox
 import com.darekbx.geotracker.ui.drawLine
+import com.darekbx.geotracker.ui.drawPoint
 import com.darekbx.geotracker.ui.rememberMapWithLifecycle
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -19,7 +22,10 @@ fun AllTracksScreen(viewState: AllTracksViewState = rememberAllTracksViewState()
     val state = viewState.state
     MapBox {
         when (state) {
-            is AllTracksUiState.Done -> PreviewMap(points = state.data)
+            is AllTracksUiState.Done -> PreviewMap(
+                points = state.data,
+                placesToVisit = state.placesToVisit
+            )
             AllTracksUiState.Idle -> {}
             AllTracksUiState.InProgress -> LoadingProgress()
         }
@@ -27,7 +33,7 @@ fun AllTracksScreen(viewState: AllTracksViewState = rememberAllTracksViewState()
 }
 
 @Composable
-fun PreviewMap(points: List<List<SimplePointDto>>) {
+fun PreviewMap(points: List<List<SimplePointDto>>, placesToVisit: List<PlaceToVisit>) {
     val context = LocalContext.current
     val mapView = rememberMapWithLifecycle()
     val zoomToPlace = 12.0
@@ -44,6 +50,10 @@ fun PreviewMap(points: List<List<SimplePointDto>>) {
 
         points.forEach {
             map.drawLine(it, dashed = false)
+        }
+
+        placesToVisit.forEach {
+            map.drawPoint(Point(it.latitude, it.longitude))
         }
     }
 }

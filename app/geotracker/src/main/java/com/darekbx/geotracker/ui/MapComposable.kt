@@ -17,10 +17,12 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.darekbx.geotracker.R
 import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.repository.model.Point
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 
 @Composable
@@ -69,6 +71,16 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
             }
         }
     }
+
+fun MapView.drawPoint(
+    point: Point
+) {
+    val point = Marker(this).apply {
+        position = GeoPoint(point.latitude, point.longitude)
+        icon = this@drawPoint.context.getDrawable(R.drawable.ic_place_to_visit_marker)
+    }
+    overlays.add(point)
+}
 
 fun MapView.drawLine(
     collection: List<Point>,
