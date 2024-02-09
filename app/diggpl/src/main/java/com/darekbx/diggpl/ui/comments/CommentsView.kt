@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.common.ui.isScrolledToEnd
@@ -68,6 +69,7 @@ fun CommentsLazyList(
 @Composable
 fun CommentView(comment: Comment) {
     val context = LocalContext.current
+    val localUriHandler = LocalUriHandler.current
     Column(modifier = Modifier.padding(4.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             // green, orange, burgundy
@@ -95,7 +97,8 @@ fun CommentView(comment: Comment) {
         Spacer(modifier = Modifier.height(8.dp))
         comment.media.photo?.let {
             CommonImage(it, comment.adult) {
-                WebViewActivity.openImage(context, it.url)
+                localUriHandler.openUri(it.url)
+            //WebViewActivity.openImage(context, it.url)
             }
         }
         comment.media.embed
@@ -103,7 +106,8 @@ fun CommentView(comment: Comment) {
             ?.let {
                 Box(contentAlignment = Alignment.BottomCenter) {
                     CommonImage(MediaPhoto("", it.thumbnail!!, ""), comment.adult) {
-                        WebViewActivity.openImage(context, it.url!!)
+                        localUriHandler.openUri(it.url!!)
+                        //WebViewActivity.openImage(context, it.url!!)
                     }
                     Text(
                         modifier = Modifier

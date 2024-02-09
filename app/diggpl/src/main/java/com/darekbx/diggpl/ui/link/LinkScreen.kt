@@ -97,6 +97,7 @@ private fun LinkContent(link: StreamItem) {
 @Composable
 private fun RelatedView(relatedItems: List<Related>) {
     val context = LocalContext.current
+    val localUriHandler = LocalUriHandler.current
     relatedItems.forEach { item ->
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -107,7 +108,8 @@ private fun RelatedView(relatedItems: List<Related>) {
                 Box(modifier = Modifier.size(64.dp)) {
                     item.media.photo?.let {
                         CommonImage(it, item.adult) {
-                            WebViewActivity.openImage(context, it.url)
+                            localUriHandler.openUri(it.url!!)
+                            //WebViewActivity.openImage(context, it.url)
                         }
                     }
                 }
@@ -139,7 +141,8 @@ private fun RelatedView(relatedItems: List<Related>) {
                     .padding(8.dp)
                     .clickable {
                         item.source?.url?.let {
-                            WebViewActivity.openImage(context, it)
+                            localUriHandler.openUri(it)
+                            //WebViewActivity.openImage(context, it)
                         }
                     },
                 painter = painterResource(id = R.drawable.ic_open),

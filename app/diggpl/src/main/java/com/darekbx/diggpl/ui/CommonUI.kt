@@ -216,7 +216,8 @@ fun LinkImages(streamItem: StreamItem) {
     Box(modifier = Modifier.fillMaxWidth()) {
         streamItem.media.photo?.let {
             CommonImage(it, streamItem.adult) {
-                WebViewActivity.openImage(context, it.url)
+                //WebViewActivity.openImage(context, it.url)
+                localUriHandler.openUri(it.url)
             }
         }
         streamItem.media.embed
@@ -255,6 +256,7 @@ fun EntryView(
     onLongClick: () -> Unit = { }
 ) {
     val context = LocalContext.current
+    val localUriHandler = LocalUriHandler.current
     Box(Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -283,7 +285,8 @@ fun EntryView(
             Spacer(modifier = Modifier.height(8.dp))
             streamItem.media.photo?.let {
                 CommonImage(it, streamItem.adult) {
-                    WebViewActivity.openImage(context, it.url)
+                    //WebViewActivity.openImage(context, it.url)
+                    localUriHandler.openUri(it.url)
                 }
             }
             streamItem.media.embed
@@ -292,7 +295,8 @@ fun EntryView(
                     Box(contentAlignment = Alignment.BottomCenter) {
                         CommonImage(MediaPhoto("", it.thumbnail!!, ""), streamItem.adult) {
                             it.url?.let { url ->
-                                WebViewActivity.openImage(context, url)
+                                //WebViewActivity.openImage(context, url)
+                                localUriHandler.openUri(it.url)
                             }
                         }
                         Text(
