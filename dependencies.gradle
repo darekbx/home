@@ -28,7 +28,8 @@ ext {
             coil_gif: "io.coil-kt:coil-gif:2.1.0",
             markdown: "com.github.jeziellago:compose-markdown:0.3.1",
             osmdroid: "org.osmdroid:osmdroid-android:6.1.13",
-            accompanist: "com.google.accompanist:accompanist-permissions:0.32.0"
+            accompanist: "com.google.accompanist:accompanist-permissions:0.32.0",
+            swipe: "de.charlex.compose:revealswipe:1.2.0"
     ]
 
     useRoom = { ->
