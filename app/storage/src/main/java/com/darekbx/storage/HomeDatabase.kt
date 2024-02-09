@@ -25,6 +25,9 @@ import com.darekbx.storage.diggpl.SavedEntryDto
 import com.darekbx.storage.diggpl.SavedLinkDto
 import com.darekbx.storage.diggpl.SavedTagDto
 import com.darekbx.storage.dotpad.DotsDao
+import com.darekbx.storage.favourites.FavouriteCategoryDto
+import com.darekbx.storage.favourites.FavouriteItemDto
+import com.darekbx.storage.favourites.FavouritesDao
 import com.darekbx.storage.fuel.FuelDao
 import com.darekbx.storage.fuel.FuelEntryDto
 import com.darekbx.storage.lifetimememo.LocationDto
@@ -93,10 +96,13 @@ import com.darekbx.storage.weight.WeightDto
         RouteDto::class,
         // Timeline
         TimelineEntryDto::class,
-        TimelineCategoryDto::class
+        TimelineCategoryDto::class,
+        // Favourites
+        FavouriteCategoryDto::class,
+        FavouriteItemDto::class,
     ],
     exportSchema = true,
-    version = 16
+    version = 17
 )
 abstract class HomeDatabase : RoomDatabase() {
 
@@ -151,6 +157,9 @@ abstract class HomeDatabase : RoomDatabase() {
 
     // Timeline
     abstract fun timelineDao(): TimelineDao
+
+    // Favourites
+    abstract fun favouritesDao(): FavouritesDao
 
     companion object {
         const val DB_NAME = "home_db"
@@ -273,6 +282,13 @@ abstract class HomeDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS timeline_entry (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `category_id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)")
                 database.execSQL("CREATE TABLE IF NOT EXISTS timeline_category (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `color` INTEGER NOT NULL)")
+            }
+        }
+
+        val MIGRATION_16_17 = object : Migration(16, 17) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `favourite_category` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `index` INTEGER NOT NULL)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `favourite_item` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `category_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `rating` REAL NOT NULL, `comment` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)")
             }
         }
     }

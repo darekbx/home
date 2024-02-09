@@ -310,6 +310,11 @@ fun EntryView(
                         )
                     }
                 }
+            streamItem.media.embed
+                ?.takeIf { it.url != null }
+                ?.let {
+                    MarkdownContent(it.url!!)
+                }
             EntryFooter(streamItem, onClick, onLongClick)
         }
         if (streamItem.hot) {

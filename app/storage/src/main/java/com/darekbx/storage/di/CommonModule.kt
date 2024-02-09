@@ -16,6 +16,7 @@ import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_12_13
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_13_14
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_14_15
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_15_16
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_16_17
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_1_2
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_2_3
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_3_4
@@ -28,6 +29,7 @@ import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_9_10
 import com.darekbx.storage.books.BookDao
 import com.darekbx.storage.diggpl.DiggDao
 import com.darekbx.storage.dotpad.DotsDao
+import com.darekbx.storage.favourites.FavouritesDao
 import com.darekbx.storage.fuel.FuelDao
 import com.darekbx.storage.hejto.HejtoDao
 import com.darekbx.storage.legacy.DotPadHelper
@@ -188,6 +190,11 @@ class CommonModule {
         return database.timelineDao()
     }
 
+    @Provides
+    fun provideFavouritesDao(database: HomeDatabase): FavouritesDao {
+        return database.favouritesDao()
+    }
+
     @Singleton
     @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): HomeDatabase {
@@ -212,6 +219,7 @@ class CommonModule {
             .addMigrations(MIGRATION_13_14)
             .addMigrations(MIGRATION_14_15)
             .addMigrations(MIGRATION_15_16)
+            .addMigrations(MIGRATION_16_17)
             .build()
     }
 }
