@@ -156,7 +156,9 @@ fun PlacesList(
                 }
             ) {
                 PlaceListItem(
-                    modifier = Modifier.clickable { onItemClick(place) },
+                    modifier = Modifier
+                        .padding(start = 8.dp, top = 8.dp, end = 8.dp)
+                        .clickable { onItemClick(place) },
                     placeToVisit = place
                 )
             }

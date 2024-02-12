@@ -258,7 +258,9 @@ fun TripsList(
                     )
                 }
             ) {
-                TripListItem(modifier = Modifier.clickable { onItemClick(track) }, track = track)
+                TripListItem(modifier = Modifier
+                    .padding(start = 8.dp, top = 4.dp, end = 8.dp)
+                    .clickable { onItemClick(track) }, track = track)
             }
         }
     }
