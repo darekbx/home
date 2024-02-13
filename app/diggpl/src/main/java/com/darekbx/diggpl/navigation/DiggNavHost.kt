@@ -22,7 +22,7 @@ fun DiggNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Homepage.route,
+        startDestination = Tags.route,
         modifier = modifier
     ) {
         composable(route = Homepage.route) {

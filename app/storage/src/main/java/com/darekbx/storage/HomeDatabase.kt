@@ -53,6 +53,8 @@ import com.darekbx.storage.vault.VaultDao
 import com.darekbx.storage.vault.VaultDto
 import com.darekbx.storage.weight.WeightDao
 import com.darekbx.storage.weight.WeightDto
+import com.darekbx.storage.words.WordDao
+import com.darekbx.storage.words.WordDto
 
 @Database(
     entities = [
@@ -100,9 +102,11 @@ import com.darekbx.storage.weight.WeightDto
         // Favourites
         FavouriteCategoryDto::class,
         FavouriteItemDto::class,
+        // Words
+        WordDto::class
     ],
     exportSchema = true,
-    version = 17
+    version = 18
 )
 abstract class HomeDatabase : RoomDatabase() {
 
@@ -160,6 +164,9 @@ abstract class HomeDatabase : RoomDatabase() {
 
     // Favourites
     abstract fun favouritesDao(): FavouritesDao
+
+    // Words
+    abstract fun wordsDao(): WordDao
 
     companion object {
         const val DB_NAME = "home_db"
@@ -289,6 +296,12 @@ abstract class HomeDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `favourite_category` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `index` INTEGER NOT NULL)")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `favourite_item` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `category_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `rating` REAL NOT NULL, `comment` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)")
+            }
+        }
+
+        val MIGRATION_17_18 = object : Migration(17, 18) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `word_item` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `word` TEXT NOT NULL, `translation` TEXT NOT NULL, `checked_count` INTEGER NOT NULL, `is_archived` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL)")
             }
         }
     }

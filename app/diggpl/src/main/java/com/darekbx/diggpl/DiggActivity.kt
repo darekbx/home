@@ -80,12 +80,12 @@ private fun BottomMenu(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        MenuItem(
+        /*MenuItem(
             modifier = Modifier.clickable { navController.navigateSingleTopTo(Homepage.route) },
             label = "Homepage",
             icon = painterResource(id = R.drawable.ic_home),
             selected = navBackStackEntry?.destination?.route == Homepage.route
-        )
+        )*/
         MenuItem(
             modifier = Modifier.clickable { navController.navigateSingleTopTo(Tags.route) },
             label = "Tags",

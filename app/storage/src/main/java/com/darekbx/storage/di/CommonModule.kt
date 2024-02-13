@@ -17,6 +17,7 @@ import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_13_14
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_14_15
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_15_16
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_16_17
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_17_18
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_1_2
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_2_3
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_3_4
@@ -220,6 +221,7 @@ class CommonModule {
             .addMigrations(MIGRATION_14_15)
             .addMigrations(MIGRATION_15_16)
             .addMigrations(MIGRATION_16_17)
+            .addMigrations(MIGRATION_17_18)
             .build()
     }
 }

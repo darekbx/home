@@ -45,9 +45,7 @@ fun GeoTrackerNavHost(
         }
 
         composable(route = SettingsDestination.route) {
-            SettingsScreen {
-                navController.navigateUp()
-            }
+            SettingsScreen()
         }
 
         composable(route = TripsDestination.route) {
