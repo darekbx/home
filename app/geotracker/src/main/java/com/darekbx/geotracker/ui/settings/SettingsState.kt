@@ -7,7 +7,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 class SettingsViewState(
     private val settingsViewModel: SettingsViewModel
-)  {
+) {
     val state: SettingsUiState
         @Composable get() = settingsViewModel.uiState.collectAsState(initial = SettingsUiState.Idle).value
 
@@ -15,8 +15,13 @@ class SettingsViewState(
         settingsViewModel.deleteAndRestore()
     }
 
-    fun save(nthPointsToSkip: Int, gpsMinDistance: Float, gpsUpdateInterval: Long) {
-        settingsViewModel.save(nthPointsToSkip, gpsMinDistance, gpsUpdateInterval)
+    fun save(
+        nthPointsToSkip: Int,
+        gpsMinDistance: Float,
+        gpsUpdateInterval: Long,
+        showYearSummaryValue: Boolean
+    ) {
+        settingsViewModel.save(nthPointsToSkip, gpsMinDistance, gpsUpdateInterval, showYearSummaryValue)
     }
 }
 

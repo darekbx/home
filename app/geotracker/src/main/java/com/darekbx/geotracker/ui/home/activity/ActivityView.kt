@@ -61,7 +61,10 @@ fun ActivityView(
     ) {
         when (state) {
             is ActivityUiState.InProgress -> LoadingProgress()
-            is ActivityUiState.Done -> ActivityBox(activityData = state.data) { openCalendar() }
+            is ActivityUiState.Done -> ActivityBox(
+                activityData = state.data,
+                showYearSummary = state.showYearSummary
+            ) { openCalendar() }
             else -> {}
         }
     }
@@ -71,6 +74,7 @@ fun ActivityView(
 private fun ActivityBox(
     modifier: Modifier = Modifier,
     activityData: List<ActivityData>,
+    showYearSummary: Boolean,
     openCalendar: () -> Unit = { }
 ) {
     Column(
@@ -85,7 +89,8 @@ private fun ActivityBox(
                 modifier = Modifier
                     .fillMaxSize()
                     .height(140.dp),
-                data = activityData
+                data = activityData,
+                showYearSummary = showYearSummary
             )
         }
     }
@@ -132,7 +137,7 @@ private fun Header(openCalendar: () -> Unit = { }) {
 }
 
 @Composable
-fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>) {
+fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>, showYearSummary: Boolean) {
     val textMeasurer = rememberTextMeasurer()
     val red = LocalColors.current.red
     Canvas(
@@ -153,7 +158,7 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>) {
         val maximum = max(50.0, data.maxOf { it.sumDistance() })
         val minimum = data.minOf { it.sumDistance() }
 
-        val count = max(356, data.size)
+        val count = if (showYearSummary) max(356, data.size) else data.size
         val widthStep = (size.width - leftOffset) / count
         val heightStep = ((size.height - widthStep ) * yScale) / (maximum - minimum)
 
@@ -241,7 +246,7 @@ fun ChartPreview1() {
         ActivityData(1, listOf(9000.0)),
     )
 
-    Chart(Modifier.size(200.dp, 100.dp), data)
+    Chart(Modifier.size(200.dp, 100.dp), data, true)
 }
 
 @Preview
@@ -271,5 +276,5 @@ fun ChartPreview2() {
         ActivityData(16, listOf(5000.0)),
     )
 
-    Chart(Modifier.size(200.dp, 100.dp), data)
+    Chart(Modifier.size(200.dp, 100.dp), data, false)
 }

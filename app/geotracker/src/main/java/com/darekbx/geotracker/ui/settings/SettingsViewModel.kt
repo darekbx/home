@@ -13,7 +13,12 @@ import javax.inject.Inject
 sealed class SettingsUiState {
     object Idle : SettingsUiState()
     object InProgress : SettingsUiState()
-    data class Done(val nthPointsToSkip: Int, val gpsMinDistance: Float, val gpsUpdateInterval: Long) :
+    data class Done(
+        val nthPointsToSkip: Int,
+        val gpsMinDistance: Float,
+        val gpsUpdateInterval: Long,
+        val showYearSummaryValue: Boolean
+    ) :
         SettingsUiState()
 }
 
@@ -37,15 +42,33 @@ class SettingsViewModel @Inject constructor(
             val nthPointsToSkip = settingsRepository.nthPointsToSkip()
             val gpsMinDistance = settingsRepository.gpsMinDistance()
             val gpsUpdateInterval = settingsRepository.gpsUpdateInterval()
+            val showYearSummaryValue = settingsRepository.showYearSummary()
 
             _uiState.value =
-                SettingsUiState.Done(nthPointsToSkip, gpsMinDistance, gpsUpdateInterval)
+                SettingsUiState.Done(
+                    nthPointsToSkip,
+                    gpsMinDistance,
+                    gpsUpdateInterval,
+                    showYearSummaryValue
+                )
         }
     }
 
-    fun save(nthPointsToSkip: Int, gpsMinDistance: Float, gpsUpdateInterval: Long) {
+    fun save(
+        nthPointsToSkip: Int,
+        gpsMinDistance: Float,
+        gpsUpdateInterval: Long,
+        showYearSummaryValue: Boolean
+    ) {
         viewModelScope.launch {
-            settingsRepository.saveSettings(nthPointsToSkip, gpsMinDistance, gpsUpdateInterval)
+            settingsRepository.saveSettings(
+                nthPointsToSkip,
+                gpsMinDistance,
+                gpsUpdateInterval,
+                showYearSummaryValue
+            )
+
+            refresh()
         }
     }
 
