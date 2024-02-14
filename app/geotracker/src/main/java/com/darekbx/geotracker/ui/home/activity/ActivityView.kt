@@ -158,8 +158,8 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>, showYearSumma
         val maximum = max(50.0, data.maxOf { it.sumDistance() })
         val minimum = data.minOf { it.sumDistance() }
 
-        val count = if (showYearSummary) max(356, data.size) else data.size
-        val widthStep = (size.width - leftOffset) / count
+        val count = if (showYearSummary) max(356, data.size) else data.size-1
+        val widthStep = (size.width - leftOffset) / if (showYearSummary) count else count+1
         val heightStep = ((size.height - widthStep ) * yScale) / (maximum - minimum)
 
         var start = leftOffset
@@ -169,7 +169,9 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>, showYearSumma
         this.scale(1F, -1F) {
             (0..count).forEach { dayOfYear ->
 
-                val item = data.firstOrNull { it.dayOfYear == dayOfYear }
+                val item =
+                    if (showYearSummary) data.firstOrNull { it.dayOfYear == dayOfYear }
+                    else data[dayOfYear]
 
                 if (item == null) {
                     start += widthStep

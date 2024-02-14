@@ -76,14 +76,17 @@ fun WordsScreen(wordsViewModel: WordsViewModel = hiltViewModel()) {
                         modifier = Modifier
                             .padding(vertical = 8.dp)
                             .padding(start = 8.dp, end = 8.dp),
-                        backgroundCardEndColor = Color.DarkGray,
+                        backgroundCardEndColor = if (word.isArchived) Color(0xFFE75B52) else Color.DarkGray,
                         onBackgroundEndClick = { wordsViewModel.moveToArchived(word) },
                         shape = RoundedCornerShape(16.dp),
                         directions = setOf(RevealDirection.EndToStart),
                         hiddenContentEnd = {
                             Icon(
                                 modifier = Modifier.padding(horizontal = 25.dp),
-                                painter = painterResource(id = R.drawable.ic_archive),
+                                painter = painterResource(id =
+                                    if (word.isArchived) R.drawable.ic_delete
+                                    else R.drawable.ic_archive
+                                ),
                                 tint = Color.LightGray,
                                 contentDescription = null
                             )
@@ -117,10 +120,10 @@ fun WordView(modifier: Modifier = Modifier, word: WordDto, translationShown: () 
     )
     Box(
         modifier = modifier
-            .alpha(if (word.isArchived) 0.5F else 1F)
             .background(Color.LightGray, RoundedCornerShape(16.dp))
             .fillMaxWidth()
-            .height(IntrinsicSize.Min),
+            .height(IntrinsicSize.Min)
+            .alpha(if (word.isArchived) 0.5F else 1F),
         contentAlignment = Alignment.CenterStart
     ) {
         Row(
@@ -164,7 +167,7 @@ fun WordView(modifier: Modifier = Modifier, word: WordDto, translationShown: () 
                     Text(
                         modifier = Modifier
                             .blur(translationBlur)
-                            .padding(top =6.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
+                            .padding(top = 6.dp, bottom = 6.dp, start = 8.dp, end = 8.dp),
                         text = word.translation,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.background
@@ -221,7 +224,10 @@ fun WordView(modifier: Modifier = Modifier, word: WordDto, translationShown: () 
 @Composable
 fun WordViewPreview() {
     HomeTheme(isDarkTheme = true) {
-        Surface(Modifier.background(Color.Black).padding(8.dp)) {
+        Surface(
+            Modifier
+                .background(Color.Black)
+                .padding(8.dp)) {
             WordView(word = WordDto(null, "Word", "Slowo", 1, false, System.currentTimeMillis()))
         }
     }
@@ -231,7 +237,10 @@ fun WordViewPreview() {
 @Composable
 fun WordViewPreviewArchived() {
     HomeTheme(isDarkTheme = true) {
-        Surface(Modifier.background(Color.Black).padding(8.dp)) {
+        Surface(
+            Modifier
+                .background(Color.Black)
+                .padding(8.dp)) {
             WordView(word = WordDto(null, "Word", "Slowo", 5, true, System.currentTimeMillis()))
         }
     }

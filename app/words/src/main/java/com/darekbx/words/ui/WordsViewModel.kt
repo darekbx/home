@@ -23,7 +23,11 @@ class WordsViewModel @Inject constructor(
 
     fun moveToArchived(wordDto: WordDto): Boolean {
         viewModelScope.launch {
-            wordDao.setArchived(wordDto.id!!, isArchived = true)
+            if (wordDto.isArchived) {
+                wordDao.deleteWord(wordDto.id!!)
+            } else {
+                wordDao.setArchived(wordDto.id!!, isArchived = true)
+            }
         }
         return true
     }
