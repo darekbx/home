@@ -46,6 +46,7 @@ import com.darekbx.storage.task.TaskDao
 import com.darekbx.storage.timeline.TimelineDao
 import com.darekbx.storage.vault.VaultDao
 import com.darekbx.storage.weight.WeightDao
+import com.darekbx.storage.words.WordDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -194,6 +195,11 @@ class CommonModule {
     @Provides
     fun provideFavouritesDao(database: HomeDatabase): FavouritesDao {
         return database.favouritesDao()
+    }
+
+    @Provides
+    fun provideWordsDao(database: HomeDatabase): WordDao {
+        return database.wordsDao()
     }
 
     @Singleton
