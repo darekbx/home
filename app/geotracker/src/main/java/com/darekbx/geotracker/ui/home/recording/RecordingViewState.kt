@@ -27,6 +27,8 @@ class RecordingViewState(
 
     fun fetchAllTracks() = recordingViewModel.fetchAllTracks()
 
+    fun placesToVisit() = recordingViewModel.placesToVisit()
+
     fun loadGpx(uri: Uri?) = recordingViewModel.loadGpx(uri)
 }
 

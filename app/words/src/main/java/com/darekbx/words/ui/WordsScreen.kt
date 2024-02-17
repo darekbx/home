@@ -113,7 +113,7 @@ fun WordsScreen(wordsViewModel: WordsViewModel = hiltViewModel()) {
 
 @Composable
 fun WordView(modifier: Modifier = Modifier, word: WordDto, translationShown: () -> Unit = { }) {
-    var translationVisible by remember { mutableStateOf(false) }
+    var translationVisible by remember(word.id) { mutableStateOf(false) }
     val translationBlur by animateDpAsState(
         targetValue = if (translationVisible) 0.dp else 10.dp,
         label = "translationBlurAnimation"

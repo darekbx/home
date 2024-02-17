@@ -8,6 +8,7 @@ import com.darekbx.geotracker.domain.usecase.GetAllTracksUseCase
 import com.darekbx.geotracker.domain.usecase.GetRecordingStateUseCase
 import com.darekbx.geotracker.domain.usecase.GetActiveTrackPointsUseCase
 import com.darekbx.geotracker.domain.usecase.GetActiveTrackUseCase
+import com.darekbx.geotracker.domain.usecase.GetPlacesToVisitUseCase
 import com.darekbx.geotracker.domain.usecase.StopRecordingUseCase
 import com.darekbx.geotracker.gpx.GpxReader
 import com.darekbx.geotracker.service.LocationService
@@ -32,6 +33,7 @@ class RecordingViewModel @Inject constructor(
     private val getActiveTrackUseCase: GetActiveTrackUseCase,
     private val stopRecordingUseCase: StopRecordingUseCase,
     private val getAllTracksUseCase: GetAllTracksUseCase,
+    private val getPlacesToVisitUseCase: GetPlacesToVisitUseCase,
     private val gpxReader: GpxReader,
     private val contentResolver: ContentResolver
 ) : ViewModel() {
@@ -42,6 +44,10 @@ class RecordingViewModel @Inject constructor(
 
     fun fetchAllTracks() = flow {
         emit(getAllTracksUseCase.invoke())
+    }
+
+    fun placesToVisit() = flow {
+        emit(getPlacesToVisitUseCase.invoke())
     }
 
     fun listenForLocationUpdates() =

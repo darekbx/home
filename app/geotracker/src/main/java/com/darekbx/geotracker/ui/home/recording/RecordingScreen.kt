@@ -35,11 +35,13 @@ import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.gpx.Gpx
 import com.darekbx.geotracker.repository.entities.SimplePointDto
+import com.darekbx.geotracker.repository.model.PlaceToVisit
 import com.darekbx.geotracker.repository.model.Point
 import com.darekbx.geotracker.service.LocationService
 import com.darekbx.geotracker.ui.LoadingProgress
 import com.darekbx.geotracker.ui.defaultCard
 import com.darekbx.geotracker.ui.drawLine
+import com.darekbx.geotracker.ui.drawPoint
 import com.darekbx.geotracker.ui.rememberMapWithLifecycle
 import com.darekbx.geotracker.ui.theme.bounceClick
 import org.osmdroid.config.Configuration
@@ -58,6 +60,7 @@ fun RecordingScreen(
     val context = LocalContext.current
     val intent = Intent(context, LocationService::class.java)
     val allTracks by recordingViewState.fetchAllTracks().collectAsState(initial = emptyList())
+    val placesToVisit by recordingViewState.placesToVisit().collectAsState(initial = emptyList())
     val gpxTrack by recordingViewState.loadGpx(gpxUri).collectAsState(initial = null)
 
     var isMapVisible by remember { mutableStateOf(false) }
@@ -113,7 +116,7 @@ fun RecordingScreen(
                     if (isMapVisible) {
                         Column(Modifier.fillMaxSize()) {
                             MapBox(Modifier.weight(1F)) {
-                                PreviewMap(allTracks, gpxTrack) { mapView, marker ->
+                                PreviewMap(allTracks, placesToVisit, gpxTrack) { mapView, marker ->
                                     map = mapView
                                     positionMarker = marker
                                 }
@@ -174,6 +177,7 @@ fun StopButton(onClick: () -> Unit = { }) {
 @Composable
 fun PreviewMap(
     historicalTracks: List<List<SimplePointDto>>,
+    placesToVisit: List<PlaceToVisit>,
     gpxTrack: Gpx?,
     ready: (MapView, Marker) -> Unit
 ) {
@@ -194,6 +198,10 @@ fun PreviewMap(
 
         gpxTrack?.let {
             map.drawLine(it.points, android.graphics.Color.parseColor("#0A247D"), 8F)
+        }
+
+        placesToVisit.forEach {
+            map.drawPoint(Point(it.latitude, it.longitude))
         }
 
         val positionMarker = Marker(map).apply {
