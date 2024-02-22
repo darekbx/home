@@ -89,14 +89,16 @@ dependencies {
     implementation project(':app:vault')
     implementation project(':app:books')
     implementation project(':app:notepad')
-    implementation project(':app:rssreader')
     implementation project(':app:tasks')
     implementation project(':app:fuel')
-    implementation project(':app:diggpl')
-    implementation project(':app:hejto')
     implementation project(':app:lifetimememo')
     implementation project(':app:weather')
     implementation project(':app:stocks')
+
+    // Disabled
+    //implementation project(':app:rssreader')
+    //implementation project(':app:diggpl')
+    //implementation project(':app:hejto')
 
     implementation androidx.core_ktx
     implementation androidx.lifecycle_runtime_ktx

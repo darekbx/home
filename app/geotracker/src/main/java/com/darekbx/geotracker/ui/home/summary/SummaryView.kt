@@ -58,7 +58,7 @@ fun SummaryView(
 }
 
 @Composable
-private fun SummaryBox(
+fun SummaryBox(
     modifier: Modifier = Modifier,
     summaryWrapper: SummaryWrapper,
     maxSpeed: Float

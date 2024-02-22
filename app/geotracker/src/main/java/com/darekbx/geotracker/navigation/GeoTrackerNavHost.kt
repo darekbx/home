@@ -11,6 +11,7 @@ import com.darekbx.geotracker.ui.calendar.CalendarScreen
 import com.darekbx.geotracker.ui.home.HomeScreen
 import com.darekbx.geotracker.ui.placestovisit.PlacesToVisitScreen
 import com.darekbx.geotracker.ui.settings.SettingsScreen
+import com.darekbx.geotracker.ui.statistics.StatisticsScreen
 import com.darekbx.geotracker.ui.trip.TripScreen
 import com.darekbx.geotracker.ui.trips.TripsScreen
 
@@ -32,6 +33,10 @@ fun GeoTrackerNavHost(
 
         composable(route = MapDestination.route) {
             AllTracksScreen()
+        }
+
+        composable(route = StatisticsDestination.route) {
+            StatisticsScreen()
         }
 
         composable(route = CalendarDestination.route) {

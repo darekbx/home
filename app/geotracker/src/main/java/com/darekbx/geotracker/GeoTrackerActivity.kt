@@ -44,6 +44,7 @@ import com.darekbx.geotracker.navigation.HomeDestination
 import com.darekbx.geotracker.navigation.MapDestination
 import com.darekbx.geotracker.navigation.PlacesToVisitDestination
 import com.darekbx.geotracker.navigation.SettingsDestination
+import com.darekbx.geotracker.navigation.StatisticsDestination
 import com.darekbx.geotracker.navigation.TripsDestination
 import com.darekbx.geotracker.navigation.navigateSingleTopTo
 import com.darekbx.geotracker.ui.theme.GeoTrackerTheme
@@ -136,6 +137,14 @@ fun BottomMenu(navController: NavHostController, countPlacesUseCase: GetCountPla
                 icon = painterResource(id = R.drawable.ic_to_visit),
                 selected = navBackStackEntry?.destination?.route == PlacesToVisitDestination.route,
                 count = placesCount
+            )
+            MenuItem(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { navController.navigateSingleTopTo(StatisticsDestination.route) },
+                label = "Statistics",
+                icon = painterResource(id = R.drawable.ic_statistics),
+                selected = navBackStackEntry?.destination?.route == StatisticsDestination.route
             )
             MenuItem(
                 modifier = Modifier

@@ -98,7 +98,7 @@ private fun ActivityBox(
 
 @Preview
 @Composable
-private fun Header(openCalendar: () -> Unit = { }) {
+fun Header(openCalendar: () -> Unit = { }) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -255,10 +255,6 @@ fun ChartPreview1() {
 @Composable
 fun ChartPreview2() {
     val r = Random(100)
-    val randomData = (0..100)
-        .map { r.nextDouble() * 54120.0 }
-        .mapIndexed { i, d -> ActivityData(i, listOf(d + 2100.0)) }
-
     val data = listOf(
         ActivityData(1, listOf(10000.0)),
         ActivityData(2, listOf(20000.0)),

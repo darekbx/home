@@ -11,11 +11,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,25 +36,35 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.common.ui.InformationDialog
+import com.darekbx.geotracker.repository.model.ActivityData
+import com.darekbx.geotracker.repository.model.Summary
+import com.darekbx.geotracker.repository.model.SummaryWrapper
 import com.darekbx.geotracker.service.LocationService
+import com.darekbx.geotracker.ui.defaultCard
 import com.darekbx.geotracker.ui.home.activity.ActivityView
+import com.darekbx.geotracker.ui.home.activity.Chart
+import com.darekbx.geotracker.ui.home.activity.Header
 import com.darekbx.geotracker.ui.home.mappreview.MapPreviewView
 import com.darekbx.geotracker.ui.home.recording.RecordingScreen
 import com.darekbx.geotracker.ui.home.recording.RecordingUiState
 import com.darekbx.geotracker.ui.home.recording.RecordingViewState
 import com.darekbx.geotracker.ui.home.recording.rememberRecordingViewState
+import com.darekbx.geotracker.ui.home.summary.SummaryBox
 import com.darekbx.geotracker.ui.home.summary.SummaryView
+import com.darekbx.geotracker.ui.theme.GeoTrackerTheme
 import com.darekbx.geotracker.ui.theme.LocalColors
 import com.darekbx.geotracker.ui.theme.bounceClick
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlin.random.Random
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -174,6 +187,101 @@ fun HomeScreen(
     if (locationDisabledDialog) {
         InformationDialog("Please enable location!") {
             locationDisabledDialog = false
+        }
+    }
+}
+
+@Preview(showSystemUi = true, device = Devices.PIXEL_4_XL)
+@Composable
+fun HomeScreenPreview() {
+    val data = listOf(
+        ActivityData(1, listOf(10000.0)),
+        ActivityData(2, listOf(20000.0)),
+        ActivityData(3, listOf(26000.0)),
+        ActivityData(4, listOf(65000.0)),
+        ActivityData(5, listOf(12000.0)),
+        ActivityData(6, listOf(8000.0, 8000.0)),
+        ActivityData(7, listOf(5000.0)),
+        ActivityData(8, listOf(20000.0, 20000.0, 5000.0)),
+        ActivityData(9, listOf(20000.0)),
+        ActivityData(10, listOf(24000.0)),
+        ActivityData(11, listOf(9000.0)),
+        ActivityData(12, listOf(12000.0)),
+        ActivityData(13, listOf(18000.0)),
+        ActivityData(14, listOf(39000.0)),
+        ActivityData(15, listOf(37000.0)),
+        ActivityData(16, listOf(5000.0)),
+    )
+
+    GeoTrackerTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .defaultCard()
+                        .height(114.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    SummaryBox(
+                        summaryWrapper = SummaryWrapper(
+                            Summary(5213.27, 8287800, 213),
+                            Summary(2430.02, 21004, 81),
+                        ),
+                        maxSpeed = 52.4F
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .defaultCard()
+                        .height(100.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                }
+                Box(
+                    modifier = Modifier
+                        .defaultCard()
+                        .height(200.dp), // 240 -> 220
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(8.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Header { }
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Chart(
+                            Modifier
+                                .fillMaxSize(), data, true
+                        )
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .defaultCard()
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                    }
+                }
+            }
         }
     }
 }

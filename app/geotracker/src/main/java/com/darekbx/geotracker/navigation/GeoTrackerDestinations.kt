@@ -19,6 +19,10 @@ object TripsDestination : GeoTrackerDestinations {
     override val route = "trips"
 }
 
+object StatisticsDestination : GeoTrackerDestinations {
+    override val route = "statistics"
+}
+
 object TripDestination : GeoTrackerDestinations {
     override val route = "trip"
     const val tripIdArg = "trip_id"
