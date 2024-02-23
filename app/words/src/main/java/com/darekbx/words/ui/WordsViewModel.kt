@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.darekbx.storage.words.WordDao
 import com.darekbx.storage.words.WordDto
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,8 +27,17 @@ class WordsViewModel @Inject constructor(
             if (wordDto.isArchived) {
                 wordDao.deleteWord(wordDto.id!!)
             } else {
+                delay(150)
                 wordDao.setArchived(wordDto.id!!, isArchived = true)
             }
+        }
+        return true
+    }
+
+    fun moveToActive(wordDto: WordDto): Boolean {
+        viewModelScope.launch {
+            delay(150)
+            wordDao.setArchived(wordDto.id!!, isArchived = false)
         }
         return true
     }

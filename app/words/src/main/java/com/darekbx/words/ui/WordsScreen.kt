@@ -71,15 +71,21 @@ fun WordsScreen(wordsViewModel: WordsViewModel = hiltViewModel()) {
                     .padding(innerPadding)
                     .padding(top = 8.dp)
             ) {
-                items(words) { word ->
+                items(words, key = { word -> word.id!! }) { word ->
+                    val directions = mutableSetOf(RevealDirection.EndToStart)
+                    if (word.isArchived) {
+                        directions.add(RevealDirection.StartToEnd)
+                    }
                     RevealSwipe(
                         modifier = Modifier
                             .padding(vertical = 8.dp)
                             .padding(start = 8.dp, end = 8.dp),
                         backgroundCardEndColor = if (word.isArchived) Color(0xFFE75B52) else Color.DarkGray,
+                        backgroundCardStartColor = Color.DarkGray,
                         onBackgroundEndClick = { wordsViewModel.moveToArchived(word) },
+                        onBackgroundStartClick = { wordsViewModel.moveToActive(word) },
                         shape = RoundedCornerShape(16.dp),
-                        directions = setOf(RevealDirection.EndToStart),
+                        directions = directions,
                         hiddenContentEnd = {
                             Icon(
                                 modifier = Modifier.padding(horizontal = 25.dp),
@@ -91,10 +97,18 @@ fun WordsScreen(wordsViewModel: WordsViewModel = hiltViewModel()) {
                                 contentDescription = null
                             )
                         },
+                        hiddenContentStart = {
+                            Icon(
+                                modifier = Modifier.padding(horizontal = 25.dp),
+                                painter = painterResource(id = R.drawable.ic_restore),
+                                tint = Color.LightGray,
+                                contentDescription = null
+                            )
+                        },
                         backgroundStartActionLabel = null,
                         backgroundEndActionLabel = null
                     ) {
-                        WordView(word = word) {
+                        WordView(modifier = Modifier, word = word) {
                             wordsViewModel.increaseCount(word)
                         }
                     }
@@ -178,18 +192,14 @@ fun WordView(modifier: Modifier = Modifier, word: WordDto, translationShown: () 
             if (word.isArchived) {
                 Box(
                     modifier = Modifier
-                        .background(
-                            Color.DarkGray,
-                            RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
-                        )
                         .fillMaxHeight()
-                        .padding(4.dp),
+                        .padding(8.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(24.dp),
                         painter = painterResource(id = R.drawable.ic_archive),
-                        tint = Color.LightGray,
+                        tint = Color.DarkGray,
                         contentDescription = "archive"
                     )
                 }
