@@ -10,3 +10,13 @@ data class Summary(
     val time: Long,
     val tripsCount: Int
 )
+
+data class YearSummary(
+    val year: Int,
+    val distance: Double,
+    val time: Long,
+    val tripsCount: Int,
+    val daysOnBike: Int,
+    val longestTrip: Double,
+    val maxDayDistance: Double
+)

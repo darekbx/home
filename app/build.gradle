@@ -82,7 +82,6 @@ dependencies {
     implementation project(':app:geotracker')
     implementation project(':app:timeline')
     implementation project(':app:backup')
-    implementation project(':app:infopigula')
     implementation project(':app:weight')
     implementation project(':app:dotpad')
     implementation project(':app:riverstatus')
@@ -96,6 +95,7 @@ dependencies {
     implementation project(':app:stocks')
 
     // Disabled
+    //implementation project(':app:infopigula')
     //implementation project(':app:rssreader')
     //implementation project(':app:diggpl')
     //implementation project(':app:hejto')

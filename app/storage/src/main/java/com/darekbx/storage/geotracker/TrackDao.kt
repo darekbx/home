@@ -23,6 +23,9 @@ interface TrackDao {
     @Query("SELECT * FROM geo_track WHERE start_timestamp > :fromTimestamp")
     suspend fun fetchAll(fromTimestamp: Long): List<TrackDto>
 
+    @Query("SELECT * FROM geo_track WHERE start_timestamp > :fromTimestamp AND start_timestamp < :toTimestamp")
+    suspend fun fetchAllTracks(fromTimestamp: Long, toTimestamp: Long): List<TrackDto>
+
     @Query("SELECT COUNT(id) FROM geo_track LIMIT 1")
     suspend fun countAllTracks(): Int
 

@@ -11,7 +11,7 @@ class StatisticsState(
     val state: StatisticsUiState
         @Composable get() = statisticsViewModel.uiState.collectAsState(initial = StatisticsUiState.Idle).value
 
-    fun loadStatistics(year: Int) = statisticsViewModel.loadStatistics(year)
+    fun loadStatistics() = statisticsViewModel.loadStatistics()
 }
 
 @Composable

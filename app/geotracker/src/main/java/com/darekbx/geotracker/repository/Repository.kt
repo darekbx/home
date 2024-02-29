@@ -19,6 +19,8 @@ interface BaseRepository {
 
     suspend fun fetchYearTracks(year: Int): List<TrackPointsDto>
 
+    suspend fun fetchYearTracksStatistics(year: Int): List<TrackDto>
+
     suspend fun fetchYears(): List<Int>
 
     suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>>
@@ -100,6 +102,12 @@ class Repository @Inject constructor(
         val startTimestamp = yearStartTimestamp(year)
         val endTimestamp = yearEndTimestamp(year)
         return trackDao.fetchAll(startTimestamp.timeInMillis, endTimestamp.timeInMillis)
+    }
+
+    override suspend fun fetchYearTracksStatistics(year: Int): List<TrackDto> {
+        val startTimestamp = yearStartTimestamp(year)
+        val endTimestamp = yearEndTimestamp(year)
+        return trackDao.fetchAllTracks(startTimestamp.timeInMillis, endTimestamp.timeInMillis)
     }
 
     override suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
