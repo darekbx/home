@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -26,6 +27,14 @@ import com.darekbx.weight.ui.chart.LoadingProgress
 fun ListScreen(weightViewModel: WeightViewModel = hiltViewModel()) {
     val entries by weightViewModel.getEntries().collectAsState(initial = emptyList())
     var clickedEntry by remember { mutableStateOf<WeightEntry?>(null) }
+
+    val scrollState = rememberLazyListState()
+
+    LaunchedEffect(entries.size) {
+        if (entries.size > 0) {
+            scrollState.scrollToItem(0)
+        }
+    }
 
     Box(
         modifier = Modifier,

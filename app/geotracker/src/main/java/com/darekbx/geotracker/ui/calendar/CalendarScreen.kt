@@ -35,11 +35,13 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.darekbx.geotracker.domain.usecase.TripsWrapper
 import com.darekbx.geotracker.repository.model.Track
 import com.darekbx.geotracker.ui.LoadingProgress
+import com.darekbx.geotracker.ui.theme.GeoTrackerTheme
 import com.darekbx.geotracker.ui.theme.LocalColors
 import com.darekbx.geotracker.ui.trips.YearsScroller
 import com.darekbx.geotracker.ui.trips.states.TripsViewState
@@ -59,6 +61,7 @@ import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Calendar
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun CalendarScreen(
@@ -212,14 +215,6 @@ private fun SingleDay(
     dayState: DayState<EmptySelectionState>,
     trips: List<Track>
 ) {
-    fun obtainColor(sumDistance: Double) = when {
-        sumDistance > 0 && sumDistance <= 10 -> Color(40, 220, 80, 60)
-        sumDistance > 10 && sumDistance <= 20 -> Color(40, 220, 80, 100)
-        sumDistance > 20 && sumDistance <= 30 -> Color(40, 220, 80, 140)
-        sumDistance > 30 -> Color(40, 220, 80, 180)
-        else -> Color.Black
-    }
-
     Card(
         modifier = modifier
             .aspectRatio(1f)
@@ -274,7 +269,57 @@ private fun DayNumber(modifier: Modifier, dayState: DayState<EmptySelectionState
     )
 }
 
-private fun List<Track>.filterByDay(
+@Preview
+@Composable
+fun CalendarPreview() {
+    val data = TripsWrapper(
+        100.0,
+        listOf(
+            Track(0, null, System.currentTimeMillis(), distance = 10F, pointsCount = 2),
+            Track(
+                0,
+                null,
+                System.currentTimeMillis() - TimeUnit.DAYS.toMillis(13),
+                distance = 27F,
+                pointsCount = 2
+            ),
+            Track(
+                0,
+                null,
+                System.currentTimeMillis() - TimeUnit.DAYS.toMillis(5),
+                distance = 7F,
+                pointsCount = 2
+            ),
+            Track(
+                0,
+                null,
+                System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2),
+                distance = 20F,
+                pointsCount = 2
+            ),
+            Track(
+                0,
+                null,
+                System.currentTimeMillis() + TimeUnit.DAYS.toMillis(3),
+                distance = 15F,
+                pointsCount = 2
+            )
+        )
+    )
+    GeoTrackerTheme {
+        YearCalendar(Modifier.fillMaxWidth(), 2024, data)
+    }
+}
+
+fun obtainColor(sumDistance: Double) = when {
+    sumDistance > 0 && sumDistance <= 10 -> Color(40, 220, 80, 60)
+    sumDistance > 10 && sumDistance <= 20 -> Color(40, 220, 80, 100)
+    sumDistance > 20 && sumDistance <= 30 -> Color(40, 220, 80, 140)
+    sumDistance > 30 -> Color(40, 220, 80, 180)
+    else -> Color.Black
+}
+
+fun List<Track>.filterByDay(
     dayState: DayState<EmptySelectionState>
 ) = filter {
     val timeStamp = Calendar.getInstance().apply { timeInMillis = it.startTimestamp }

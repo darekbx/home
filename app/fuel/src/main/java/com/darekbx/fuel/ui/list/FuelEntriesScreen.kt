@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +31,7 @@ import com.darekbx.common.ui.theme.HomeTheme
 import com.darekbx.fuel.R
 import com.darekbx.fuel.model.FuelEntry
 import com.darekbx.fuel.model.FuelType
+import com.darekbx.fuel.ui.chart.ChartScreen
 
 @Composable
 fun FuelEntriesScreen(
@@ -47,6 +50,14 @@ fun FuelEntriesScreen(
 
     val sumCost = entries.sumOf { it.cost }.toInt()
     val sumLiters = entries.sumOf { it.liters }.toInt()
+
+    val scrollState = rememberLazyListState()
+
+    LaunchedEffect(entries.size) {
+        if (entries.size > 0) {
+            scrollState.scrollToItem(0)
+        }
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -69,14 +80,30 @@ fun FuelEntriesScreen(
                 }
             }
         },
-        topBar = { HeaderView(entries) },
+        topBar = {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black.copy(alpha = 0.075F))) {
+                HeaderView(entries)
+                ChartScreen(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp), showGuide = false)
+
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Color.Black)
+                )
+            }
+        },
         bottomBar = { FooterView(sumCost, sumLiters) },
         content = { innerPadding ->
             Box(
                 modifier = Modifier.padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
-                LazyColumn(modifier = Modifier.padding(bottom = 24.dp)) {
+                LazyColumn(modifier = Modifier, state = scrollState) {
                     items(entries, key = { it.id }) { entry ->
                         EntryView(fuelEntry = entry) {
                             clickedEntry = entry
@@ -109,13 +136,16 @@ private fun HeaderView(entries: List<FuelEntry>) {
     Text(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(Color.Black)
             .padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
         color = Color.White,
         fontWeight = FontWeight.Light,
         text = buildAnnotatedString {
             append("Entries: ")
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+            withStyle(style = SpanStyle(
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace
+            )) {
                 append("${entries.size}")
             }
         },
@@ -128,17 +158,19 @@ private fun FooterView(sumCost: Int, sumLiters: Int) {
     Text(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(Color.Black)
             .padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
         color = Color.White,
         fontWeight = FontWeight.Light,
         text = buildAnnotatedString {
             append("Total cost: ")
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace)) {
                 append("${sumCost}zł")
             }
             append(", Total liters: ")
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace)) {
                 append("${sumLiters}L")
             }
         },

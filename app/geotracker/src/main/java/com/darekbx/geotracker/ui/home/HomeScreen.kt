@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -31,9 +30,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BuildDrawCacheParams
+import androidx.compose.ui.draw.DrawCacheModifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
@@ -64,7 +66,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlin.random.Random
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -108,7 +109,7 @@ fun HomeScreen(
         }
     }
 
-    if (!(state is RecordingUiState.Stopped)) {
+    if (state !is RecordingUiState.Stopped) {
         RecordingScreen(gpxUri = gpxUri)
         // Don't show home screen while is recording
         return
@@ -191,7 +192,7 @@ fun HomeScreen(
     }
 }
 
-@Preview(showSystemUi = true, device = Devices.PIXEL_4_XL)
+@Preview(showSystemUi = false, device = Devices.PIXEL_4_XL, backgroundColor = 0L)
 @Composable
 fun HomeScreenPreview() {
     val data = listOf(
@@ -216,7 +217,7 @@ fun HomeScreenPreview() {
     GeoTrackerTheme {
         Box(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize().background(Color.Black),
             contentAlignment = Alignment.BottomEnd
         ) {
             Column(
@@ -241,20 +242,22 @@ fun HomeScreenPreview() {
                 Box(
                     modifier = Modifier
                         .defaultCard()
-                        .height(100.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-
-                }
-                Box(
-                    modifier = Modifier
-                        .defaultCard()
-                        .height(200.dp), // 240 -> 220
+                        .height(240.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
                         modifier = Modifier
-                            .padding(8.dp),
+                            .padding(8.dp)
+                            .then(object : DrawCacheModifier {
+                                override fun onBuildCache(params: BuildDrawCacheParams) {
+                                    params
+                                }
+
+                                override fun ContentDrawScope.draw() {
+                                    drawContent()
+                                }
+
+                            }),
                         horizontalAlignment = Alignment.Start
                     ) {
                         Header { }

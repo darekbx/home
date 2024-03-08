@@ -1,9 +1,8 @@
-@file:OptIn(ExperimentalTextApi::class)
-
 package com.darekbx.fuel.ui.chart
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,11 +31,25 @@ fun ChartScreen(chartViewModel: ChartViewModel = hiltViewModel()) {
         }
     }
 }
+@Composable
+fun ChartScreen(modifier: Modifier, showGuide: Boolean, chartViewModel: ChartViewModel = hiltViewModel()) {
+    val entries by chartViewModel.entries.collectAsState(initial = emptyList())
+    val textMeasurer = rememberTextMeasurer()
+    Canvas(modifier = modifier.fillMaxWidth()) {
+        ChartUtils.drawEntries(this, entries)
+        if (showGuide) {
+            val last = entries.lastOrNull()
+            if (last != null) {
+                ChartUtils.drawGuideLine(this, last.pricePerLiter(), textMeasurer)
+            }
+        }
+    }
+}
 
 object ChartUtils {
 
-    private val ratio = 9F
-    private val padding = 32F
+    private const val ratio = 9F
+    private const val padding = 32F
     private val green = Color(0xFF4CAF50)
     private val black = Color.Black
 
@@ -55,7 +68,7 @@ object ChartUtils {
         }
 
         val heightRatio = canvas.size.height / ratio
-        val widthStep = (canvas.size.width - padding) / fuelEntries.size
+        val widthStep = (canvas.size.width - padding) / (fuelEntries.size - 1)
         var start = 0F
 
         var color = Color.Black
@@ -79,10 +92,19 @@ object ChartUtils {
 
                 lastType = entry.type
 
-                canvas.drawLine(color, p0, p1, strokeWidth = 1.5F)
+                canvas.drawLine(color, p0, p1, strokeWidth = 2F)
                 p0 = p1
                 start += widthStep
             }
+
+        val guidesCount = 6
+        val guideHeightRatio = canvas.size.height / guidesCount
+
+        (0..guidesCount).forEach { index ->
+            val p0 = Offset(0F, guideHeightRatio * index)
+            val p1 = Offset(canvas.size.width, guideHeightRatio * index)
+            canvas.drawLine(Color.LightGray, p0, p1)
+        }
     }
 
     private fun convertPrice(size: Size, price: Double, heightRatio: Float): Float =
