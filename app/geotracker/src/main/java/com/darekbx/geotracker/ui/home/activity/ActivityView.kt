@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.scale
@@ -39,7 +40,6 @@ import com.darekbx.geotracker.ui.defaultCard
 import com.darekbx.geotracker.ui.theme.LocalColors
 import com.darekbx.geotracker.ui.theme.LocalStyles
 import kotlin.math.max
-import kotlin.random.Random
 
 @Composable
 fun ActivityView(
@@ -152,6 +152,9 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>, showYearSumma
         val yellow4 = Color(0xFFE7FBE2)
         val colors = listOf(red, orange, yellow, yellow2, yellow3, yellow4)
 
+        val gradientSize = 8F
+        val maxCountForGradient = 250 // Gradient will be not visible when we have a lot of riden days
+
         val yScale = 0.85F
         val leftOffset = 50F
 
@@ -179,21 +182,33 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>, showYearSumma
 
                     var innerTop = 0.0F
                     var index = 0
-                    item.distances.forEach { distance ->
-                        drawRect(
-                            color = colors[index],
-                            topLeft = Offset(start, innerTop + 0F),
-                            size = Size(widthStep, (distance * heightStep).toFloat())
-                        )
-                        innerTop += (distance * heightStep).toFloat()
-                        index++
-                    }
 
                     drawCircle(
-                        colors[index - 1],
+                        colors[item.distances.size - 1],
                         radius = widthStep / 2F,
                         Offset(start + widthStep / 2F, (item.sumDistance() * heightStep).toFloat())
                     )
+
+                    item.distances.forEach { distance ->
+                        drawRect(
+                            color = colors[index],
+                            topLeft = Offset(start, innerTop),
+                            size = Size(widthStep, (distance * heightStep).toFloat())
+                        )
+                        if (count < maxCountForGradient && index > 0) {
+                            drawRect(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(colors[index-1], colors[index]),
+                                    startY = innerTop,
+                                    endY = innerTop + gradientSize
+                                ),
+                                topLeft = Offset(start, innerTop),
+                                size = Size(widthStep, gradientSize)
+                            )
+                        }
+                        innerTop += (distance * heightStep).toFloat()
+                        index++
+                    }
 
                     start += widthStep
                 }
@@ -238,7 +253,6 @@ private fun DrawScope.drawLines(
 @Preview
 @Composable
 fun ChartPreview1() {
-    val r = Random(100)
     val data = listOf(
         ActivityData(1, listOf(7000.0)),
         ActivityData(2, listOf(2000.0)),
@@ -254,16 +268,15 @@ fun ChartPreview1() {
 @Preview
 @Composable
 fun ChartPreview2() {
-    val r = Random(100)
     val data = listOf(
         ActivityData(1, listOf(10000.0)),
         ActivityData(2, listOf(20000.0)),
         ActivityData(3, listOf(26000.0)),
-        ActivityData(4, listOf(65000.0)),
+        ActivityData(4, listOf(15000.0, 50000.0)),
         ActivityData(5, listOf(12000.0)),
         ActivityData(6, listOf(8000.0, 8000.0)),
         ActivityData(7, listOf(5000.0)),
-        ActivityData(8, listOf(20000.0, 20000.0, 5000.0)),
+        ActivityData(8, listOf(20000.0, 20000.0, 3500.0)),
         ActivityData(9, listOf(20000.0)),
         ActivityData(10, listOf(24000.0)),
         ActivityData(11, listOf(9000.0)),
@@ -275,4 +288,19 @@ fun ChartPreview2() {
     )
 
     Chart(Modifier.size(200.dp, 100.dp), data, false)
+}
+
+@Preview
+@Composable
+fun BrushPreview() {
+    Canvas(modifier = Modifier.size(40.dp, 100.dp)) {
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(Color.Blue, Color.Green),
+                endY = 50F
+            ),
+            topLeft = Offset(0F, 20F),
+            size = Size(20F, 50F)
+        )
+    }
 }
