@@ -152,7 +152,7 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>, showYearSumma
         val yellow4 = Color(0xFFE7FBE2)
         val colors = listOf(red, orange, yellow, yellow2, yellow3, yellow4)
 
-        val gradientSize = 8F
+        val gradientSize = 16F
         val maxCountForGradient = 250 // Gradient will be not visible when we have a lot of riden days
 
         val yScale = 0.85F

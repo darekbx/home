@@ -1,17 +1,25 @@
 package com.darekbx.geotracker.ui.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -19,8 +27,10 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,6 +45,9 @@ fun SettingsScreen(
     settingsViewState: SettingsViewState = rememberSettingsViewState()
 ) {
     val state = settingsViewState.state
+    val dataToSynchronize by settingsViewState.dataToSynchronize().collectAsState(initial = null)
+    var isSyncRunning by remember { mutableStateOf(false) }
+    var syncProgress by remember { mutableStateOf(Pair(1000, 0)) }
 
     Box(
         modifier = Modifier
@@ -45,23 +58,57 @@ fun SettingsScreen(
             SettingsUiState.Idle -> {}
             SettingsUiState.InProgress -> LoadingProgress()
             is SettingsUiState.Done -> {
-                val (nthPointsToSkip, gpsMinDistance, gpsUpdateInterval, showYearSummaryValue) = state
+                val (nthPointsToSkip, gpsMinDistance, gpsUpdateInterval, showYearSummary) = state
                 SettingsContainer(
                     nthPointsToSkip,
                     gpsMinDistance,
                     gpsUpdateInterval,
-                    showYearSummaryValue
-                ) { nthPointsToSkipValue, gpsMinDistanceValue, gpsUpdateIntervalValue, showYearSummaryValue ->
-                    settingsViewState.save(
-                        nthPointsToSkipValue,
-                        gpsMinDistanceValue,
-                        gpsUpdateIntervalValue,
-                        showYearSummaryValue
-                    )
-                }
+                    showYearSummary,
+                    dataToSynchronize,
+                    onSave = { nthPointsToSkipValue, gpsMinDistanceValue, gpsUpdateIntervalValue, showYearSummaryValue ->
+                        settingsViewState.save(
+                            nthPointsToSkipValue,
+                            gpsMinDistanceValue,
+                            gpsUpdateIntervalValue,
+                            showYearSummaryValue
+                        )
+                    },
+                    onSynchronizeClick = {
+                        isSyncRunning = true
+                        settingsViewState.synchronize { progress, max ->
+                            syncProgress = Pair(progress, max)
+                            if (progress == max) {
+                                isSyncRunning = false
+                            }
+                        }
+                    }
+                )
             }
         }
     }
+
+    if (isSyncRunning) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5F)),
+            contentAlignment = Alignment.Center
+        ) {
+            SyncProgress(Modifier.size(128.dp), syncProgress)
+        }
+    }
+}
+
+@Composable
+fun SyncProgress(modifier: Modifier = Modifier, progress: Pair<Int, Int>) {
+    CircularProgressIndicator(
+        progress = progress.first / progress.second.toFloat(),
+        modifier = modifier
+            .background(
+                MaterialTheme.colorScheme.primaryContainer, CircleShape
+            )
+            .padding(8.dp)
+    )
 }
 
 @Composable
@@ -70,7 +117,9 @@ fun SettingsContainer(
     gpsMinDistance: Float,
     gpsUpdateInterval: Long,
     showYearSummary: Boolean,
-    onSave: (Int, Float, Long, Boolean) -> Unit
+    dataToSynchronize: Int?,
+    onSave: (Int, Float, Long, Boolean) -> Unit,
+    onSynchronizeClick: () -> Unit
 ) {
     var nthPointsToSkipValue by remember { mutableIntStateOf(nthPointsToSkip) }
     var gpsMinDistanceValue by remember { mutableFloatStateOf(gpsMinDistance) }
@@ -139,6 +188,27 @@ fun SettingsContainer(
                 save()
             }
         )
+
+        InputLabel("Synchronization with Firebase Cloud")
+        Button(modifier = Modifier.fillMaxWidth(), onClick = onSynchronizeClick) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Synchronize",
+                    color = Color.Black,
+                    modifier = Modifier.padding(end = 4.dp)
+                )
+                if (dataToSynchronize == null) {
+                    CircularProgressIndicator(
+                        color = Color.Black,
+                        strokeWidth = 2.dp,
+                        modifier = Modifier
+                            .size(18.dp)
+                    )
+                } else {
+                    Text(text = "($dataToSynchronize new tracks)", color = Color.Black)
+                }
+            }
+        }
     }
 }
 
@@ -160,7 +230,10 @@ private fun SettingsContainerPreview() {
             nthPointsToSkip = 2,
             gpsMinDistance = 20F,
             gpsUpdateInterval = 50L,
-            showYearSummary = true
-        ) { _, _, _, _ -> }
+            showYearSummary = true,
+            dataToSynchronize = null,
+            { _, _, _, _ -> },
+            { }
+        )
     }
 }

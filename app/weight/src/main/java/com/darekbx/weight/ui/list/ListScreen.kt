@@ -40,7 +40,7 @@ fun ListScreen(weightViewModel: WeightViewModel = hiltViewModel()) {
         modifier = Modifier,
         contentAlignment = Alignment.Center
     ) {
-        LazyColumn(modifier = Modifier.padding(bottom = 24.dp)) {
+        LazyColumn(modifier = Modifier.padding(bottom = 24.dp), state = scrollState) {
             items(entries.reversed(), key = { it.id!! }) { entry ->
                 EntryView(weightEntry = entry) {
                     clickedEntry = entry

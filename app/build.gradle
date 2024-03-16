@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
+    id 'com.google.gms.google-services'
 }
 
 apply from: '../dependencies.gradle'
@@ -84,7 +85,6 @@ dependencies {
     implementation project(':app:backup')
     implementation project(':app:weight')
     implementation project(':app:dotpad')
-    implementation project(':app:riverstatus')
     implementation project(':app:vault')
     implementation project(':app:books')
     implementation project(':app:notepad')
@@ -93,12 +93,13 @@ dependencies {
     implementation project(':app:lifetimememo')
     implementation project(':app:weather')
     implementation project(':app:stocks')
+    implementation project(':app:infopigula')
 
     // Disabled
-    //implementation project(':app:infopigula')
     //implementation project(':app:rssreader')
     //implementation project(':app:diggpl')
     //implementation project(':app:hejto')
+    //implementation project(':app:riverstatus')
 
     implementation androidx.core_ktx
     implementation androidx.lifecycle_runtime_ktx

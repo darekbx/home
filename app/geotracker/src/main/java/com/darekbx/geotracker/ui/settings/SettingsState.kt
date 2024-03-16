@@ -23,6 +23,12 @@ class SettingsViewState(
     ) {
         settingsViewModel.save(nthPointsToSkip, gpsMinDistance, gpsUpdateInterval, showYearSummaryValue)
     }
+
+    fun synchronize(onProgress: (Int, Int) -> Unit) {
+        settingsViewModel.synchronize(onProgress)
+    }
+
+    fun dataToSynchronize() = settingsViewModel.dataToSynchronize()
 }
 
 @Composable

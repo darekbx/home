@@ -87,7 +87,8 @@ fun FuelEntriesScreen(
                 HeaderView(entries)
                 ChartScreen(modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp), showGuide = false)
+                    .padding(top = 4.dp, bottom = 4.dp)
+                    .height(80.dp))
 
                 Spacer(
                     modifier = Modifier

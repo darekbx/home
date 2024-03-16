@@ -42,6 +42,14 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+    buildTypes.all { type ->
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        def cloudEmail = properties.getProperty('geotracker.cloud.email')
+        def cloudPassword = properties.getProperty('geotracker.cloud.password')
+        buildConfigField 'String', 'CLOUD_EMAIL', "\"${cloudEmail}\""
+        buildConfigField 'String', 'CLOUD_PASSWORD', "\"${cloudPassword}\""
+    }
 }
 
 useCompose()
@@ -59,9 +67,14 @@ dependencies {
 
     implementation other.osmdroid
     implementation other.accompanist
+    implementation other.gson
 
     implementation other.swipe
     implementation "io.github.boguszpawlowski.composecalendar:composecalendar:1.1.1"
+
+    implementation platform('com.google.firebase:firebase-bom:32.7.4')
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
     testImplementation other.junit
     testImplementation other.mockk_android
