@@ -1,5 +1,6 @@
 package com.darekbx.weather.data.remote.rainviewer
 
+import androidx.collection.mutableScatterMapOf
 import com.darekbx.weather.data.remote.ConditionsDataSource
 import javax.inject.Inject
 
@@ -11,7 +12,7 @@ class RainViewerDataSource @Inject constructor(
         lat: Double,
         lng: Double
     ): Map<ConditionsDataSource.ImageType, String> {
-        val result = mutableMapOf<ConditionsDataSource.ImageType, String>()
+        val result = mutableScatterMapOf<ConditionsDataSource.ImageType, String>()
         val weatherInfo = rainViewerService.getWeatherMaps()
         weatherInfo.radar.nowcast
             .maxByOrNull { it.time }
@@ -26,7 +27,7 @@ class RainViewerDataSource @Inject constructor(
                 )
             }
 
-        return result
+        return result.asMap()
     }
 
     private companion object {

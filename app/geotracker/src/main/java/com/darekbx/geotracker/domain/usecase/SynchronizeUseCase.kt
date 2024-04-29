@@ -31,6 +31,10 @@ class SynchronizeUseCase @Inject constructor(
      * Count data to synchronize
      */
     fun dataToSynchronize(email: String, password: String) = flow {
+        if (!isAuthorized()) {
+            authorize(email, password)
+                ?: throw IllegalStateException("Unabled to login!")
+        }
         val localTracks = getTracksUseCase()
         val remoteTrackIds = fetchRemoteIds()
         val tracksToSynchronize = filterObjectsById(remoteTrackIds, localTracks)

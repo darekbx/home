@@ -1,7 +1,7 @@
 package com.darekbx.stocks.data
 
 import android.content.Context
-import android.util.Log
+import androidx.collection.mutableScatterMapOf
 import com.darekbx.stocks.BuildConfig
 import java.io.BufferedReader
 
@@ -27,7 +27,7 @@ class ArdustocksImport(
 
     suspend fun importFromCsv() {
         stocksRepository.clearDataForImport()
-        val idMap = mutableMapOf<Long, Long>()
+        val idMap = mutableScatterMapOf<Long, Long>()
         var index = 1L
         for (source in SOURCES) {
             val currencyId = stocksRepository.addCurrency(source.type.label, source.queryParam)
