@@ -8,7 +8,7 @@
             android:clearTaskOnLaunch="true"
             android:noHistory="false"
             android:label="@string/fuel_app_name"
-            android:icon="@drawable/ic_fuel_app_icon"
+            android:icon="@drawable/ic_fuel"
             android:theme="@style/Theme.Home"
             android:usesCleartextTraffic="true"
             >
