@@ -168,12 +168,14 @@ class DotsViewModel(
     }
 
     fun selectDot(dot: Dot) {
+        datePickerState.value = false
         dialogState.value = true
         selectedDot.value = dot
         reminderChanged = false
     }
 
     fun discardChanges() {
+        datePickerState.value = false
         dialogState.value = false
         selectedDot.value = null
     }
