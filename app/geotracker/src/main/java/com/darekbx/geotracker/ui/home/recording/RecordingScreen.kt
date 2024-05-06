@@ -1,12 +1,15 @@
 package com.darekbx.geotracker.ui.home.recording
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.view.MotionEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,6 +49,7 @@ import com.darekbx.geotracker.ui.drawLine
 import com.darekbx.geotracker.ui.drawPoint
 import com.darekbx.geotracker.ui.rememberMapWithLifecycle
 import com.darekbx.geotracker.ui.theme.bounceClick
+import kotlinx.coroutines.flow.collectLatest
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -78,6 +84,13 @@ fun RecordingScreen(
     var latestPoint by remember { mutableStateOf<Point?>(null) }
 
     LaunchedEffect(Unit) {
+        recordingViewModel.lastPoint.collectLatest { lastPoint ->
+            lastPoint?.let {
+                  map?.controller?.setCenter(GeoPoint(it.latitude, it.longitude))
+            }
+        }
+    }
+    LaunchedEffect(Unit) {
         recordingViewModel.listenForLocationUpdates().collect { points ->
             if (points.isNotEmpty()) {
                 isMapVisible = true
@@ -90,7 +103,9 @@ fun RecordingScreen(
                 map?.run {
                     positionMarker?.position = GeoPoint(mapPoints.first())
                     overlays[overlays.size - 1] = polyline
-                    controller?.setCenter(mapPoints[0])
+                    if (!recordingViewModel.reCenterButtonVisible.value) {
+                        controller?.setCenter(mapPoints[0])
+                    }
                     invalidate()
                 }
             }
@@ -116,10 +131,15 @@ fun RecordingScreen(
                     if (isMapVisible) {
                         Column(Modifier.fillMaxSize()) {
                             MapBox(Modifier.weight(1F)) {
-                                PreviewMap(allTracks, placesToVisit, gpxTrack) { mapView, marker ->
+                                PreviewMap(
+                                    allTracks, placesToVisit, gpxTrack,
+                                    onPan = recordingViewModel::onPan
+                                ) { mapView, marker ->
                                     map = mapView
                                     positionMarker = marker
                                 }
+
+                                RecenterButton(Modifier.align(Alignment.BottomStart))
                             }
                             RecordingSummary(Modifier)
                         }
@@ -138,7 +158,19 @@ fun RecordingScreen(
 }
 
 @Composable
-fun MapBox(modifier: Modifier, contents: @Composable () -> Unit) {
+private fun RecenterButton(modifier: Modifier, recordingViewModel: RecordingViewModel = hiltViewModel()) {
+    if (recordingViewModel.reCenterButtonVisible.value) {
+        Button(
+            modifier = modifier.padding(start = 12.dp, bottom = 12.dp),
+            onClick = { recordingViewModel.onReCenter() }
+        ) {
+            Text(text = "Re-Center", color = Color.White)
+        }
+    }
+}
+
+@Composable
+fun MapBox(modifier: Modifier, contents: @Composable BoxScope.() -> Unit) {
     Box(
         modifier = modifier
             .padding(8.dp)
@@ -174,11 +206,13 @@ fun StopButton(onClick: () -> Unit = { }) {
     }
 }
 
+@SuppressLint("ClickableViewAccessibility")
 @Composable
 fun PreviewMap(
     historicalTracks: List<List<SimplePointDto>>,
     placesToVisit: List<PlaceToVisit>,
     gpxTrack: Gpx?,
+    onPan: () -> Unit,
     ready: (MapView, Marker) -> Unit
 ) {
     val context = LocalContext.current
@@ -190,7 +224,7 @@ fun PreviewMap(
             .load(context, context.getSharedPreferences("osm", Context.MODE_PRIVATE))
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
-        map.overlays.clear()
+        map.overlays.removeIf { it is Marker }
 
         historicalTracks.forEach { collection ->
             map.drawLine(collection)
@@ -211,6 +245,12 @@ fun PreviewMap(
 
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setMultiTouchControls(true)
+        map.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_MOVE) {
+                onPan()
+            }
+            false
+        }
         map.controller.setZoom(zoomToPlace)
         map.overlays.add(positionMarker)
         map.overlays.add(Polyline())

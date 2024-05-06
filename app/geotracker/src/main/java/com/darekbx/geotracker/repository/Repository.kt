@@ -51,6 +51,8 @@ interface BaseRepository {
 
     fun fetchLivePoints(): Flow<List<PointDto>>
 
+    fun fetchLastPoint(): PointDto
+
     fun fetchLiveTrack(): Flow<TrackDto?>
 
     suspend fun appendDistance(trackId: Long, distance: Float)
@@ -158,6 +160,10 @@ class Repository @Inject constructor(
 
     override fun fetchLivePoints(): Flow<List<PointDto>> {
         return pointDao.fetchLivePoints()
+    }
+
+    override fun fetchLastPoint(): PointDto {
+        return pointDao.fetchLastPoint()
     }
 
     override fun fetchLiveTrack(): Flow<TrackDto?> {

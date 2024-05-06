@@ -10,6 +10,8 @@ class GetActiveTrackPointsUseCase @Inject constructor(
     private val repository: BaseRepository
 ) {
 
+    fun getLastPoint() = repository.fetchLastPoint()
+
     operator fun invoke(): Flow<List<Point>> {
         return repository.fetchLivePoints()
             .map { list ->

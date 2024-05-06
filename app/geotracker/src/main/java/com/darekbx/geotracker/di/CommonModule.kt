@@ -18,6 +18,7 @@ import com.darekbx.geotracker.repository.TrackDao
 import com.darekbx.geotracker.system.BaseLocationManager
 import com.darekbx.geotracker.system.DefaultLocationManager
 import com.darekbx.storage.legacy.GeoTrackerHelper
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,6 +42,11 @@ class CommonModule {
     @Provides
     fun provideSettingsRepository(dataStore: DataStore<Preferences>): SettingsRepository {
         return SettingsRepository(dataStore)
+    }
+
+    @Provides
+    fun provideGson(): Gson {
+        return Gson()
     }
 
     @Provides

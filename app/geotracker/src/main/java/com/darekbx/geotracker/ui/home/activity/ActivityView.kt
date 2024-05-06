@@ -40,6 +40,7 @@ import com.darekbx.geotracker.ui.defaultCard
 import com.darekbx.geotracker.ui.theme.LocalColors
 import com.darekbx.geotracker.ui.theme.LocalStyles
 import kotlin.math.max
+import kotlin.math.min
 
 @Composable
 fun ActivityView(
@@ -65,6 +66,7 @@ fun ActivityView(
                 activityData = state.data,
                 showYearSummary = state.showYearSummary
             ) { openCalendar() }
+
             else -> {}
         }
     }
@@ -117,7 +119,8 @@ fun Header(openCalendar: () -> Unit = { }) {
         }
         Row(
             modifier = Modifier.clickable { openCalendar() },
-            verticalAlignment = Alignment.CenterVertically) {
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 modifier = Modifier.offset(x = 8.dp),
                 text = "Calendar",
@@ -152,8 +155,11 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>, showYearSumma
         val yellow4 = Color(0xFFE7FBE2)
         val colors = listOf(red, orange, yellow, yellow2, yellow3, yellow4)
 
+        fun getColor(index: Int): Color = colors[min(colors.size - 1, index)]
+
         val gradientSize = 16F
-        val maxCountForGradient = 250 // Gradient will be not visible when we have a lot of riden days
+        val maxCountForGradient =
+            250 // Gradient will be not visible when we have a lot of riden days
 
         val yScale = 0.85F
         val leftOffset = 50F
@@ -161,9 +167,9 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>, showYearSumma
         val maximum = max(50.0, data.maxOf { it.sumDistance() })
         val minimum = data.minOf { it.sumDistance() }
 
-        val count = if (showYearSummary) max(356, data.size) else data.size-1
-        val widthStep = (size.width - leftOffset) / if (showYearSummary) count else count+1
-        val heightStep = ((size.height - widthStep ) * yScale) / (maximum - minimum)
+        val count = if (showYearSummary) max(356, data.size) else data.size - 1
+        val widthStep = (size.width - leftOffset) / if (showYearSummary) count else count + 1
+        val heightStep = ((size.height - widthStep) * yScale) / (maximum - minimum)
 
         var start = leftOffset
 
@@ -184,21 +190,21 @@ fun Chart(modifier: Modifier = Modifier, data: List<ActivityData>, showYearSumma
                     var index = 0
 
                     drawCircle(
-                        colors[item.distances.size - 1],
+                        getColor(item.distances.size - 1),
                         radius = widthStep / 2F,
                         Offset(start + widthStep / 2F, (item.sumDistance() * heightStep).toFloat())
                     )
 
                     item.distances.forEach { distance ->
                         drawRect(
-                            color = colors[index],
+                            color = getColor(index),
                             topLeft = Offset(start, innerTop),
                             size = Size(widthStep, (distance * heightStep).toFloat())
                         )
                         if (count < maxCountForGradient && index > 0) {
                             drawRect(
                                 brush = Brush.verticalGradient(
-                                    colors = listOf(colors[index-1], colors[index]),
+                                    colors = listOf(getColor(index - 1), getColor(index)),
                                     startY = innerTop,
                                     endY = innerTop + gradientSize
                                 ),
