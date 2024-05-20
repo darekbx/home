@@ -24,6 +24,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,7 +36,9 @@ import com.darekbx.common.ui.theme.HomeTheme
 @Composable
 fun StatisticsScreen(statisticsViewModel: StatisticsViewModel = hiltViewModel()) {
     val data by statisticsViewModel.statisticsData().collectAsState(initial = emptyList())
-    StatisticsScreenView(data)
+    if (data.isNotEmpty()) {
+        StatisticsScreenView(data)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,7 +75,7 @@ fun StatisticsScreenView(data: List<StatisticsItem>) {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     //Chart(data)
-                    BooksChart(modifier = Modifier.fillMaxSize(), data = data)
+                    BooksChart(modifier = Modifier.fillMaxWidth().height(80.dp), data = data)
                 }
 
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {
@@ -271,7 +274,7 @@ fun createPath(
     }
 }
 
-@Preview
+@Preview(device = Devices.PIXEL_6A)
 @Composable
 fun BooksChartPreview() {
     HomeTheme(isDarkTheme = false) {
