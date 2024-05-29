@@ -19,9 +19,16 @@ class SettingsViewState(
         nthPointsToSkip: Int,
         gpsMinDistance: Float,
         gpsUpdateInterval: Long,
-        showYearSummaryValue: Boolean
+        showYearSummaryValue: Boolean,
+        uploadLastLocation: Boolean,
     ) {
-        settingsViewModel.save(nthPointsToSkip, gpsMinDistance, gpsUpdateInterval, showYearSummaryValue)
+        settingsViewModel.save(
+            nthPointsToSkip,
+            gpsMinDistance,
+            gpsUpdateInterval,
+            showYearSummaryValue,
+            uploadLastLocation
+        )
     }
 
     fun synchronize(onProgress: (Int, Int) -> Unit) {

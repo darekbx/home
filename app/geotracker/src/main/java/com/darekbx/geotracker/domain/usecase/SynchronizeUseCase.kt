@@ -1,9 +1,9 @@
 package com.darekbx.geotracker.domain.usecase
 
 import android.util.Log
+import com.darekbx.geotracker.firebase.FirebaseAuthenticationUtils
 import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.repository.entities.TrackDto
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
@@ -23,6 +23,7 @@ import kotlin.coroutines.suspendCoroutine
 class SynchronizeUseCase @Inject constructor(
     private val getTracksUseCase: GetTracksUseCase,
     private val getTrackPointsUseCase: GetTrackPointsUseCase,
+    private val firebaseAuthenticationUtils: FirebaseAuthenticationUtils,
     private val gson: Gson
 ) {
     var onProgress: (Int, Int) -> Unit = { _, _ -> }
@@ -30,11 +31,9 @@ class SynchronizeUseCase @Inject constructor(
     /**
      * Count data to synchronize
      */
-    fun dataToSynchronize(email: String, password: String) = flow {
-        if (!isAuthorized()) {
-            authorize(email, password)
-                ?: throw IllegalStateException("Unabled to login!")
-        }
+    fun dataToSynchronize() = flow {
+        firebaseAuthenticationUtils.checkAndAuthorize()
+
         val localTracks = getTracksUseCase()
         val remoteTrackIds = fetchRemoteIds()
         val tracksToSynchronize = filterObjectsById(remoteTrackIds, localTracks)
@@ -42,11 +41,8 @@ class SynchronizeUseCase @Inject constructor(
     }
 
     @Throws(IllegalStateException::class, Exception::class)
-    suspend fun synchronize(email: String, password: String) {
-        if (!isAuthorized()) {
-            authorize(email, password)
-                ?: throw IllegalStateException("Unabled to login!")
-        }
+    suspend fun synchronize() {
+        firebaseAuthenticationUtils.checkAndAuthorize()
 
         Log.v(TAG, "User authorized, start synchronization")
 
@@ -133,16 +129,6 @@ class SynchronizeUseCase @Inject constructor(
             .addOnSuccessListener { continuation.resume(it.id) }
             .addOnFailureListener { e -> continuation.resumeWithException(e) }
     }
-
-    private fun isAuthorized() = Firebase.auth.currentUser != null
-
-    private suspend fun authorize(email: String, password: String) =
-        suspendCoroutine { continuation ->
-            Firebase.auth
-                .signInWithEmailAndPassword(email, password)
-                .addOnSuccessListener { continuation.resume(it.user) }
-                .addOnFailureListener { e -> continuation.resumeWithException(e) }
-        }
 
     private data class CloudPoint(
         val timestamp: Long,

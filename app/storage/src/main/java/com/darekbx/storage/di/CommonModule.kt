@@ -47,6 +47,7 @@ import com.darekbx.storage.timeline.TimelineDao
 import com.darekbx.storage.vault.VaultDao
 import com.darekbx.storage.weight.WeightDao
 import com.darekbx.storage.words.WordDao
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -59,6 +60,11 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ho
 @Module
 @InstallIn(SingletonComponent::class)
 class CommonModule {
+
+    @Provides
+    fun provideGson(): Gson {
+        return Gson()
+    }
 
     @Singleton
     @Provides

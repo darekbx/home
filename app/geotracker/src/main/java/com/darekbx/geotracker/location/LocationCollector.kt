@@ -29,7 +29,7 @@ class LocationCollector @Inject constructor(
         val updateInterval = settingsRepository.gpsUpdateInterval()
 
         val locationListener = LocationListener { location ->
-            Log.v(TAG, "Location changed: $location")
+            //Log.v(TAG, "Location changed: $location")
             trySend(location)
         }
 

@@ -2,12 +2,9 @@ package com.darekbx.geotracker.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.domain.usecase.DeleteAndRestoreUseCase
 import com.darekbx.geotracker.domain.usecase.SynchronizeUseCase
 import com.darekbx.geotracker.repository.SettingsRepository
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +18,8 @@ sealed class SettingsUiState {
         val nthPointsToSkip: Int,
         val gpsMinDistance: Float,
         val gpsUpdateInterval: Long,
-        val showYearSummaryValue: Boolean
+        val showYearSummaryValue: Boolean,
+        val uploadLastLocation: Boolean
     ) :
         SettingsUiState()
 }
@@ -48,13 +46,15 @@ class SettingsViewModel @Inject constructor(
             val gpsMinDistance = settingsRepository.gpsMinDistance()
             val gpsUpdateInterval = settingsRepository.gpsUpdateInterval()
             val showYearSummaryValue = settingsRepository.showYearSummary()
+            val uploadLastLocation = settingsRepository.uploadLastLocation()
 
             _uiState.value =
                 SettingsUiState.Done(
                     nthPointsToSkip,
                     gpsMinDistance,
                     gpsUpdateInterval,
-                    showYearSummaryValue
+                    showYearSummaryValue,
+                    uploadLastLocation
                 )
         }
     }
@@ -63,14 +63,16 @@ class SettingsViewModel @Inject constructor(
         nthPointsToSkip: Int,
         gpsMinDistance: Float,
         gpsUpdateInterval: Long,
-        showYearSummaryValue: Boolean
+        showYearSummaryValue: Boolean,
+        uploadLastLocation: Boolean
     ) {
         viewModelScope.launch {
             settingsRepository.saveSettings(
                 nthPointsToSkip,
                 gpsMinDistance,
                 gpsUpdateInterval,
-                showYearSummaryValue
+                showYearSummaryValue,
+                uploadLastLocation
             )
 
             refresh()
@@ -89,10 +91,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 synchronizeUseCase.onProgress = onProgress
-                synchronizeUseCase.synchronize(
-                    BuildConfig.CLOUD_EMAIL,
-                    BuildConfig.CLOUD_PASSWORD
-                )
+                synchronizeUseCase.synchronize()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -100,8 +99,5 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun dataToSynchronize() =
-        synchronizeUseCase.dataToSynchronize(
-            BuildConfig.CLOUD_EMAIL,
-            BuildConfig.CLOUD_PASSWORD
-        )
+        synchronizeUseCase.dataToSynchronize()
 }

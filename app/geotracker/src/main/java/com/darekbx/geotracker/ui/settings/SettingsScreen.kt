@@ -58,19 +58,21 @@ fun SettingsScreen(
             SettingsUiState.Idle -> {}
             SettingsUiState.InProgress -> LoadingProgress()
             is SettingsUiState.Done -> {
-                val (nthPointsToSkip, gpsMinDistance, gpsUpdateInterval, showYearSummary) = state
+                val (nthPointsToSkip, gpsMinDistance, gpsUpdateInterval, showYearSummary, uploadLastLocation) = state
                 SettingsContainer(
                     nthPointsToSkip,
                     gpsMinDistance,
                     gpsUpdateInterval,
                     showYearSummary,
+                    uploadLastLocation,
                     dataToSynchronize,
-                    onSave = { nthPointsToSkipValue, gpsMinDistanceValue, gpsUpdateIntervalValue, showYearSummaryValue ->
+                    onSave = { nthPointsToSkipValue, gpsMinDistanceValue, gpsUpdateIntervalValue, showYearSummaryValue, uploadLastLocation ->
                         settingsViewState.save(
                             nthPointsToSkipValue,
                             gpsMinDistanceValue,
                             gpsUpdateIntervalValue,
-                            showYearSummaryValue
+                            showYearSummaryValue,
+                            uploadLastLocation
                         )
                     },
                     onSynchronizeClick = {
@@ -117,14 +119,16 @@ fun SettingsContainer(
     gpsMinDistance: Float,
     gpsUpdateInterval: Long,
     showYearSummary: Boolean,
+    uploadLastLocation: Boolean,
     dataToSynchronize: Int?,
-    onSave: (Int, Float, Long, Boolean) -> Unit,
+    onSave: (Int, Float, Long, Boolean, Boolean) -> Unit,
     onSynchronizeClick: () -> Unit
 ) {
     var nthPointsToSkipValue by remember { mutableIntStateOf(nthPointsToSkip) }
     var gpsMinDistanceValue by remember { mutableFloatStateOf(gpsMinDistance) }
     var gpsUpdateIntervalValue by remember { mutableLongStateOf(gpsUpdateInterval) }
     var showYearSummaryValue by remember { mutableStateOf(showYearSummary) }
+    var uploadLastLocationValue by remember { mutableStateOf(uploadLastLocation) }
 
     fun save() {
         // Save settings
@@ -132,7 +136,8 @@ fun SettingsContainer(
             nthPointsToSkipValue,
             gpsMinDistanceValue,
             gpsUpdateIntervalValue,
-            showYearSummaryValue
+            showYearSummaryValue,
+            uploadLastLocationValue
         )
     }
 
@@ -188,6 +193,14 @@ fun SettingsContainer(
                 save()
             }
         )
+        InputLabel("Upload last location")
+        Checkbox(
+            checked = uploadLastLocationValue,
+            onCheckedChange = {
+                uploadLastLocationValue = it
+                save()
+            }
+        )
 
         InputLabel("Synchronization with Firebase Cloud")
         Button(modifier = Modifier.fillMaxWidth(), onClick = onSynchronizeClick) {
@@ -231,8 +244,9 @@ private fun SettingsContainerPreview() {
             gpsMinDistance = 20F,
             gpsUpdateInterval = 50L,
             showYearSummary = true,
+            uploadLastLocation = true,
             dataToSynchronize = null,
-            { _, _, _, _ -> },
+            { _, _, _, _, _ -> },
             { }
         )
     }

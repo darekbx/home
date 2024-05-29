@@ -43,7 +43,8 @@ useHilt()
 useRoom()
 
 dependencies {
-    
+
+    implementation other.gson
     implementation androidx.core_ktx
     implementation androidx.data_store
 

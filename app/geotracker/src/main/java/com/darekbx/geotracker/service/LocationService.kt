@@ -2,11 +2,13 @@ package com.darekbx.geotracker.service
 
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.location.Location
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.domain.usecase.AddLocationUseCase
+import com.darekbx.geotracker.domain.usecase.UploadLocationUseCase
 import com.darekbx.geotracker.location.LocationCollector
 import com.darekbx.geotracker.repository.SettingsRepository
 import com.darekbx.geotracker.system.BaseLocationManager
@@ -34,6 +36,9 @@ class LocationService : LifecycleService() {
 
     @Inject
     lateinit var addLocationUseCase: AddLocationUseCase
+
+    @Inject
+    lateinit var uploadLocationUseCase: UploadLocationUseCase
 
     private var locationFlow: Job? = null
     private var sessionStartTime = 0L
@@ -72,6 +77,7 @@ class LocationService : LifecycleService() {
         locationFlow = locationCollector.locationFlow()
             .onEach { location ->
                 val sessionDistance = addLocationUseCase(location)
+                uploadLastLocation(location)
                 updateNotification(sessionDistance)
             }
             .launchIn(lifecycleScope)
@@ -79,6 +85,9 @@ class LocationService : LifecycleService() {
         return START_STICKY
     }
 
+    private suspend fun uploadLastLocation(location: Location) {
+        uploadLocationUseCase.upload(location)
+    }
 
     private suspend fun updateNotification(sessionDistance: Float) {
         if (sessionDistance - lastSessionDistance > settingsRepository.gpsMinDistance()) {

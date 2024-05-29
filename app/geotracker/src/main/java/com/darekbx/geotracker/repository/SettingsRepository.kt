@@ -37,17 +37,24 @@ class SettingsRepository @Inject constructor(
             preferences[SHOW_YEAR_SUMMARY]
         }.firstOrNull() ?: DEFAULT_SHOW_YEAR_SUMMARY
 
+    suspend fun uploadLastLocation(): Boolean =
+        dataStore.data.map { preferences ->
+            preferences[UPLOAD_LAST_LOCATION]
+        }.firstOrNull() ?: DEFAULT_UPLOAD_LAST_LOCATION
+
     suspend fun saveSettings(
         nthPointsToSkip: Int,
         gpsMinDistance: Float,
         gpsUpdateInterval: Long,
-        showYearSummary: Boolean
+        showYearSummary: Boolean,
+        uploadLastLocation: Boolean
     ) {
         dataStore.edit { preferences ->
             preferences[NTH_POINTS_TO_SKIP] = nthPointsToSkip
             preferences[GPS_MIN_DISTANCE] = gpsMinDistance
             preferences[GPS_UPDATE_INTERVAL] = gpsUpdateInterval
             preferences[SHOW_YEAR_SUMMARY] = showYearSummary
+            preferences[UPLOAD_LAST_LOCATION] = uploadLastLocation
         }
     }
 
@@ -56,10 +63,12 @@ class SettingsRepository @Inject constructor(
         private const val DEFAULT_GPS_MIN_DISTANCE = 20F
         private const val DEFAULT_GPS_UPDATE_INTERVAL = 20L
         private const val DEFAULT_SHOW_YEAR_SUMMARY = true
+        private const val DEFAULT_UPLOAD_LAST_LOCATION = true
 
         private val NTH_POINTS_TO_SKIP = intPreferencesKey("nth_points_to_skip")
         private val GPS_MIN_DISTANCE = floatPreferencesKey("gps_min_distance")
         private val GPS_UPDATE_INTERVAL = longPreferencesKey("gps_update_interval")
         private val SHOW_YEAR_SUMMARY = booleanPreferencesKey("show_year_summary")
+        private val UPLOAD_LAST_LOCATION = booleanPreferencesKey("upload_last_location")
     }
 }
