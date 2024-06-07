@@ -76,6 +76,13 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore-ktx")
 
+    // Nordic BLE
+    def nordicVersion = "2.7.5"
+    implementation "no.nordicsemi.android:ble:$nordicVersion"
+    implementation "no.nordicsemi.android:ble-ktx:$nordicVersion"
+    implementation "no.nordicsemi.android:ble-livedata:$nordicVersion"
+    implementation 'no.nordicsemi.android.support.v18:scanner:1.6.0'
+
     testImplementation other.junit
     testImplementation other.mockk_android
     testImplementation other.mockk_agent

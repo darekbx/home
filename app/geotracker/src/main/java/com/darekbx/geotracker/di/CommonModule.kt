@@ -6,6 +6,7 @@ import android.content.Context
 import android.location.LocationManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.darekbx.geotracker.externaldisplay.ExternalDisplay
 import com.darekbx.geotracker.firebase.FirebaseAuthenticationUtils
 import com.darekbx.geotracker.gpx.GpxReader
 import com.darekbx.geotracker.location.LocationCollector
@@ -37,6 +38,11 @@ class CommonModule {
     @Provides
     fun provideGpxReader(): GpxReader {
         return GpxReader()
+    }
+
+    @Provides
+    fun provideExternalDisplay(): ExternalDisplay {
+        return ExternalDisplay()
     }
 
     @Provides

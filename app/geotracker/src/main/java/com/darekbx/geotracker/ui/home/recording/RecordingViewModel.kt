@@ -1,6 +1,8 @@
 package com.darekbx.geotracker.ui.home.recording
 
 import android.content.ContentResolver
+import android.graphics.Bitmap
+import android.graphics.Picture
 import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -11,6 +13,7 @@ import com.darekbx.geotracker.domain.usecase.GetActiveTrackPointsUseCase
 import com.darekbx.geotracker.domain.usecase.GetActiveTrackUseCase
 import com.darekbx.geotracker.domain.usecase.GetPlacesToVisitUseCase
 import com.darekbx.geotracker.domain.usecase.StopRecordingUseCase
+import com.darekbx.geotracker.externaldisplay.ExternalDisplay
 import com.darekbx.geotracker.gpx.GpxReader
 import com.darekbx.geotracker.repository.entities.PointDto
 import com.darekbx.geotracker.service.LocationService
@@ -39,7 +42,8 @@ class RecordingViewModel @Inject constructor(
     private val getAllTracksUseCase: GetAllTracksUseCase,
     private val getPlacesToVisitUseCase: GetPlacesToVisitUseCase,
     private val gpxReader: GpxReader,
-    private val contentResolver: ContentResolver
+    private val contentResolver: ContentResolver,
+    private val externalDisplay: ExternalDisplay
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<RecordingUiState>(RecordingUiState.Stopped)
@@ -49,6 +53,14 @@ class RecordingViewModel @Inject constructor(
     var reCenterButtonVisible = mutableStateOf(false)
 
     var lastPoint = MutableStateFlow<PointDto?>(null)
+
+    fun sendFrame(
+        mapWidth: Int,
+        mapHeight: Int,
+        picture: Picture
+    ) {
+        externalDisplay.sendFrame(mapWidth, mapHeight, picture)
+    }
 
     fun onPan() {
         reCenterButtonVisible.value = true
