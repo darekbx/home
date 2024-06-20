@@ -1,33 +1,49 @@
 package com.darekbx.geotracker.ui.theme
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 import com.darekbx.common.ui.theme.MontserratFontFamily
 
 @Composable
 fun GeoTrackerTheme(content: @Composable () -> Unit) {
+    val colorScheme = darkColorScheme(
+        primary = Color(223, 119, 76),
+        secondary = Color(90, 141, 185),
+        background = Color.Black,
+        onBackground = Color(60, 60, 60),
+        surface = Color(18, 18, 19),
+        primaryContainer = Color(34, 34, 37),
+        secondaryContainer = Color(60, 60, 60),
+        onPrimary = Color(189, 189, 199),
+        onSurface = Color(225, 225, 227)
+    )
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.background.toArgb()
+            window.navigationBarColor = colorScheme.background.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+        }
+    }
     MaterialTheme(
-        colorScheme = darkColorScheme(
-            primary = Color(223, 119, 76),
-            secondary = Color(90, 141, 185),
-            background = Color.Black,
-            onBackground = Color(60, 60, 60),
-            surface = Color(18, 18, 19),
-            primaryContainer = Color(34, 34, 37),
-            secondaryContainer = Color(60, 60, 60),
-            onPrimary = Color(189, 189, 199),
-            onSurface = Color(225, 225, 227)
-        ),
+        colorScheme,
         typography = Typography(
             labelSmall = TextStyle(
                 fontFamily = MontserratFontFamily,

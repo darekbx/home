@@ -78,7 +78,8 @@ dependencies {
     implementation project(':app:common')
 
     // To change which app should be run at first, move to top correct one:
-    implementation project(':app:words')
+    implementation project(':app:geotracker')
+    /*implementation project(':app:words')
     implementation project(':app:favourites')
     implementation project(':app:geotracker')
     implementation project(':app:timeline')
@@ -93,7 +94,7 @@ dependencies {
     implementation project(':app:lifetimememo')
     implementation project(':app:weather')
     implementation project(':app:stocks')
-    implementation project(':app:infopigula')
+    implementation project(':app:infopigula')*/
 
     // Disabled
     //implementation project(':app:rssreader')

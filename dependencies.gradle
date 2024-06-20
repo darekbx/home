@@ -71,7 +71,7 @@ ext {
 
     useCompose = { ->
         dependencies {
-            composeBom = "androidx.compose:compose-bom:2024.04.01"
+            composeBom = "androidx.compose:compose-bom:2024.06.00"
             compose = [
                     "androidx.compose.ui:ui",
                     "androidx.compose.material3:material3",
