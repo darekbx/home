@@ -2,6 +2,7 @@ package com.darekbx.geotracker.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.darekbx.geotracker.domain.usecase.AddLocationUseCase
 import com.darekbx.geotracker.domain.usecase.DeleteAndRestoreUseCase
 import com.darekbx.geotracker.domain.usecase.SynchronizeUseCase
 import com.darekbx.geotracker.repository.SettingsRepository
@@ -9,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 sealed class SettingsUiState {
@@ -28,7 +30,8 @@ sealed class SettingsUiState {
 class SettingsViewModel @Inject constructor(
     private val deleteAndRestoreUseCase: DeleteAndRestoreUseCase,
     private val settingsRepository: SettingsRepository,
-    private val synchronizeUseCase: SynchronizeUseCase
+    private val synchronizeUseCase: SynchronizeUseCase,
+    private val addLocationUseCase: AddLocationUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<SettingsUiState>(SettingsUiState.Idle)
@@ -76,6 +79,16 @@ class SettingsViewModel @Inject constructor(
             )
 
             refresh()
+        }
+    }
+
+    fun addManually() {
+        viewModelScope.launch {
+            addLocationUseCase.addManuallyTrack(
+                13510F,
+                System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(38),
+                System.currentTimeMillis()
+            )
         }
     }
 

@@ -13,6 +13,7 @@
             android:icon="@drawable/ic_baseline_cloud"
             android:theme="@style/Theme.Home"
             android:launchMode="singleTask"
+            android:process=":weather"
             android:noHistory="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

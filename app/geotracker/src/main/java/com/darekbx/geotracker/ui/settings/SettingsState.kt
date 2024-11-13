@@ -15,6 +15,10 @@ class SettingsViewState(
         settingsViewModel.deleteAndRestore()
     }
 
+    fun addManually() {
+        settingsViewModel.addManually()
+    }
+
     fun save(
         nthPointsToSkip: Int,
         gpsMinDistance: Float,

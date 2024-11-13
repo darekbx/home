@@ -43,6 +43,18 @@ class AddLocationUseCase @Inject constructor(
         return sessionDistance
     }
 
+    suspend fun addManuallyTrack(distance: Float, startTime: Long, endTime: Long): Long {
+        return repository.add(
+            TrackDto(
+                id = null,
+                label = null,
+                startTimestamp = startTime,
+                endTimestamp = endTime,
+                distance = distance
+            )
+        )
+    }
+
     suspend fun addNewTrack(): Long {
         return repository.add(
             TrackDto(

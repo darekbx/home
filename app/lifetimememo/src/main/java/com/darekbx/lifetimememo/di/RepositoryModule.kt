@@ -27,10 +27,10 @@ class RepositoryModule {
         return CategoryRepository(memoDao)
     }
 
-    @Provides
+  /*  @Provides
     fun provideGson(): Gson {
         return Gson()
-    }
+    }*/
 
     @Provides
     fun provideBaseMemosRepository(memoDao: MemoDao): BaseMemosRepository {

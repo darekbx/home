@@ -49,6 +49,7 @@ import com.darekbx.geotracker.navigation.TripsDestination
 import com.darekbx.geotracker.navigation.navigateSingleTopTo
 import com.darekbx.geotracker.ui.theme.GeoTrackerTheme
 import com.darekbx.geotracker.ui.theme.LocalColors
+import com.google.firebase.FirebaseApp
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -66,6 +67,7 @@ class GeoTrackerActivity : LauncherActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
 
         setContent {
             GeoTrackerTheme {

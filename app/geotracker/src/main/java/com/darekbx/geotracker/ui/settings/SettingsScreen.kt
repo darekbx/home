@@ -83,6 +83,9 @@ fun SettingsScreen(
                                 isSyncRunning = false
                             }
                         }
+                    },
+                    onAddManuallyClick = {
+                        settingsViewState.addManually()
                     }
                 )
             }
@@ -122,7 +125,8 @@ fun SettingsContainer(
     uploadLastLocation: Boolean,
     dataToSynchronize: Int?,
     onSave: (Int, Float, Long, Boolean, Boolean) -> Unit,
-    onSynchronizeClick: () -> Unit
+    onSynchronizeClick: () -> Unit,
+    onAddManuallyClick: () -> Unit
 ) {
     var nthPointsToSkipValue by remember { mutableIntStateOf(nthPointsToSkip) }
     var gpsMinDistanceValue by remember { mutableFloatStateOf(gpsMinDistance) }
@@ -222,6 +226,10 @@ fun SettingsContainer(
                 }
             }
         }
+
+        /*Button(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), onClick = onAddManuallyClick) {
+            Text(text = "Add manually", color = Color.Black)
+        }*/
     }
 }
 
@@ -247,6 +255,7 @@ private fun SettingsContainerPreview() {
             uploadLastLocation = true,
             dataToSynchronize = null,
             { _, _, _, _, _ -> },
+            { },
             { }
         )
     }

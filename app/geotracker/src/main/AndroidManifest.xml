@@ -19,6 +19,7 @@
             android:icon="@drawable/ic_bike"
             android:theme="@style/Theme.Home"
             android:usesCleartextTraffic="true"
+            android:process=":geo_tracker"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
