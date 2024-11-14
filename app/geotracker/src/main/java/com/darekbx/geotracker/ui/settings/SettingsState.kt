@@ -15,8 +15,8 @@ class SettingsViewState(
         settingsViewModel.deleteAndRestore()
     }
 
-    fun addManually() {
-        settingsViewModel.addManually()
+    fun addManually(distance: Float, start: Long, end: Long) {
+        settingsViewModel.addManually(distance, start, end)
     }
 
     fun save(

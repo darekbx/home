@@ -10,12 +10,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 sealed class SettingsUiState {
-    object Idle : SettingsUiState()
-    object InProgress : SettingsUiState()
+    data object Idle : SettingsUiState()
+    data object InProgress : SettingsUiState()
     data class Done(
         val nthPointsToSkip: Int,
         val gpsMinDistance: Float,
@@ -82,13 +81,9 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun addManually() {
+    fun addManually(distance: Float, start: Long, end: Long) {
         viewModelScope.launch {
-            addLocationUseCase.addManuallyTrack(
-                13510F,
-                System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(38),
-                System.currentTimeMillis()
-            )
+            addLocationUseCase.addManuallyTrack(distance * 1000F, start, end)
         }
     }
 

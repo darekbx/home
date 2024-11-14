@@ -47,6 +47,7 @@ fun SettingsScreen(
     val state = settingsViewState.state
     val dataToSynchronize by settingsViewState.dataToSynchronize().collectAsState(initial = null)
     var isSyncRunning by remember { mutableStateOf(false) }
+    var addManuallyDialog by remember { mutableStateOf(false) }
     var syncProgress by remember { mutableStateOf(Pair(1000, 0)) }
 
     Box(
@@ -85,7 +86,7 @@ fun SettingsScreen(
                         }
                     },
                     onAddManuallyClick = {
-                        settingsViewState.addManually()
+                        addManuallyDialog = true
                     }
                 )
             }
@@ -102,12 +103,21 @@ fun SettingsScreen(
             SyncProgress(Modifier.size(128.dp), syncProgress)
         }
     }
+
+    if (addManuallyDialog) {
+        ManualTripDialog(
+            onSave = { distance, start, end ->
+                settingsViewState.addManually(distance, start, end)
+            },
+            onDismiss = { addManuallyDialog = false }
+        )
+    }
 }
 
 @Composable
 fun SyncProgress(modifier: Modifier = Modifier, progress: Pair<Int, Int>) {
     CircularProgressIndicator(
-        progress = progress.first / progress.second.toFloat(),
+        progress = { progress.first / progress.second.toFloat() },
         modifier = modifier
             .background(
                 MaterialTheme.colorScheme.primaryContainer, CircleShape
@@ -227,9 +237,9 @@ fun SettingsContainer(
             }
         }
 
-        /*Button(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), onClick = onAddManuallyClick) {
-            Text(text = "Add manually", color = Color.Black)
-        }*/
+        Button(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), onClick = onAddManuallyClick) {
+            Text(text = "Add trip manually", color = Color.Black)
+        }
     }
 }
 
