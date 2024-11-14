@@ -54,7 +54,7 @@ fun ListScreen(listViewModel: ListViewModel = hiltViewModel()) {
                         fontWeight = FontWeight.W600
                     )
                 },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     titleContentColor = Color.White,
                     containerColor = LocalColors.current.green
                 )

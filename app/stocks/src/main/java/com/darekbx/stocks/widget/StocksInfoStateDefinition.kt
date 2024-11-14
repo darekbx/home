@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
-
+/*
 object StocksInfoStateDefinition : GlanceStateDefinition<StocksInfo> {
 
     private const val DATA_STORE_FILENAME = "stocksInfo"
@@ -47,4 +47,4 @@ object StocksInfoStateDefinition : GlanceStateDefinition<StocksInfo> {
             }
         }
     }
-}
+}*/

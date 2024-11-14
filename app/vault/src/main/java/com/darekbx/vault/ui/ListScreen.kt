@@ -45,7 +45,7 @@ fun ListScreen(vaultViewModel: VaultViewModel = hiltViewModel(), onItemClick: (L
                         fontWeight = FontWeight.W600
                     )
                 },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     titleContentColor = Color.White,
                     containerColor = MaterialTheme.colorScheme.primary
                 )

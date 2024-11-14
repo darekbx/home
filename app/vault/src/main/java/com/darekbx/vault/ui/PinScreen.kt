@@ -72,8 +72,8 @@ fun InputField(value: MutableState<String>, hasError: MutableState<Boolean>) {
             .background(Color.White),
         value = value.value,
         isError = hasError.value,
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color.White,
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = Color.White,
             errorIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent

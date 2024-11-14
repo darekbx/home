@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.kapt'
     id 'com.google.dagger.hilt.android'
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 apply from: '../../dependencies.gradle'
@@ -31,8 +32,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
         jvmTarget = '17'

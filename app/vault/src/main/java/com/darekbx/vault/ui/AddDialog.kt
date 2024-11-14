@@ -102,8 +102,8 @@ fun InputField(
             .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp)),
         value = value.value,
         isError = valueError.value,
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color.White,
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = Color.White,
             errorIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent

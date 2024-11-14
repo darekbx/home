@@ -45,11 +45,11 @@ ext {
 
     useHilt = { ->
         dependencies {
-            implementation "com.google.dagger:hilt-android:2.45"
-            implementation "androidx.hilt:hilt-navigation-compose:1.1.0"
-            implementation 'androidx.hilt:hilt-common:1.1.0'
-            implementation 'androidx.hilt:hilt-work:1.1.0'
-            kapt "com.google.dagger:hilt-compiler:2.45"
+            implementation "com.google.dagger:hilt-android:2.52"
+            implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
+            implementation 'androidx.hilt:hilt-common:1.2.0'
+            implementation 'androidx.hilt:hilt-work:1.2.0'
+            kapt "com.google.dagger:hilt-compiler:2.52"
         }
     }
 
@@ -71,7 +71,7 @@ ext {
 
     useCompose = { ->
         dependencies {
-            composeBom = "androidx.compose:compose-bom:2024.06.00"
+            composeBom = "androidx.compose:compose-bom:2024.10.01"
             compose = [
                     "androidx.compose.ui:ui",
                     "androidx.compose.material3:material3",

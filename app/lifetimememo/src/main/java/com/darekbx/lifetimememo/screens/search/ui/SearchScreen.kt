@@ -77,8 +77,8 @@ private fun SerachBox(onSearch: (String) -> Unit = { }) {
             onValueChange = { value = it },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = { onSearch(value) }),
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Secondary,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Secondary,
                 focusedIndicatorColor = Secondary,
                 unfocusedIndicatorColor = Secondary
             ),

@@ -69,10 +69,10 @@ private fun SettingsRow(
     Row(
         modifier
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(
+                //interactionSource = remember { MutableInteractionSource() },
+                /*indication = rememberRipple(
                     color = Highlight
-                ),
+                ),*/
                 onClick = onClick
             )
             .padding(Paddings.Default),

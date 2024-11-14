@@ -211,11 +211,11 @@ fun InputField(
             .background(Color.White),
         value = value.value,
         isError = valueError.value,
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color.White,
-            errorIndicatorColor = Color.Transparent,
+        colors = TextFieldDefaults.colors(
+            /*focusedContainerColor = Color.White,
+            errorInedicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
+            unfocusedIndicatorColor = Color.Transparent*/
         ),
         onValueChange = {
             if (valueError.value) {

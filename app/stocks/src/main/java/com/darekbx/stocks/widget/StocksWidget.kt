@@ -23,6 +23,7 @@ import com.darekbx.stocks.R
  * Widget is based on
  * https://github.com/android/user-interface-samples/blob/main/AppWidget/app/src/main/java/com/example/android/appwidget/glance/weather"
  */
+/*
 class StocksWidget : GlanceAppWidget() {
 
     override val sizeMode = SizeMode.Single
@@ -141,3 +142,4 @@ class UpdateStocksAction : ActionCallback {
     ) {
     }
 }
+*/

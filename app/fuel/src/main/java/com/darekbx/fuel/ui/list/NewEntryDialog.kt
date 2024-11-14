@@ -85,8 +85,8 @@ private fun CustomField(value: MutableState<String?>, label: String) {
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = value.value ?: "",
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = lightBlue,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = lightBlue,
                 cursorColor = Color.Black,
                 disabledLabelColor = lightBlue,
                 focusedIndicatorColor = Color.Transparent,

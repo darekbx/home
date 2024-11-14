@@ -44,8 +44,8 @@ fun InputField(value: String) {
             .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
             .background(Color.White),
         value = value,
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color.White,
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = Color.White,
             errorIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent

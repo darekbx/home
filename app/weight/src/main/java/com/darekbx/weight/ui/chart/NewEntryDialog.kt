@@ -76,8 +76,8 @@ private fun CustomField(
             modifier = Modifier.fillMaxWidth(),
             value = value.value,
             isError = weightError.value,
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = lightBlue,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = lightBlue,
                 cursorColor = Color.Black,
                 disabledLabelColor = lightBlue,
                 focusedIndicatorColor = Color.Transparent,
