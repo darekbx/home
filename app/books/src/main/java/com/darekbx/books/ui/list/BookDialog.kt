@@ -197,7 +197,6 @@ private fun FlagCheckBox(label: String, isChecked: MutableState<Boolean>) {
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun InputField(
     modifier: Modifier = Modifier,
     label: String,
@@ -212,10 +211,9 @@ fun InputField(
         value = value.value,
         isError = valueError.value,
         colors = TextFieldDefaults.colors(
-            /*focusedContainerColor = Color.White,
-            errorInedicatorColor = Color.Transparent,
+            cursorColor = Color.Black,
             focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent*/
+            unfocusedIndicatorColor = Color.Transparent
         ),
         onValueChange = {
             if (valueError.value) {
