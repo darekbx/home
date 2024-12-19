@@ -1,9 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.darekbx.books.ui.list
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -197,26 +194,18 @@ private fun FlagCheckBox(label: String, isChecked: MutableState<Boolean>) {
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun InputField(
     modifier: Modifier = Modifier,
     label: String,
     value: MutableState<String>,
     valueError: MutableState<Boolean>
 ) {
-    TextField(
+    OutlinedTextField(
         modifier = modifier
             .fillMaxWidth()
-            .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
             .background(Color.White),
         value = value.value,
         isError = valueError.value,
-        colors = TextFieldDefaults.colors(
-            /*focusedContainerColor = Color.White,
-            errorInedicatorColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent*/
-        ),
         onValueChange = {
             if (valueError.value) {
                 valueError.value = false
