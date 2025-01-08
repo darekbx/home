@@ -56,7 +56,6 @@ import javax.inject.Inject
 /**
  * TODO:
  *  - add ability to edit track
- *  - add ability to add new track (without points)
  */
 
 @AndroidEntryPoint

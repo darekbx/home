@@ -106,6 +106,7 @@ dependencies {
     implementation androidx.core_ktx
     implementation androidx.lifecycle_runtime_ktx
 
+    implementation("androidx.core:core-splashscreen:1.0.0")
     implementation("androidx.glance:glance-appwidget:1.0.0")
     implementation("androidx.glance:glance-material3:1.0.0")
 
