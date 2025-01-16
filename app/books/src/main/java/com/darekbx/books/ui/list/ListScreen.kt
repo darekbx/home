@@ -119,11 +119,10 @@ private fun BooksList(
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 4.dp)
     ) {
         stickyHeader {
             InputField(
-                modifier = Modifier.padding(start = 2.dp, end = 2.dp, top = 2.dp, bottom = 4.dp),
+                modifier = Modifier.padding(start = 2.dp, end = 2.dp, top = 0.dp, bottom = 4.dp),
                 value = filter,
                 label = "Search",
                 valueError = mutableStateOf(false)

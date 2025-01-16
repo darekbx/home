@@ -19,13 +19,13 @@ fun InfoPigulaTheme(isDarkTheme: Boolean, content: @Composable () -> Unit) {
         colorScheme =
         if (isDarkTheme)
             darkColorScheme(
-                primary = Color.White,
-                secondary = Color.White,
+                primary = Color(0xFFAAAAAA),
+                secondary = Color(0xFFAAAAAA),
                 background = Color.Black,
-                onBackground = Color.White,
+                onBackground = Color(0xFFAAAAAA),
                 surface = Color.Black,
-                onPrimary = Color.White,
-                onSurface = Color.White,
+                onPrimary = Color(0xFFAAAAAA),
+                onSurface = Color(0xFFAAAAAA),
                 tertiary = LocalColors.current.darkblue
             )
         else
