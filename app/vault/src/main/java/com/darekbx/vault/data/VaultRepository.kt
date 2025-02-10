@@ -26,6 +26,10 @@ class VaultRepository @Inject constructor(
         storedPin = pin
     }
 
+    fun reset() {
+        storedPin = null
+    }
+
     suspend fun delete(id: Long) {
         vaultDao.delete(id)
     }
