@@ -60,20 +60,20 @@ class VaultActivity : LauncherActivity() {
     @Composable
     private fun Navigation(navController: NavHostController) {
         if (USES_NEW_VAULT) {
-            vault(navController)
+            Vault(navController)
         } else {
-            legacyVault(navController)
+            LegacyVault(navController)
         }
     }
 
     @Composable
-    private fun vault(navController: NavHostController) {
+    private fun Vault(navController: NavHostController) {
         NavHost(navController, startDestination = RoutePin.route) {
             composable(RoutePin.route) {
                 PinScreen(onSuccess = { navController.navigateSingleTopTo(RouteList.route) })
             }
             composable(RouteList.route) {
-                ListScreen(onItemClick = { secretId ->
+                ListScreen(onItemOpen = { secretId ->
                     with (RouteSecret) {
                         navController.navigate("$route?$secretIdArg=$secretId")
                     }
@@ -91,7 +91,7 @@ class VaultActivity : LauncherActivity() {
     }
 
     @Composable
-    private fun legacyVault(navController: NavHostController) {
+    private fun LegacyVault(navController: NavHostController) {
         NavHost(navController, startDestination = RoutePin.route) {
             composable(RoutePin.route) {
                 LegacyPinScreen(onSuccess = { navController.navigateSingleTopTo(RouteList.route) })
@@ -115,6 +115,6 @@ class VaultActivity : LauncherActivity() {
     }
 
     companion object {
-        private const val USES_NEW_VAULT = false
+        private const val USES_NEW_VAULT = true
     }
 }

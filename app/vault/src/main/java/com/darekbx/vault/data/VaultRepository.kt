@@ -46,10 +46,18 @@ class VaultRepository @Inject constructor(
             )
         }
     }
+    suspend fun update(id: Long, key: String, account: String, password: String) {
+        vaultDao.update(
+            id,
+            key,
+            encryption.encode(storedPin!!, account),
+            encryption.encode(storedPin!!, password)
+        )
+    }
 
     fun getItems() =
         vaultDao.getItems().map { list ->
-            list.map { Vault(it.id, it.key) }
+            list.map { Vault(it.id, it.key, encryption.decode(storedPin!!, it.account)) }
         }
 
     suspend fun getItem(id: Long) =

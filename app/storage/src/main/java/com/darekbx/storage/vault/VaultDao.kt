@@ -14,7 +14,7 @@ interface VaultDao {
     @Insert
     suspend fun add(item: VaultDto)
 
-    @Query("UPDATE vault SET key = :key, account = :account, password = :password WHERE id = :id")
+    @Query("UPDATE vault SET `key` = :key, account = :account, password = :password WHERE id = :id")
     suspend fun update(id: Long, key: String, account: String, password: String)
 
     @Query("DELETE FROM vault WHERE id = :id")

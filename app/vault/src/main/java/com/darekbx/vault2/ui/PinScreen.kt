@@ -1,6 +1,7 @@
 package com.darekbx.vault2.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -71,6 +72,7 @@ private fun PinScreen(onValidate: (List<Int>) -> Boolean = { false }) {
         )
     }
     var isValid by remember { mutableStateOf(false) }
+    var isError by remember { mutableStateOf(false) }
     val pin = remember { mutableStateListOf<Int>() }
     val isEnabled = pin.size < 4
 
@@ -94,31 +96,40 @@ private fun PinScreen(onValidate: (List<Int>) -> Boolean = { false }) {
                 .align(Alignment.CenterHorizontally)
         )
         Row(Modifier.align(Alignment.CenterHorizontally)) {
-            PinDigit(filled = pin.elementAtOrNull(0) != null)
-            PinDigit(filled = pin.elementAtOrNull(1) != null)
-            PinDigit(filled = pin.elementAtOrNull(2) != null)
-            PinDigit(filled = pin.elementAtOrNull(3) != null)
+            PinDigit(filled = pin.elementAtOrNull(0) != null, isError = isError)
+            PinDigit(filled = pin.elementAtOrNull(1) != null, isError = isError)
+            PinDigit(filled = pin.elementAtOrNull(2) != null, isError = isError)
+            PinDigit(filled = pin.elementAtOrNull(3) != null, isError = isError)
         }
 
         Spacer(modifier = Modifier.weight(1F))
 
-        Column(Modifier.padding(top = 16.dp)) {
+        Column(Modifier.padding(top = 16.dp, bottom = 16.dp)) {
             buttons.forEach { group ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                     group.forEach { button ->
                         when (button) {
                             is PinButton -> {
                                 KeyButton(button.value, isEnabled) { digit ->
+                                    isError = false
                                     pin.add(digit)
                                 }
                             }
                             is PinButtonAction -> {
-                                KeyButton(button.value, true) {
+                                val enabled = when (button.value) {
+                                    '<' -> pin.isNotEmpty()
+                                    'X' -> pin.size == 4
+                                    else -> true
+                                }
+                                KeyButton(button.value, enabled) { _ ->
                                     when (button.value) {
                                         '<' -> pin.removeLastOrNull()
                                         'X' -> {
                                             isValid = onValidate(pin)
-                                            if (!isValid) pin.clear()
+                                            if (!isValid) {
+                                                isError = true
+                                                pin.clear()
+                                            }
                                         }
                                     }
                                 }
@@ -154,12 +165,13 @@ private fun RowScope.KeyButton(char: Any, enabled: Boolean, onClick: (Int) -> Un
 }
 
 @Composable
-private fun PinDigit(filled: Boolean = false) {
+private fun PinDigit(filled: Boolean = false, isError: Boolean = false) {
     Box(
         modifier = Modifier
             .padding(5.dp)
             .size(56.dp)
             .background(Color.White, CircleShape)
+            .border(1.dp, if (isError) Color.Red else Color.Transparent, CircleShape)
             .innerShadow(CircleShape, Color.Gray)
     ) {
         Box(
