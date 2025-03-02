@@ -1,7 +1,10 @@
 package com.darekbx.backup
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,6 +25,12 @@ import java.util.*
 class BackupActivity : LauncherActivity() {
 
     private val backupViewModel: BackupViewModel by viewModels()
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        /* NOOP */
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +65,10 @@ class BackupActivity : LauncherActivity() {
                 }
             }
         }
+
+        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+        intent.data = Uri.parse("package:" + this.packageName)
+        requestPermissionLauncher.launch(intent)
     }
 
     private fun restore() {

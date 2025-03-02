@@ -9,6 +9,7 @@ import com.darekbx.geotracker.repository.PlaceDao
 import com.darekbx.geotracker.repository.PointDao
 import com.darekbx.geotracker.repository.RouteDao
 import com.darekbx.geotracker.repository.TrackDao
+import com.darekbx.storage.BuildConfig
 import com.darekbx.storage.HomeDatabase
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_10_11
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_11_12
@@ -53,6 +54,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import javax.inject.Singleton
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "home_preferences")
@@ -60,6 +63,17 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ho
 @Module
 @InstallIn(SingletonComponent::class)
 class CommonModule {
+
+    @Provides
+    fun provideOkHttpClient() = OkHttpClient.Builder()
+        .addInterceptor(
+            HttpLoggingInterceptor().apply {
+                if (BuildConfig.DEBUG) {
+                    level = HttpLoggingInterceptor.Level.BODY
+                }
+            }
+        )
+        .build()
 
     @Provides
     fun provideGson(): Gson {

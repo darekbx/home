@@ -48,6 +48,8 @@ dependencies {
     implementation other.gson
     implementation androidx.core_ktx
     implementation androidx.data_store
+    implementation other.okhttp
+    implementation other.okhttp_logging_interceptor
 
     testImplementation other.junit
 }

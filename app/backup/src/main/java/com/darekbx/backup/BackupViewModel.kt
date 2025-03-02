@@ -45,8 +45,6 @@ class BackupViewModel @Inject constructor(
                     localDatabaseFile.createNewFile()
                 }
                 localDatabaseFile.writeBytes(inputStream.readBytes())
-
-
             }
             onSuccess()
         }

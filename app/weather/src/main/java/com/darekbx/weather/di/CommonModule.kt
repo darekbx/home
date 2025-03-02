@@ -64,17 +64,6 @@ class CommonModule {
     }
 
     @Provides
-    fun provideOkHttpClient() = OkHttpClient.Builder()
-        .addInterceptor(
-            HttpLoggingInterceptor().apply {
-                if (BuildConfig.DEBUG) {
-                    level = HttpLoggingInterceptor.Level.BODY
-                }
-            }
-        )
-        .build()
-
-    @Provides
     fun provideAntistormService(okHttpClient: OkHttpClient): AntistormService {
         return Retrofit.Builder()
             .baseUrl(AntistormService.ANTISTORM_BASE_URL)
