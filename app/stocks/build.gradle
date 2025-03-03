@@ -65,6 +65,7 @@ dependencies {
 
     implementation other.retrofit
     implementation other.retrofit_scalars
+    implementation other.retrofit_gson
     implementation other.okhttp
     implementation other.okhttp_logging_interceptor
 

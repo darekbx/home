@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.stocks.data.ArdustocksImport
+import com.darekbx.stocks.data.ArdustocksImport.Companion.RIVER_STATE
 import com.darekbx.stocks.data.StockType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -27,7 +28,7 @@ class SettingsViewModel @Inject constructor(
     fun addCustom() {
         viewModelScope.launch {
             _uiState.value = UiState.InProgress
-            ardustocksImport.addCustom(StockType.ALLEGRO, "ale")
+            ardustocksImport.addCustom(StockType.RIVER_STATE, RIVER_STATE)
             _uiState.value = UiState.Idle
         }
     }

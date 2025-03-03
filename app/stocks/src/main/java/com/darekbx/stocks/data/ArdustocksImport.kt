@@ -19,10 +19,14 @@ class ArdustocksImport(
             Source(StockType.BTC, "btc.v", "btc.txt"),
             Source(StockType.GOLD, "xaupln", "gold.txt")
         )
+
+        const val RIVER_STATE = "river_state"
     }
 
     suspend fun addCustom(stockType: StockType, query: String) {
-        stocksRepository.addCurrency(stockType.label, query)
+        val id = stocksRepository.addCurrency(stockType.label, query)
+        stocksRepository.addRate(id, 49.0)
+        stocksRepository.addRate(id, 50.0)
     }
 
     suspend fun importFromCsv() {

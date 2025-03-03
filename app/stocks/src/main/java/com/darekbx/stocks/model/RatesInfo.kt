@@ -13,5 +13,6 @@ data class RateInfo(
     val label: String,
     val guideLinesStep: Float,
     val color: Color,
-    val status: Status
+    val status: Status,
+    val unit: String = "zł"
 )

@@ -35,7 +35,8 @@ fun CommonChart(
     label: String = "PLN/USD",
     chartColor: Long = Color.Red.value.toLong(),
     guideLinesStep: Float = 0.02f,
-    status: Status = Status.PLUS
+    status: Status = Status.PLUS,
+    unit: String = "zł"
 ) {
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
 
@@ -104,7 +105,7 @@ fun CommonChart(
             }
         }
 
-        DrawLegend(minValue, maxValue, data, status)
+        DrawLegend(minValue, maxValue, data, status, unit)
     }
 }
 
@@ -113,7 +114,8 @@ private fun DrawLegend(
     minValue: Double,
     maxValue: Double,
     data: List<Double>,
-    status: Status
+    status: Status,
+    unit: String
 ) {
     Row(
         modifier = Modifier
@@ -128,19 +130,19 @@ private fun DrawLegend(
         }
 
         Text(
-            text = "Actual: %.2fzł".format(data.last()),
+            text = "Actual: %.2f$unit".format(data.last()),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
             color = color
         )
         Text(
-            text = "Min: %.2fzł".format(minValue),
+            text = "Min: %.2f$unit".format(minValue),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Normal,
             color = Color.White
         )
         Text(
-            text = "Max: %.2fzł".format(maxValue),
+            text = "Max: %.2f$unit".format(maxValue),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Normal,
             color = Color.White

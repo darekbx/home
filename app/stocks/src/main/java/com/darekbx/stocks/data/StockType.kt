@@ -6,4 +6,5 @@ enum class StockType(val label: String) {
     PLN_EUR("PLN/EUR"),
     PLN_USD("PLN/USD"),
     ALLEGRO("Allegro"),
+    RIVER_STATE("River State"),
 }

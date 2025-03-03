@@ -30,7 +30,7 @@ fun StocksScreen(
     }
 
     Scaffold(
-        /*floatingActionButton = {
+        floatingActionButton = {
             Column {
                 FloatingActionButton(
                     onClick = openSettings,
@@ -39,7 +39,7 @@ fun StocksScreen(
                     Icon(Icons.Default.Settings, contentDescription = "settings")
                 }
             }
-        },*/
+        },
         content = { innerPadding ->
             val rates = stocksViewModel.rateInfoList
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -95,7 +95,8 @@ private fun ChartCard(
             label = ratesInfo.label,
             chartColor = ratesInfo.color.value.toLong(),
             guideLinesStep = ratesInfo.guideLinesStep,
-            status = ratesInfo.status
+            status = ratesInfo.status,
+            unit = ratesInfo.unit
         )
     }
 }

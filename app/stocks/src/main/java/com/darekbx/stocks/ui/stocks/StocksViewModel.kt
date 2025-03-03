@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.darekbx.stocks.data.ArdustocksImport.Companion.RIVER_STATE
 import com.darekbx.stocks.model.RateInfo
 import com.darekbx.stocks.data.StocksRepository
 import com.darekbx.stocks.model.Status
@@ -37,12 +38,19 @@ class StocksViewModel @Inject constructor(
             val color = Color(160, 160, 160)
             val currencies = stocksRepository.currencies()
             currencies.forEach { currency ->
-                stocksRepository.refreshCurrency(currency)
+                if (currency.queryParam == RIVER_STATE) {
+                    // Use river state service
+                    stocksRepository.refreshRiverState(currency)
+                } else {
+                    // Use common service
+                    stocksRepository.refreshCurrency(currency)
+                }
                 val rates = stocksRepository.rates(currency.id!!).map { it.value }
                 if (rates.isNotEmpty()) {
                     val step = calculateStep(rates[0])
                     val status = obtainStatus(rates)
-                    val rateInfo = RateInfo(rates, currency.label, step, color, status)
+                    val unit = if (currency.queryParam == RIVER_STATE) "m" else "zł"
+                    val rateInfo = RateInfo(rates, currency.label, step, color, status, unit)
                     rateInfoList.add(0, rateInfo)
                 }
                 _uiState.value = UiState.Idle

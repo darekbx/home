@@ -3,6 +3,7 @@ package com.darekbx.stocks.data
 import android.util.Log
 import com.darekbx.stocks.BuildConfig
 import com.darekbx.stocks.data.remote.CurrencyService
+import com.darekbx.stocks.data.remote.RiverStateApiService
 import com.darekbx.stocks.widget.StocksInfo
 import com.darekbx.storage.stocks.CurrencyDto
 import com.darekbx.storage.stocks.RateDto
@@ -13,6 +14,7 @@ import kotlin.random.Random
 class StocksRepository @Inject constructor(
     private val stocksDao: StocksDao,
     private val currencyService: CurrencyService,
+    private val riverStateApiService: RiverStateApiService,
     private val responseParser: ResponseParser
 ) {
     companion object {
@@ -27,6 +29,18 @@ class StocksRepository @Inject constructor(
                 Log.v(TAG, "${currency.label}: $value")
                 stocksDao.add(RateDto(currencyId = currency.id!!, value = value))
             }
+        } catch (e: Exception) {
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    suspend fun refreshRiverState(currency: CurrencyDto) {
+        try {
+            val response = riverStateApiService.getWaterState(id = "152210170", hoursInterval = 2)
+            val data = response.operational.map { it.value }
+            stocksDao.add(RateDto(currencyId = currency.id!!, value = data.last()))
         } catch (e: Exception) {
             if (BuildConfig.DEBUG) {
                 e.printStackTrace()
