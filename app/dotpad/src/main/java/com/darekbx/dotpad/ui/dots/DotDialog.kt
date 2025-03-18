@@ -56,7 +56,7 @@ fun DotDialog(
     RequestPermission(Manifest.permission.WRITE_CALENDAR) {
         Dialog(
             onDismissRequest = { onDiscardChanges() },
-            properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
+            properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false)
         ) {
             DialogContent(dot, onSave, onResetTime, onShowDatePicker, onRemove)
         }
