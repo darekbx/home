@@ -10,6 +10,7 @@ import com.darekbx.stocks.data.ArdustocksImport.Companion.RIVER_STATE
 import com.darekbx.stocks.model.RateInfo
 import com.darekbx.stocks.data.StocksRepository
 import com.darekbx.stocks.model.Status
+import com.darekbx.storage.stocks.CurrencyDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,7 +37,8 @@ class StocksViewModel @Inject constructor(
             rateInfoList.clear()
 
             val color = Color(160, 160, 160)
-            val currencies = stocksRepository.currencies()
+            val currencies = listOf(CurrencyDto(1, "River State", RIVER_STATE))// stocksRepository.currencies()
+
             currencies.forEach { currency ->
                 if (currency.queryParam == RIVER_STATE) {
                     // Use river state service

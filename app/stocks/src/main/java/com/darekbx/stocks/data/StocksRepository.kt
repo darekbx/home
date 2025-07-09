@@ -38,9 +38,9 @@ class StocksRepository @Inject constructor(
 
     suspend fun refreshRiverState(currency: CurrencyDto) {
         try {
-            val response = riverStateApiService.getWaterState(id = "152210170", hoursInterval = 2)
-            val data = response.operational.map { it.value }
-            stocksDao.add(RateDto(currencyId = currency.id!!, value = data.last()))
+            val response = riverStateApiService.getWaterState(id = "152210170")
+            val data = response.status.currentState.value
+            stocksDao.add(RateDto(currencyId = currency.id!!, value = data))
         } catch (e: Exception) {
             if (BuildConfig.DEBUG) {
                 e.printStackTrace()
