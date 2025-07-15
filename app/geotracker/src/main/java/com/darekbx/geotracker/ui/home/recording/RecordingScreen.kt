@@ -8,9 +8,12 @@ import android.view.MotionEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -57,6 +62,10 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 
+fun fixBearingForOsmdroid(bearing: Float): Float {
+    return (360f - bearing) % 360f
+}
+
 @Composable
 fun RecordingScreen(
     gpxUri: Uri? = null,
@@ -81,12 +90,13 @@ fun RecordingScreen(
         mutableStateOf<Marker?>(null)
     }
 
-    var latestPoint by remember { mutableStateOf<Point?>(null) }
+    var previousLocation by remember { mutableStateOf<GeoPoint?>(null) }
 
     LaunchedEffect(Unit) {
         recordingViewModel.lastPoint.collectLatest { lastPoint ->
-            lastPoint?.let {
-                  map?.controller?.setCenter(GeoPoint(it.latitude, it.longitude))
+            lastPoint?.let { currentPoint ->
+                val currentLocation = GeoPoint(currentPoint.latitude, currentPoint.longitude)
+                map?.controller?.setCenter(currentLocation)
             }
         }
     }
@@ -98,14 +108,28 @@ fun RecordingScreen(
                 val mapPoints = points.map { point -> GeoPoint(point.latitude, point.longitude) }
                 polyline.setPoints(mapPoints)
 
-                latestPoint = points.first()
-
                 map?.run {
+                    val first= GeoPoint(mapPoints.first())
                     positionMarker?.position = GeoPoint(mapPoints.first())
                     overlays[overlays.size - 1] = polyline
                     if (!recordingViewModel.reCenterButtonVisible.value) {
                         controller?.setCenter(mapPoints[0])
                     }
+
+                    if (recordingViewModel.rotationLocked.value) {
+                        setMapOrientation(0F)
+                    } else {
+                        // Set automatic map rotation
+                        previousLocation?.let { prev ->
+                            val bearing = prev.bearingTo(first)
+                            if (bearing != 0.0) {
+                                setMapOrientation(fixBearingForOsmdroid(bearing.toFloat()))
+                            }
+                        }
+                    }
+
+                    previousLocation = GeoPoint(first.latitude, first.longitude)
+
                     invalidate()
                 }
             }
@@ -133,13 +157,23 @@ fun RecordingScreen(
                             MapBox(Modifier.weight(1F)) {
                                 PreviewMap(
                                     allTracks, placesToVisit, gpxTrack,
-                                    onPan = recordingViewModel::onPan
+                                    onPan = recordingViewModel::onPan,
+                                    directionMarker = {
+                                        if (recordingViewModel.rotationLocked.value) {
+                                            R.drawable.ic_marker
+                                        } else {
+                                            R.drawable.ic_direction_marker
+                                        }
+                                    }
                                 ) { mapView, marker ->
                                     map = mapView
                                     positionMarker = marker
                                 }
 
-                                RecenterButton(Modifier.align(Alignment.BottomStart))
+                                Column(Modifier.align(Alignment.BottomStart).padding(bottom = 12.dp)) {
+                                    RecenterButton()
+                                    LockRotationButton()
+                                }
                             }
                             RecordingSummary(Modifier)
                         }
@@ -158,13 +192,34 @@ fun RecordingScreen(
 }
 
 @Composable
-private fun RecenterButton(modifier: Modifier, recordingViewModel: RecordingViewModel = hiltViewModel()) {
+private fun RecenterButton(recordingViewModel: RecordingViewModel = hiltViewModel()) {
     if (recordingViewModel.reCenterButtonVisible.value) {
         Button(
-            modifier = modifier.padding(start = 12.dp, bottom = 12.dp),
+            modifier = Modifier.padding(start = 12.dp),
+            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
             onClick = { recordingViewModel.onReCenter() }
         ) {
             Text(text = "Re-Center", color = Color.White)
+        }
+    }
+}
+
+@Composable
+private fun LockRotationButton(recordingViewModel: RecordingViewModel = hiltViewModel()) {
+    val icon =
+        if (recordingViewModel.rotationLocked.value) R.drawable.ic_lock
+        else R.drawable.ic_lock_open
+    Button(
+        modifier = Modifier.padding(start = 12.dp),
+        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
+        onClick = { recordingViewModel.toggleRotationLock() }
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(text = "Rotation", color = Color.White, modifier = Modifier.padding(end = 4.dp))
+            Icon(painterResource(icon), contentDescription = null, tint = Color.White)
         }
     }
 }
@@ -213,6 +268,7 @@ fun PreviewMap(
     placesToVisit: List<PlaceToVisit>,
     gpxTrack: Gpx?,
     onPan: () -> Unit,
+    directionMarker: () -> Int,
     ready: (MapView, Marker) -> Unit
 ) {
     val context = LocalContext.current
@@ -239,7 +295,7 @@ fun PreviewMap(
         }
 
         val positionMarker = Marker(map).apply {
-            icon = context.getDrawable(R.drawable.ic_marker)
+            icon = context.getDrawable(directionMarker())
             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
         }
 

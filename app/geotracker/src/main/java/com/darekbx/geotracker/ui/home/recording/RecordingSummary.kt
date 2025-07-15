@@ -106,7 +106,6 @@ fun SummaryWrapper(modifier: Modifier, points: List<Point>?, track: Track?) {
                 }
             }
         }
-
     }
 }
 

@@ -47,6 +47,7 @@ class RecordingViewModel @Inject constructor(
         get() = _uiState
 
     var reCenterButtonVisible = mutableStateOf(false)
+    var rotationLocked = mutableStateOf(true)
 
     var lastPoint = MutableStateFlow<PointDto?>(null)
 
@@ -62,6 +63,10 @@ class RecordingViewModel @Inject constructor(
                 lastPoint.value = getActiveTrackPointsUseCase.getLastPoint()
             }
         }
+    }
+
+    fun toggleRotationLock() {
+        rotationLocked.value = !rotationLocked.value
     }
 
     fun fetchAllTracks() = flow {
