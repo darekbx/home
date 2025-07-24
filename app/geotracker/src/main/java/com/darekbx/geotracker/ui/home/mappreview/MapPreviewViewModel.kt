@@ -1,5 +1,6 @@
 package com.darekbx.geotracker.ui.home.mappreview
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.geotracker.repository.entities.SimplePointDto
@@ -19,11 +20,15 @@ sealed class MapPreviewUiState {
 @HiltViewModel
 class MapPreviewViewModel @Inject constructor(
     private val getLatestTracksUseCase: GetLatestTracksUseCase,
+    private val osmMapPreferences: SharedPreferences
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MapPreviewUiState>(MapPreviewUiState.Idle)
     val uiState: Flow<MapPreviewUiState>
         get() = _uiState
+
+    val mapPreferences: SharedPreferences
+        get() = osmMapPreferences
 
     init {
         refresh()

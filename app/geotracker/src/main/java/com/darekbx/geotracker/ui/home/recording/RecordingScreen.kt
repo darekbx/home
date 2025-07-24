@@ -3,6 +3,7 @@ package com.darekbx.geotracker.ui.home.recording
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.view.MotionEvent
 import androidx.compose.foundation.background
@@ -61,10 +62,6 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
-
-fun fixBearingForOsmdroid(bearing: Float): Float {
-    return (360f - bearing) % 360f
-}
 
 @Composable
 fun RecordingScreen(
@@ -164,7 +161,8 @@ fun RecordingScreen(
                                         } else {
                                             R.drawable.ic_direction_marker
                                         }
-                                    }
+                                    },
+                                    mapPreferences = recordingViewState.mapPreferences
                                 ) { mapView, marker ->
                                     map = mapView
                                     positionMarker = marker
@@ -269,6 +267,7 @@ fun PreviewMap(
     gpxTrack: Gpx?,
     onPan: () -> Unit,
     directionMarker: () -> Int,
+    mapPreferences: SharedPreferences,
     ready: (MapView, Marker) -> Unit
 ) {
     val context = LocalContext.current
@@ -276,8 +275,7 @@ fun PreviewMap(
     val zoomToPlace = 17.0
 
     AndroidView(factory = { mapView }) { map ->
-        Configuration.getInstance()
-            .load(context, context.getSharedPreferences("osm", Context.MODE_PRIVATE))
+        Configuration.getInstance().load(context, mapPreferences)
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
         map.overlays.removeIf { it is Marker }
@@ -313,4 +311,8 @@ fun PreviewMap(
 
         ready(map, positionMarker)
     }
+}
+
+fun fixBearingForOsmdroid(bearing: Float): Float {
+    return (360f - bearing) % 360f
 }

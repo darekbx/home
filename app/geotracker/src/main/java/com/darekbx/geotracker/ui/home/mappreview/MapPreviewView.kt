@@ -1,6 +1,7 @@
 package com.darekbx.geotracker.ui.home.mappreview
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Color
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,7 +54,7 @@ fun MapPreviewView(
         ) {
             when (state) {
                 is MapPreviewUiState.InProgress -> LoadingProgress()
-                is MapPreviewUiState.Done -> MapView(state.data)
+                is MapPreviewUiState.Done -> MapView(state.data, mapPreviewViewState.mapPreferences)
                 else -> {}
             }
         }
@@ -61,7 +62,7 @@ fun MapPreviewView(
 }
 
 @Composable
-private fun MapView(data: Map<Long, List<SimplePointDto>>) {
+private fun MapView(data: Map<Long, List<SimplePointDto>>, mapPreferences: SharedPreferences) {
     val context = LocalContext.current
     val mapView = rememberMapWithLifecycle()
     val zoomToPlace = 13.0
@@ -82,8 +83,7 @@ private fun MapView(data: Map<Long, List<SimplePointDto>>) {
     }
 
     AndroidView(factory = { mapView }) { map ->
-        Configuration.getInstance()
-            .load(context, context.getSharedPreferences("osm", Context.MODE_PRIVATE))
+        Configuration.getInstance().load(context, mapPreferences)
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
         map.setTileSource(TileSourceFactory.MAPNIK)

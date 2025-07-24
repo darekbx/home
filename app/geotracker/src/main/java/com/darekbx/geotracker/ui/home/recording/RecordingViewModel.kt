@@ -1,6 +1,7 @@
 package com.darekbx.geotracker.ui.home.recording
 
 import android.content.ContentResolver
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -39,7 +40,8 @@ class RecordingViewModel @Inject constructor(
     private val getAllTracksUseCase: GetAllTracksUseCase,
     private val getPlacesToVisitUseCase: GetPlacesToVisitUseCase,
     private val gpxReader: GpxReader,
-    private val contentResolver: ContentResolver
+    private val contentResolver: ContentResolver,
+    private val osmMapPreferences: SharedPreferences
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<RecordingUiState>(RecordingUiState.Stopped)
@@ -50,6 +52,9 @@ class RecordingViewModel @Inject constructor(
     var rotationLocked = mutableStateOf(true)
 
     var lastPoint = MutableStateFlow<PointDto?>(null)
+
+    val mapPreferences: SharedPreferences
+        get() = osmMapPreferences
 
     fun onPan() {
         reCenterButtonVisible.value = true

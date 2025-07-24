@@ -3,6 +3,7 @@ package com.darekbx.geotracker.di
 import android.app.NotificationManager
 import android.content.ContentResolver
 import android.content.Context
+import android.content.SharedPreferences
 import android.location.LocationManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -28,6 +29,11 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 class CommonModule {
+
+    @Provides
+    fun provideMapPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences("osm", Context.MODE_PRIVATE)
+    }
 
     @Provides
     fun provideContentResolver(@ApplicationContext context: Context): ContentResolver {

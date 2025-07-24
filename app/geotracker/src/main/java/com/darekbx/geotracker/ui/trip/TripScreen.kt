@@ -1,6 +1,7 @@
 package com.darekbx.geotracker.ui.trip
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.repeatable
@@ -107,7 +108,8 @@ fun TripScreen(
                         MapBox {
                             PreviewMap(
                                 points = state.data.points,
-                                allPoints = state.allPoints
+                                allPoints = state.allPoints,
+                                mapPreferences = tripState.mapPreferences
                             ) { mapView ->
                                 map = mapView
                             }
@@ -383,14 +385,17 @@ fun ColumnScope.MapBox(contents: @Composable () -> Unit) {
 }
 
 @Composable
-fun PreviewMap(allPoints: List<List<SimplePointDto>>, points: List<Point>, onMapReady: (MapView) -> Unit) {
+fun PreviewMap(
+    allPoints: List<List<SimplePointDto>>,
+    points: List<Point>,
+    mapPreferences: SharedPreferences,
+    onMapReady: (MapView) -> Unit) {
     val context = LocalContext.current
     val mapView = rememberMapWithLifecycle()
     val zoomToPlace = 17.0
 
     AndroidView(factory = { mapView }) { map ->
-        Configuration.getInstance()
-            .load(context, context.getSharedPreferences("osm", Context.MODE_PRIVATE))
+        Configuration.getInstance().load(context, mapPreferences)
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
         map.setTileSource(TileSourceFactory.MAPNIK)

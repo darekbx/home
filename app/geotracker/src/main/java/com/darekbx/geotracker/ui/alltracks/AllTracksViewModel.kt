@@ -1,5 +1,6 @@
 package com.darekbx.geotracker.ui.alltracks
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.geotracker.domain.usecase.GetAllTracksUseCase
@@ -24,7 +25,8 @@ sealed class AllTracksUiState {
 @HiltViewModel
 class AllTracksViewModel @Inject constructor(
     private val getAllTracksUseCase: GetAllTracksUseCase,
-    private val getPlacesToVisitUseCase: GetPlacesToVisitUseCase
+    private val getPlacesToVisitUseCase: GetPlacesToVisitUseCase,
+    private val osmMapPreferences: SharedPreferences
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AllTracksUiState>(AllTracksUiState.Idle)
@@ -34,6 +36,9 @@ class AllTracksViewModel @Inject constructor(
     init {
         refresh()
     }
+
+    val mapPreferences: SharedPreferences
+        get() = osmMapPreferences
 
     fun refresh() {
         _uiState.value = AllTracksUiState.InProgress

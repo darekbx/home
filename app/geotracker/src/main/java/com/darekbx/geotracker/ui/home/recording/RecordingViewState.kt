@@ -1,5 +1,6 @@
 package com.darekbx.geotracker.ui.home.recording
 
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -12,6 +13,9 @@ class RecordingViewState(
     val state: RecordingUiState
         @Composable get() = recordingViewModel.uiState
             .collectAsState(initial = RecordingUiState.Stopped).value
+
+    val mapPreferences: SharedPreferences
+        get() = recordingViewModel.mapPreferences
 
     fun setIsRecording() {
         recordingViewModel.setIsRecording()

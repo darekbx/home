@@ -1,6 +1,7 @@
 package com.darekbx.geotracker.ui
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.graphics.DashPathEffect
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import com.darekbx.geotracker.repository.model.Point
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
 
 @Composable
@@ -111,6 +113,19 @@ fun MapView.drawLine(
     val mapPoints = collection.map { point -> GeoPoint(point.latitude, point.longitude) }
     polyline.setPoints(mapPoints)
     overlays.add(polyline)
+}
+
+fun MapView.drawCircle(
+    center: GeoPoint,
+    radius: Double
+) {
+    val points = Polygon.pointsAsCircle(center, radius)
+    val polygon = Polygon(this).apply {
+        outlinePaint.color = Color.BLACK
+        outlinePaint.strokeWidth = 3F
+        setPoints(points)
+    }
+    overlays.add(polygon)
 }
 
 

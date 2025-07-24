@@ -1,5 +1,6 @@
 package com.darekbx.geotracker.ui.trip
 
+import android.content.SharedPreferences
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -11,6 +12,9 @@ class TripViewState(
 )  {
     val state: TripUiState
         @Composable get() = tripViewModel.uiState.collectAsState(initial = TripUiState.Idle).value
+
+    val mapPreferences: SharedPreferences
+        get() = tripViewModel.mapPreferences
 
     fun fetch(tripId: Long) {
         tripViewModel.fetch(tripId)

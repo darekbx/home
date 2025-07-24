@@ -1,5 +1,6 @@
 package com.darekbx.geotracker.ui.alltracks
 
+import android.content.SharedPreferences
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -11,6 +12,9 @@ class AllTracksViewState(
     val state: AllTracksUiState
         @Composable get() = allTracksViewModel.uiState.collectAsState(initial = AllTracksUiState.Idle).value
 
+    val mapPreferences: SharedPreferences
+        get() = allTracksViewModel.mapPreferences
+
     fun refresh() {
         allTracksViewModel.refresh()
     }
@@ -18,7 +22,7 @@ class AllTracksViewState(
 
 @Composable
 fun rememberAllTracksViewState(
-    allTracksViewModel: AllTracksViewModel = hiltViewModel()
+    allTracksViewModel: AllTracksViewModel = hiltViewModel(),
 ) = remember {
     AllTracksViewState(allTracksViewModel)
 }

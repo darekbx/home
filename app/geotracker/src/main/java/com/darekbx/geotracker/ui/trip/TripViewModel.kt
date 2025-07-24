@@ -1,5 +1,6 @@
 package com.darekbx.geotracker.ui.trip
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.geotracker.domain.usecase.DeleteAllPointsUseCase
@@ -30,12 +31,16 @@ class TripViewModel @Inject constructor(
     private val trimPointsUseCase: TrimPointsUseCase,
     private val saveLabelUseCase: SaveLabelUseCase,
     private val fixEndTimestampUseCase: FixEndTimestampUseCase,
-    private val allTracksUseCase: GetAllTracksUseCase
+    private val allTracksUseCase: GetAllTracksUseCase,
+    private val osmMapPreferences: SharedPreferences
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<TripUiState>(TripUiState.Idle)
     val uiState: Flow<TripUiState>
         get() = _uiState
+
+    val mapPreferences: SharedPreferences
+        get() = osmMapPreferences
 
     fun fetch(trackId: Long) {
         viewModelScope.launch {

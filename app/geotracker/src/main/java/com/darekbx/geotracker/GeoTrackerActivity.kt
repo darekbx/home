@@ -51,12 +51,15 @@ import com.darekbx.geotracker.ui.theme.GeoTrackerTheme
 import com.darekbx.geotracker.ui.theme.LocalColors
 import com.google.firebase.FirebaseApp
 import dagger.hilt.android.AndroidEntryPoint
+import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
 /**
  * TODO:
  *  - add ability to edit track
  */
+
+val DEFAULT_LOCATION = GeoPoint(52.1528, 21.0176)
 
 @AndroidEntryPoint
 class GeoTrackerActivity : LauncherActivity() {
