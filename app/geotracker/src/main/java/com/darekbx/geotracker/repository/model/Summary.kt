@@ -2,7 +2,8 @@ package com.darekbx.geotracker.repository.model
 
 data class SummaryWrapper(
     val summary: Summary,
-    val yearSummary: Summary
+    val yearSummary: Summary,
+    val onKonaUnit: Double
 )
 
 data class Summary(

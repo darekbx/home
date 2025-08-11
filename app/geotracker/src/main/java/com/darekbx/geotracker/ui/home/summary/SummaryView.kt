@@ -45,7 +45,6 @@ fun SummaryView(
     Box(
         modifier = modifier
             .defaultCard()
-            .height(114.dp)
             .clickable { summaryViewState.refresh() },
         contentAlignment = Alignment.Center
     ) {
@@ -91,13 +90,20 @@ fun SummaryBox(
             )
             SummaryRow(summaryWrapper.yearSummary)
             Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "On Kona Unit",
+                style = LocalStyles.current.grayLabel
+            )
+            Text(
+                text = "${summaryWrapper.onKonaUnit.toInt()}km",
+                style = LocalStyles.current.boldLabel
+            )
         }
 
         Column(
             modifier = Modifier.padding(end = 8.dp),
             horizontalAlignment = Alignment.End
         ) {
-
             Text(
                 text = "Max speed",
                 style = LocalStyles.current.grayLabel
@@ -158,8 +164,9 @@ fun SummaryPreview() {
     GeoTrackerTheme {
         SummaryBox(
             summaryWrapper = SummaryWrapper(
-                Summary(5213.27, 8287800, 213),
+                Summary(25213.27, 8287800, 213),
                 Summary(2430.02, 21004, 81),
+                43121.0
             ),
             maxSpeed = 52.4F
         )

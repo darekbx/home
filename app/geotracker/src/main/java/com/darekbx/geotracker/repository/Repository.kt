@@ -27,7 +27,7 @@ interface BaseRepository {
 
     suspend fun fetchAllTrackPoints(nthPointsToSkip: Int): List<List<SimplePointDto>>
 
-    suspend fun fetchMaxSpeed(exceptions: List<Long>): PointDto?
+    suspend fun fetchMaxSpeed(): PointDto?
 
     suspend fun fetchUnFinishedTracks(): List<TrackDto>
 
@@ -82,8 +82,9 @@ class Repository @Inject constructor(
     private val geoTrackerHelper: GeoTrackerHelper?
 ) : BaseRepository {
 
-    override suspend fun fetchMaxSpeed(exceptions: List<Long>): PointDto? {
-        return pointDao.fetchMaxSpeed(exceptions.toLongArray())
+    override suspend fun fetchMaxSpeed(): PointDto? {
+        val startTimestamp = currentYearTimestamp()
+        return pointDao.fetchMaxSpeed(startTimestamp.timeInMillis)
             .firstOrNull()
     }
 

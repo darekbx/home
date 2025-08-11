@@ -235,6 +235,7 @@ fun HomeScreenPreview() {
                         summaryWrapper = SummaryWrapper(
                             Summary(5213.27, 8287800, 213),
                             Summary(2430.02, 21004, 81),
+                            2411.0,
                         ),
                         maxSpeed = 52.4F
                     )

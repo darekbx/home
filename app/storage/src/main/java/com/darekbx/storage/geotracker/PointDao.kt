@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PointDao {
 
-    @Query("SELECT * FROM geo_point WHERE track_id NOT IN (:exceptions) ORDER BY speed DESC LIMIT 1")
-    suspend fun fetchMaxSpeed(exceptions: LongArray): List<PointDto>
+    @Query("SELECT * FROM geo_point WHERE timestamp > :fromTimestamp ORDER BY speed DESC LIMIT 1")
+    suspend fun fetchMaxSpeed(fromTimestamp: Long): List<PointDto>
 
     @Insert
     suspend fun addAll(dtos: List<PointDto>)

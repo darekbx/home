@@ -8,11 +8,9 @@ import javax.inject.Inject
 class GetMaxSpeedUseCase @Inject constructor(
     private val repository: BaseRepository
 ) {
-    // Exceptions for motorcycle
-    private val exceptions = listOf(1118L, 1117L)
-
+    // Year max speed
     suspend fun getMaxSpeed(): Float {
-        val point = repository.fetchMaxSpeed(exceptions)
+        val point = repository.fetchMaxSpeed()
         Log.v(TAG, "TrackId with max speed: ${point?.trackId}")
         val speed = point?.speed ?: return -1F
         return SpeedUtils.msToKm(speed)
