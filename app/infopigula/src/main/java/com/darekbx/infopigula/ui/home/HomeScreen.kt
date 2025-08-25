@@ -47,11 +47,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.common.ui.InformationDialog
-import com.darekbx.common.ui.isScrolledToEnd
-import com.darekbx.infopigula.domain.GetNewsUseCase
-import com.darekbx.infopigula.model.Group
+import com.darekbx.infopigula.model.Category
 import com.darekbx.infopigula.model.LastRelease
-import com.darekbx.infopigula.model.News
+import com.darekbx.infopigula.model.SingleNews
 import com.darekbx.infopigula.ui.theme.InfoPigulaTheme
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
@@ -63,24 +61,16 @@ fun HomeScreen(
     val groups = homeViewModel.groups
     val lastReleases = homeViewModel.lastReleases
 
-    var page by remember { mutableIntStateOf(0) }
     val state = rememberLazyListState()
-    val isAtBottom by remember { derivedStateOf { state.isScrolledToEnd() } }
     val uiState by homeViewModel.uiState.collectAsState(initial = HomeUiState.Idle)
     var errorDialogVisible by remember { mutableStateOf(false) }
 
-    var activeGroup by remember { mutableIntStateOf(GetNewsUseCase.DEFAULT_GROUP) }
+    var activeGroup by remember { mutableStateOf(groups.firstOrNull()?.name) }
     var activeReleaseId by remember { mutableStateOf<Int?>(null) }
 
-    LaunchedEffect(activeGroup, activeReleaseId) {
-        page = 0
-        homeViewModel.loadNews(activeGroup, page, activeReleaseId)
-    }
-
-    LaunchedEffect(isAtBottom) {
-        if (isAtBottom && homeViewModel.hasNextPage) {
-            page += 1
-            homeViewModel.loadNews(activeGroup, page, activeReleaseId)
+    LaunchedEffect(Unit) {
+        homeViewModel.loadNews {
+            activeGroup = it.name
         }
     }
 
@@ -106,7 +96,7 @@ fun HomeScreen(
                 Modifier.fillMaxWidth(),
                 groups,
                 lastReleases,
-                activeGroup,
+                activeGroup ?: "",
                 openGroup = { groupId -> activeGroup = groupId },
                 releaseClicked = { releaseId -> activeReleaseId = releaseId }
             )
@@ -117,7 +107,7 @@ fun HomeScreen(
                 contentAlignment = Alignment.TopStart
             ) {
                 LazyColumn(state = state) {
-                    itemsIndexed(items = newsStream) { index, item ->
+                    itemsIndexed(items = groups.firstOrNull { it.name == activeGroup }?.news ?: emptyList()) { index, item ->
                         NewsItem(news = item, index = index)
                     }
                 }
@@ -144,11 +134,11 @@ fun HomeScreen(
             }
 
             if (newsStream.isEmpty() && uiState is HomeUiState.Done) {
-                Text(
+                /*Text(
                     text = "Nothing to show...",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground
-                )
+                )*/
             }
         }
     }
@@ -156,7 +146,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun NewsItem(news: News, index: Int) {
+fun NewsItem(news: SingleNews, index: Int) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -183,7 +173,7 @@ fun NewsItem(news: News, index: Int) {
             )
 
             MarkdownText(
-                markdown = news.sourceLogo
+                markdown = news.source.name
             )
 
             Row(
@@ -197,7 +187,7 @@ fun NewsItem(news: News, index: Int) {
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "${news.voteScore} (${news.voteCount})",
+                    text = "${news.rating} (${news.totalVotes})",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -210,10 +200,10 @@ fun NewsItem(news: News, index: Int) {
 @Composable
 fun GroupsRow(
     modifier: Modifier = Modifier,
-    groups: List<Group>,
+    groups: List<Category>,
     lastReleases: List<LastRelease>,
-    selectedGroupId: Int,
-    openGroup: (Int) -> Unit = { },
+    selectedGroup: String,
+    openGroup: (String) -> Unit = { },
     releaseClicked: (Int) -> Unit = { }
 ) {
     Row(modifier = modifier) {
@@ -225,9 +215,9 @@ fun GroupsRow(
         ) {
             items(groups) { group ->
                 GroupItem(
-                    Modifier.clickable { openGroup(group.targetId) },
+                    Modifier.clickable { openGroup(group.name) },
                     group = group,
-                    selected = selectedGroupId == group.targetId
+                    selected = selectedGroup == group.name
                 )
             }
         }
@@ -236,11 +226,11 @@ fun GroupsRow(
 }
 
 @Composable
-fun GroupItem(modifier: Modifier = Modifier, group: Group, selected: Boolean) {
+fun GroupItem(modifier: Modifier = Modifier, group: Category, selected: Boolean) {
     Row {
         Text(
             modifier = modifier.padding(4.dp),
-            text = group.value,
+            text = group.name,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
         )
     }

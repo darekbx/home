@@ -26,7 +26,7 @@ import javax.inject.Singleton
 class CommonModule {
 
     companion object {
-        const val API_BASE_URL = "https://api.infopigula.pl/"
+        const val API_BASE_URL = "https://infopigula.pl:8443/"
     }
 
     @Singleton

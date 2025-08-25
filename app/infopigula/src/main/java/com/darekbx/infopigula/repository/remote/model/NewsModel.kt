@@ -2,7 +2,7 @@ package com.darekbx.infopigula.repository.remote.model
 
 import com.google.gson.annotations.SerializedName
 
-data class NewsResponse(
+data class LegacyNewsResponse(
     val pager: RemotePager,
     @SerializedName("form_options")
     val formOptions: FormOptions,

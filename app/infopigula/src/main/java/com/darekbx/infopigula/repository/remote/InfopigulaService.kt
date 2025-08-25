@@ -1,9 +1,9 @@
 package com.darekbx.infopigula.repository.remote
 
+import com.darekbx.infopigula.model.NewsResponse
 import com.darekbx.infopigula.repository.remote.model.Creator
 import com.darekbx.infopigula.repository.remote.model.CurrentUserResponse
 import com.darekbx.infopigula.repository.remote.model.LoginResponse
-import com.darekbx.infopigula.repository.remote.model.NewsResponse
 import com.darekbx.infopigula.repository.remote.model.SubscriptionPlan
 import com.darekbx.infopigula.repository.remote.model.TokenResponse
 import com.darekbx.infopigula.repository.remote.model.UserLogin
@@ -30,7 +30,6 @@ interface InfopigulaService {
 
     @GET("api/v1/creators-app?_format=json")
     suspend fun getCreators(): List<Creator>
-
     @GET("api/subscription_plans")
     suspend fun getSubscriptionPlans(): SubscriptionPlan
 
@@ -40,13 +39,8 @@ interface InfopigulaService {
      * @param showLastRelease 1 when latest news should be fetched
      * @param releaseId pass release id to display other release than latest
      */
-    @GET("api/v1/news-app?_format=json")
-    suspend fun getNews(
-        @Query("group_target_id") groupTargetId: Int,
-        @Query("page") page: Int,
-        @Query("show_last_release") showLastRelease: Int,
-        @Query("release_nids") releaseId: Int? = null
-    ): NewsResponse
+    @GET("api/v1/user-dashboard/release")
+    suspend fun getNews(): NewsResponse
 
     @GET("api/v1/news-app/creators?_format=json&keys=&show_favourites_creators=1")
     suspend fun getCreators(

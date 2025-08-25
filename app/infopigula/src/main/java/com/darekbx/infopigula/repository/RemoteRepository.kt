@@ -1,10 +1,10 @@
 package com.darekbx.infopigula.repository
 
+import com.darekbx.infopigula.model.NewsResponse
 import com.darekbx.infopigula.repository.remote.InfopigulaService
 import com.darekbx.infopigula.repository.remote.model.Creator
 import com.darekbx.infopigula.repository.remote.model.CurrentUserResponse
 import com.darekbx.infopigula.repository.remote.model.LoginResponse
-import com.darekbx.infopigula.repository.remote.model.NewsResponse
 import com.darekbx.infopigula.repository.remote.model.TokenResponse
 import com.darekbx.infopigula.repository.remote.model.UserLogin
 import com.darekbx.infopigula.repository.remote.model.UserResponse
@@ -20,12 +20,7 @@ interface RemoteRepository {
 
     suspend fun currentUser(): List<CurrentUserResponse>
 
-    suspend fun getNews(
-        groupTargetId: Int,
-        page: Int,
-        showLastRelease: Int,
-        releaseId: Int? = null
-    ): NewsResponse
+    suspend fun getNews(): NewsResponse
 
     suspend fun getCreators(
         page: Int,
@@ -55,13 +50,8 @@ class DefaultRemoteRepository @Inject constructor(
         return infopigulaService.getCurrentUser()
     }
 
-    override suspend fun getNews(
-        groupTargetId: Int,
-        page: Int,
-        showLastRelease: Int,
-        releaseId: Int?
-    ): NewsResponse {
-        return infopigulaService.getNews(groupTargetId, page, showLastRelease, releaseId)
+    override suspend fun getNews(): NewsResponse {
+        return infopigulaService.getNews()
     }
 
     override suspend fun getCreators(
