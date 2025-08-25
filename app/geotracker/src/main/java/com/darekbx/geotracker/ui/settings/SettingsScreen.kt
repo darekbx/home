@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -31,7 +32,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,6 +44,8 @@ import com.darekbx.geotracker.ui.LoadingProgress
 import com.darekbx.geotracker.ui.theme.GeoTrackerTheme
 import com.darekbx.geotracker.ui.theme.LocalStyles
 import com.darekbx.geotracker.ui.theme.inputColors
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 
 @Composable
 fun SettingsScreen(
@@ -49,6 +56,13 @@ fun SettingsScreen(
     var isSyncRunning by remember { mutableStateOf(false) }
     var addManuallyDialog by remember { mutableStateOf(false) }
     var syncProgress by remember { mutableStateOf(Pair(1000, 0)) }
+    var pointsCount by remember { mutableLongStateOf(0L) }
+
+    LaunchedEffect(Unit) {
+        settingsViewState.getPointsCount { count ->
+            pointsCount = count
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -67,6 +81,7 @@ fun SettingsScreen(
                     showYearSummary,
                     uploadLastLocation,
                     dataToSynchronize,
+                    pointsCount,
                     onSave = { nthPointsToSkipValue, gpsMinDistanceValue, gpsUpdateIntervalValue, showYearSummaryValue, uploadLastLocation ->
                         settingsViewState.save(
                             nthPointsToSkipValue,
@@ -134,6 +149,7 @@ fun SettingsContainer(
     showYearSummary: Boolean,
     uploadLastLocation: Boolean,
     dataToSynchronize: Int?,
+    pointsCount: Long,
     onSave: (Int, Float, Long, Boolean, Boolean) -> Unit,
     onSynchronizeClick: () -> Unit,
     onAddManuallyClick: () -> Unit
@@ -207,6 +223,7 @@ fun SettingsContainer(
                 save()
             }
         )
+
         InputLabel("Upload last location")
         Checkbox(
             checked = uploadLastLocationValue,
@@ -214,6 +231,18 @@ fun SettingsContainer(
                 uploadLastLocationValue = it
                 save()
             }
+        )
+
+        Text(
+            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+            text = buildAnnotatedString {
+                append("Points count: ")
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color.LightGray)) {
+                    append(formatNumberWithSpaces(pointsCount))
+                }
+            },
+            style = LocalStyles.current.grayLabel,
+            fontSize = 14.sp,
         )
 
         InputLabel("Synchronization with Firebase Cloud")
@@ -243,6 +272,14 @@ fun SettingsContainer(
     }
 }
 
+private fun formatNumberWithSpaces(number: Long): String {
+    val formatter = DecimalFormat("#,##0")
+    val symbols = DecimalFormatSymbols()
+    symbols.groupingSeparator = ' '
+    formatter.decimalFormatSymbols = symbols
+    return formatter.format(number)
+}
+
 @Composable
 private fun InputLabel(label: String) {
     Text(
@@ -264,6 +301,7 @@ private fun SettingsContainerPreview() {
             showYearSummary = true,
             uploadLastLocation = true,
             dataToSynchronize = null,
+            pointsCount = 5135100L,
             { _, _, _, _, _ -> },
             { },
             { }

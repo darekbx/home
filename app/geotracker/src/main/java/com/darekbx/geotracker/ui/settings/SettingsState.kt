@@ -11,6 +11,10 @@ class SettingsViewState(
     val state: SettingsUiState
         @Composable get() = settingsViewModel.uiState.collectAsState(initial = SettingsUiState.Idle).value
 
+    fun getPointsCount(count: (Long) -> Unit) {
+        settingsViewModel.getPointsCount(count)
+    }
+
     fun deleteAndRestore() {
         settingsViewModel.deleteAndRestore()
     }

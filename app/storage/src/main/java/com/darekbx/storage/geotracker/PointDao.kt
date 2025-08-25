@@ -40,6 +40,9 @@ interface PointDao {
     @Query("DELETE FROM geo_point")
     suspend fun deleteAll()
 
+    @Query("SELECT COUNT(id) FROM geo_point")
+    suspend fun countPoints(): Long
+
     /*
         @Query("SELECT * FROM geo_point WHERE track_id = :trackId")
         suspend fun fetchByTrack(trackId: Long): LiveData<List<PointDto>>

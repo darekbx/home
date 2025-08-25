@@ -37,7 +37,7 @@ class StocksViewModel @Inject constructor(
             rateInfoList.clear()
 
             val color = Color(160, 160, 160)
-            val currencies = listOf(CurrencyDto(1, "River State", RIVER_STATE))// stocksRepository.currencies()
+            val currencies = stocksRepository.currencies()
 
             currencies.forEach { currency ->
                 if (currency.queryParam == RIVER_STATE) {

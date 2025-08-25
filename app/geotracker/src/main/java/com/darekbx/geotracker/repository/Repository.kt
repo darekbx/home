@@ -67,6 +67,8 @@ interface BaseRepository {
 
     suspend fun countPlacesToVisit(): Int
 
+    suspend fun countPoints(): Long
+
     /**
      * WARNING
      * Deletes all data and restores from legacy db
@@ -209,6 +211,10 @@ class Repository @Inject constructor(
 
     override suspend fun countPlacesToVisit(): Int {
         return placeDao.countAll()
+    }
+
+    override suspend fun countPoints(): Long {
+        return pointDao.countPoints()
     }
 
     /**
