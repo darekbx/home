@@ -33,11 +33,6 @@ class AppModule {
     }
 
     @Provides
-    fun provideContentResolver(@ApplicationContext context: Context): ContentResolver {
-        return context.contentResolver
-    }
-
-    @Provides
     fun provideSpreadSheetUseCases(
         spreadSheetDao: SpreadSheetDao,
         cellDao: CellDao

@@ -36,11 +36,6 @@ class CommonModule {
     }
 
     @Provides
-    fun provideContentResolver(@ApplicationContext context: Context): ContentResolver {
-        return context.contentResolver
-    }
-
-    @Provides
     fun provideGpxReader(): GpxReader {
         return GpxReader()
     }

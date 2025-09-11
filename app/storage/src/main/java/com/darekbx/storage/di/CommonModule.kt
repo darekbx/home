@@ -1,5 +1,6 @@
 package com.darekbx.storage.di
 
+import android.content.ContentResolver
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -65,6 +66,11 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ho
 @Module
 @InstallIn(SingletonComponent::class)
 class CommonModule {
+
+    @Provides
+    fun provideContentResolver(@ApplicationContext context: Context): ContentResolver {
+        return context.contentResolver
+    }
 
     @Provides
     fun provideOkHttpClient() = OkHttpClient.Builder()
