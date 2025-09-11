@@ -43,6 +43,8 @@ import com.darekbx.storage.lifetimememo.SearchDao
 import com.darekbx.storage.stocks.StocksDao
 import com.darekbx.storage.notes.NotesDao
 import com.darekbx.storage.riverstatus.WaterLevelDao
+import com.darekbx.storage.spreadsheet.CellDao
+import com.darekbx.storage.spreadsheet.SpreadSheetDao
 import com.darekbx.storage.task.TaskDao
 import com.darekbx.storage.timeline.TimelineDao
 import com.darekbx.storage.vault.VaultDao
@@ -220,6 +222,16 @@ class CommonModule {
     @Provides
     fun provideWordsDao(database: HomeDatabase): WordDao {
         return database.wordsDao()
+    }
+
+    @Provides
+    fun provideCellDao(database: HomeDatabase): CellDao {
+        return database.cellDao()
+    }
+
+    @Provides
+    fun provideSpreadSheetDao(database: HomeDatabase): SpreadSheetDao {
+        return database.spreadSheetDao()
     }
 
     @Singleton

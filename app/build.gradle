@@ -11,7 +11,7 @@ apply from: '../dependencies.gradle'
 
 android {
     namespace 'com.darekbx.home'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.darekbx.home"
@@ -78,8 +78,8 @@ dependencies {
 
     implementation project(':app:common')
 
-    // To change which app should be run at first, move to top correct one:
-    implementation project(':app:stocks')
+    // To change which app should be run at first, move to top correct one
+    implementation project(':app:spreadsheet')
     implementation project(':app:infopigula')
     implementation project(':app:weather')
     implementation project(':app:geotracker')

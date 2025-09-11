@@ -19,6 +19,7 @@ rootProject.name = "home"
 include ':app'
 include ':app:storage'
 include ':app:common'
+include ':app:spreadsheet'
 include ':app:stocks'
 include ':app:infopigula'
 include ':app:weather'

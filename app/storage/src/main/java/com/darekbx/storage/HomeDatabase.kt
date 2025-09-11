@@ -44,6 +44,10 @@ import com.darekbx.storage.notes.NoteDto
 import com.darekbx.storage.notes.NotesDao
 import com.darekbx.storage.riverstatus.WaterLevelDao
 import com.darekbx.storage.riverstatus.WaterLevelDto
+import com.darekbx.storage.spreadsheet.CellDao
+import com.darekbx.storage.spreadsheet.SpreadSheetDao
+import com.darekbx.storage.spreadsheet.entities.CellDto
+import com.darekbx.storage.spreadsheet.entities.SpreadSheetDto
 import com.darekbx.storage.task.TaskDao
 import com.darekbx.storage.task.TaskDto
 import com.darekbx.storage.timeline.TimelineCategoryDto
@@ -103,10 +107,13 @@ import com.darekbx.storage.words.WordDto
         FavouriteCategoryDto::class,
         FavouriteItemDto::class,
         // Words
-        WordDto::class
+        WordDto::class,
+        // Spreadsheet
+        CellDto::class,
+        SpreadSheetDto::class
     ],
     exportSchema = true,
-    version = 18
+    version = 19
 )
 abstract class HomeDatabase : RoomDatabase() {
 
@@ -167,6 +174,11 @@ abstract class HomeDatabase : RoomDatabase() {
 
     // Words
     abstract fun wordsDao(): WordDao
+
+    // Spreadsheet
+    abstract fun cellDao(): CellDao
+
+    abstract fun spreadSheetDao(): SpreadSheetDao
 
     companion object {
         const val DB_NAME = "home_db"
@@ -302,6 +314,13 @@ abstract class HomeDatabase : RoomDatabase() {
         val MIGRATION_17_18 = object : Migration(17, 18) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `word_item` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `word` TEXT NOT NULL, `translation` TEXT NOT NULL, `checked_count` INTEGER NOT NULL, `is_archived` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL)")
+            }
+        }
+
+        val MIGRATION_18_19 = object : Migration(18, 19) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `cell` (`uid` TEXT NOT NULL, `sheet_uid` TEXT NOT NULL, `row_index` INTEGER NOT NULL, `column_index` INTEGER NOT NULL, `value` TEXT NOT NULL, `formula` TEXT NOT NULL, `style` TEXT NOT NULL, `width` INTEGER NOT NULL, PRIMARY KEY(`uid`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `spread_sheet` (`uid` TEXT NOT NULL, `name` TEXT NOT NULL, `parent_name` TEXT NOT NULL, `parent_uid` TEXT, `created_timestamp` INTEGER NOT NULL, `updated_timestamp` INTEGER NOT NULL, PRIMARY KEY(`uid`))")
             }
         }
     }
