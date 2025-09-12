@@ -1,5 +1,6 @@
 package com.darekbx.spreadsheet.navigation
 
+import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +21,7 @@ fun SpreadsheetNavigation(modifier: Modifier = Modifier) {
         composable(RouteSheets.route) {
             SpreadSheets(
                 openItem = { sheet ->
-                    navController.navigate(RouteSheet.build(sheet.uid))
+                    navController.navigate(RouteSheet.build(sheet.uid, sheet.parentName))
                 }
             )
         }
@@ -28,8 +29,8 @@ fun SpreadsheetNavigation(modifier: Modifier = Modifier) {
             route = RouteSheet.routeWithArgs,
             arguments = RouteSheet.arguments
         ) { backStackEntry ->
-            val uid = RouteSheet.parse(backStackEntry.arguments!!)
-            SpreadsheetGrid(spreadSheetUid = uid!!)
+            val (uid, name) = RouteSheet.parse(backStackEntry.arguments ?: Bundle())
+            SpreadsheetGrid(spreadSheetUid = uid!!, parentName = name!!)
         }
     }
 }

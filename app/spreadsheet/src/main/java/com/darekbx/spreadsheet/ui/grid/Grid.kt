@@ -71,6 +71,7 @@ import kotlin.collections.forEach
 @Composable
 fun SpreadsheetGrid(
     spreadSheetUid: String,
+    parentName: String,
     viewModel: GridViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -90,11 +91,7 @@ fun SpreadsheetGrid(
             TopAppBar(
                 title = {
                     activeSpreadSheet?.let {
-                        if (it.parentName.isBlank()) {
-                            Text(it.name)
-                        } else {
-                            Text("${it.parentName} (${it.name})")
-                        }
+                        Text("$parentName (${it.name})")
                     }
                 },
                 actions = {
