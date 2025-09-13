@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterialApi::class)
-
 package com.darekbx.geotracker.ui.trips
 
 import androidx.compose.foundation.background
@@ -21,10 +19,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -66,6 +65,7 @@ import com.darekbx.geotracker.ui.trips.viewmodels.TripsUiState
 import com.darekbx.geotracker.ui.trips.viewmodels.YearsUiState
 import de.charlex.compose.RevealDirection
 import de.charlex.compose.RevealSwipe
+import de.charlex.compose.rememberRevealState
 
 @Composable
 fun TripsScreen(
@@ -242,7 +242,7 @@ fun TripsList(
                 true
             }
         }) { track ->
-            RevealSwipe(
+            /*RevealSwipe(
                 modifier = Modifier
                     .padding(vertical = 5.dp)
                     .padding(start = 8.dp, end = 8.dp),
@@ -257,10 +257,54 @@ fun TripsList(
                         contentDescription = null
                     )
                 }
+            ) {*/
+
+            val state = rememberRevealState(
+                directions = setOf(
+                    RevealDirection.EndToStart,
+                )
+            )
+            RevealSwipe(
+                modifier = Modifier
+                    .padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 4.dp),
+                backgroundCardEndColor = LocalColors.current.red,
+                backgroundCardStartColor =  LocalColors.current.green,
+                backgroundStartActionLabel = "",
+                backgroundEndActionLabel = "Delete",
+                shape = RoundedCornerShape(8.dp),
+                card = { shape, shapeContent ->
+                    Card(
+                        modifier = Modifier.matchParentSize(),
+                        colors = CardDefaults.cardColors(
+                            contentColor = MaterialTheme.colorScheme.onSecondary,
+                            containerColor = Color.Transparent
+                        ),
+                        shape = shape,
+                        content = shapeContent
+                    )
+                },
+                onBackgroundEndClick = {
+                    onItemDeleteClick(track)
+                    true
+                },
+                hiddenContentEnd = {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        tint = Color.White,
+                        contentDescription = null
+                    )
+                },
+                state = state
             ) {
-                TripListItem(modifier = Modifier
-                    .padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 4.dp)
-                    .clickable { onItemClick(track) }, track = track)
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.Black),
+                    shape = it,
+                ) {
+                    TripListItem(
+                        modifier = Modifier
+                        .clickable { onItemClick(track) }, track = track
+                    )
+                }
             }
         }
     }

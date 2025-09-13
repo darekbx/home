@@ -28,7 +28,6 @@ ext {
             markdown                  : "com.github.jeziellago:compose-markdown:0.3.1",
             osmdroid                  : "org.osmdroid:osmdroid-android:6.1.13",
             accompanist               : "com.google.accompanist:accompanist-permissions:0.32.0",
-            swipe                     : "de.charlex.compose:revealswipe:1.2.0",
             swipe3                    : "de.charlex.compose:revealswipe:3.0.0",
             gson                      : "com.google.code.gson:gson:2.10.1"
     ]

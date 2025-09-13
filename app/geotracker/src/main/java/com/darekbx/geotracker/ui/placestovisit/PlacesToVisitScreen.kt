@@ -13,12 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +42,7 @@ import com.darekbx.geotracker.ui.theme.LocalStyles
 import com.darekbx.geotracker.ui.trip.LabelDialog
 import de.charlex.compose.RevealDirection
 import de.charlex.compose.RevealSwipe
+import de.charlex.compose.rememberRevealState
 import org.osmdroid.util.GeoPoint
 
 @Composable
@@ -126,7 +128,6 @@ private fun ActionButtons(onAddClick: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PlacesList(
     places: List<PlaceToVisit>,
@@ -139,28 +140,53 @@ fun PlacesList(
             .padding(top = 4.dp)
     ) {
         items(places) { place ->
+            val state = rememberRevealState(
+                directions = setOf(
+                    RevealDirection.EndToStart,
+                )
+            )
             RevealSwipe(
                 modifier = Modifier
-                    .padding(vertical = 5.dp)
-                    .padding(start = 8.dp, end = 8.dp),
+                    .padding(start = 8.dp, top = 8.dp, end = 8.dp),
                 backgroundCardEndColor = LocalColors.current.red,
-                onBackgroundEndClick = { onItemDeleteClick(place) },
-                directions = setOf(RevealDirection.EndToStart),
+                backgroundCardStartColor =  LocalColors.current.green,
+                backgroundStartActionLabel = "",
+                backgroundEndActionLabel = "Delete",
+                shape = RoundedCornerShape(8.dp),
+                card = { shape, shapeContent ->
+                    Card(
+                        modifier = Modifier.matchParentSize(),
+                        colors = CardDefaults.cardColors(
+                            contentColor = MaterialTheme.colorScheme.onSecondary,
+                            containerColor = Color.Transparent
+                        ),
+                        shape = shape,
+                        content = shapeContent
+                    )
+                },
+                onBackgroundEndClick = {
+                    onItemDeleteClick(place)
+                    true
+                },
                 hiddenContentEnd = {
                     Icon(
-                        modifier = Modifier.padding(horizontal = 25.dp),
                         imageVector = Icons.Outlined.Delete,
                         tint = Color.White,
                         contentDescription = null
                     )
-                }
+                },
+                state = state
             ) {
-                PlaceListItem(
-                    modifier = Modifier
-                        .padding(start = 8.dp, top = 8.dp, end = 8.dp)
-                        .clickable { onItemClick(place) },
-                    placeToVisit = place
-                )
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.Black),
+                    shape = it,
+                ) {
+                    PlaceListItem(
+                        modifier = Modifier
+                            .clickable { onItemClick(place) },
+                        placeToVisit = place
+                    )
+                }
             }
         }
     }

@@ -58,7 +58,7 @@ dependencies {
     implementation androidx.lifecycle_service
     implementation androidx.data_store
 
-    implementation other.swipe
+    implementation other.swipe3
 
     testImplementation other.junit
     testImplementation other.mockk_android

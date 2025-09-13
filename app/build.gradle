@@ -84,7 +84,6 @@ dependencies {
     implementation project(':app:weather')
     implementation project(':app:stocks')
     implementation project(':app:geotracker')
-    implementation project(':app:favourites')
     implementation project(':app:geotracker')
     implementation project(':app:timeline')
     implementation project(':app:backup')
@@ -98,6 +97,7 @@ dependencies {
     implementation project(':app:lifetimememo')
 
     // Disabled
+    //implementation project(':app:favourites')
     //implementation project(':app:rssreader')
     //implementation project(':app:diggpl')
     //implementation project(':app:hejto')

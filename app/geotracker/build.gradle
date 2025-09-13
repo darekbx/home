@@ -71,7 +71,7 @@ dependencies {
     implementation other.accompanist
     implementation other.gson
 
-    implementation other.swipe
+    implementation other.swipe3
     implementation "io.github.boguszpawlowski.composecalendar:composecalendar:1.1.1"
 
     implementation platform('com.google.firebase:firebase-bom:32.7.4')
