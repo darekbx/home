@@ -82,6 +82,7 @@ dependencies {
     implementation project(':app:spreadsheet')
     implementation project(':app:infopigula')
     implementation project(':app:weather')
+    implementation project(':app:stocks')
     implementation project(':app:geotracker')
     implementation project(':app:favourites')
     implementation project(':app:geotracker')
