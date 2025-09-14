@@ -420,10 +420,10 @@ fun SpreadSheetsRowPreview() {
     BasicSpreadsheetTheme {
         SpreadSheetsRow(
             spreadSheets = listOf(
-                SpreadSheet(uid = "1", parentName = "Parent", name = "Sheet 1", created = "2024-06-01", updated = "2025-06-01"),
-                SpreadSheet(uid = "2", parentName = "", name = "Sheet 2", created = "2024-06-01", updated = "2025-06-01"),
-                SpreadSheet(uid = "3", parentName = "", name = "Sheet 3", created = "2024-06-01", updated = "2025-06-01"),
-                SpreadSheet(uid = "3", parentName = "", name = "Sheet 4", created = "2024-06-01", updated = "2025-06-01"),
+                SpreadSheet(uid = "1", parentName = "Parent", name = "Sheet 1", created = "2024-06-01", updated = "2025-06-01", createdTimestamp = 123456789),
+                SpreadSheet(uid = "2", parentName = "", name = "Sheet 2", created = "2024-06-01", updated = "2025-06-01", createdTimestamp = 123456789),
+                SpreadSheet(uid = "3", parentName = "", name = "Sheet 3", created = "2024-06-01", updated = "2025-06-01", createdTimestamp = 123456789),
+                SpreadSheet(uid = "3", parentName = "", name = "Sheet 4", created = "2024-06-01", updated = "2025-06-01", createdTimestamp = 123456789),
             )
         )
     }

@@ -11,6 +11,7 @@ data class SpreadSheet(
     val parentName: String,
     val created: String,
     val updated: String,
+    val createdTimestamp: Long,
     val parentUid: String? = null
 ) {
 
@@ -24,6 +25,7 @@ data class SpreadSheet(
                 parentName = parentName,
                 created = TimestampFormatter.formatToDate(createdTimestamp),
                 updated = TimestampFormatter.formatToDate(updatedTimestamp),
+                createdTimestamp = createdTimestamp,
                 parentUid = parentUid
             )
         }

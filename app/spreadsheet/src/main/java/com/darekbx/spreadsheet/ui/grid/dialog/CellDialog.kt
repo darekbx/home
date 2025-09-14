@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toArgb
@@ -182,8 +183,9 @@ private fun ColorsRow(
             Spacer(
                 modifier = Modifier
                     .size(32.dp)
-                    .clickable { onColorChange(it) }
                     .background(it, CircleShape)
+                    .clip(CircleShape)
+                    .clickable { onColorChange(it) }
                     .then(selectedModifier)
             )
         }

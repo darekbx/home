@@ -46,7 +46,7 @@ fun NewSpreadSheetDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Edit Cell") },
+        title = { Text("New spreadsheet") },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (parent) {

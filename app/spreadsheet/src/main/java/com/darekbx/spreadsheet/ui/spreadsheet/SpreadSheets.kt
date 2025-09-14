@@ -246,13 +246,13 @@ private fun SpreadSheetListPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             ItemsList(
                 items = listOf(
-                    SpreadSheet("1", "Parent", "Test 1", "2024-06-01", "2024-08-01").apply {
+                    SpreadSheet("1", "Parent", "Test 1", "2024-06-01", "2024-08-01", 1000).apply {
                         childrenNames = listOf("Child 1", "Child 2", "Child 3")
                     },
-                    SpreadSheet("2", "Parent", "Test 2", "2024-06-01", "2025-06-01"),
-                    SpreadSheet("3", "Parent", "Test 3", "2024-06-01", "2025-06-01"),
-                    SpreadSheet("4", "Parent", "Test 4", "2024-06-01", "2025-06-01"),
-                    SpreadSheet("4", "Parent", "Test 5", "2024-06-01", "2025-06-01")
+                    SpreadSheet("2", "Parent", "Test 2", "2024-06-01", "2025-06-01", 1),
+                    SpreadSheet("3", "Parent", "Test 3", "2024-06-01", "2025-06-01", 2),
+                    SpreadSheet("4", "Parent", "Test 4", "2024-06-01", "2025-06-01", 3),
+                    SpreadSheet("4", "Parent", "Test 5", "2024-06-01", "2025-06-01", 4)
                 )
             )
         }

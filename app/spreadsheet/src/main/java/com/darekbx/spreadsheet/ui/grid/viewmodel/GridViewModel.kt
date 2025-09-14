@@ -58,7 +58,8 @@ class GridViewModel @Inject constructor(
                 val parentSpreadSheet = spreadSheetUseCases.fetchSheet(sheetUid)
                     ?: throw IllegalArgumentException("Sheet with UID $sheetUid not found")
                 val childSpreadSheets = spreadSheetUseCases.fetchSheets(sheetUid)
-                val spreadSheets = listOf(parentSpreadSheet) + childSpreadSheets
+                val spreadSheets = (listOf(parentSpreadSheet) + childSpreadSheets)
+                    .sortedByDescending { it.createdTimestamp }
 
                 if (currentSheet != null) {
                     currentSheet = spreadSheets.firstOrNull { it.uid == currentSheet?.uid }
