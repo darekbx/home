@@ -8,6 +8,7 @@
             android:label="@string/spreadsheet_app_name"
             android:theme="@style/Theme.Home"
             android:launchMode="singleTask"
+            android:icon="@drawable/ic_table"
             android:usesCleartextTraffic="true"
             android:windowSoftInputMode="adjustResize"
             android:noHistory="false">

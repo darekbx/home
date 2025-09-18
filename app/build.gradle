@@ -67,6 +67,10 @@ android {
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            pickFirst 'META-INF/NOTICE.md'
+            pickFirst 'META-INF/LICENSE.md'
+            pickFirst 'META-INF/LICENSE.txt'
+            pickFirst 'META-INF/NOTICE.txt'
         }
     }
 }
@@ -79,6 +83,8 @@ dependencies {
     implementation project(':app:common')
 
     // To change which app should be run at first, move to top correct one
+    implementation project(':app:notebookcheckreader')
+    implementation project(':app:emailbot')
     implementation project(':app:spreadsheet')
     implementation project(':app:infopigula')
     implementation project(':app:weather')
@@ -105,6 +111,7 @@ dependencies {
     //implementation project(':app:words')
 
     implementation androidx.core_ktx
+    implementation androidx.work
     implementation androidx.lifecycle_runtime_ktx
 
     implementation("androidx.core:core-splashscreen:1.0.0")

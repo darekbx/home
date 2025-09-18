@@ -67,11 +67,6 @@ class CommonModule {
     }
 
     @Provides
-    fun provideNotificationManager(@ApplicationContext context: Context): NotificationManager {
-        return context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    }
-
-    @Provides
     fun provideLocationService(@ApplicationContext context: Context): LocationManager {
         return context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
