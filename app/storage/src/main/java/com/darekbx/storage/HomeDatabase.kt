@@ -25,6 +25,8 @@ import com.darekbx.storage.diggpl.SavedEntryDto
 import com.darekbx.storage.diggpl.SavedLinkDto
 import com.darekbx.storage.diggpl.SavedTagDto
 import com.darekbx.storage.dotpad.DotsDao
+import com.darekbx.storage.emailbot.SpamDao
+import com.darekbx.storage.emailbot.SpamDto
 import com.darekbx.storage.favourites.FavouriteCategoryDto
 import com.darekbx.storage.favourites.FavouriteItemDto
 import com.darekbx.storage.favourites.FavouritesDao
@@ -37,6 +39,10 @@ import com.darekbx.storage.hejto.FavouriteTagDto
 import com.darekbx.storage.hejto.HejtoDao
 import com.darekbx.storage.hejto.SavedSlugDto
 import com.darekbx.storage.lifetimememo.SearchDao
+import com.darekbx.storage.notebookcheckreader.RssDao
+import com.darekbx.storage.notebookcheckreader.RssFavouriteItemDto
+import com.darekbx.storage.notebookcheckreader.RssFavouritesDao
+import com.darekbx.storage.notebookcheckreader.RssItemDto
 import com.darekbx.storage.stocks.CurrencyDto
 import com.darekbx.storage.stocks.StocksDao
 import com.darekbx.storage.stocks.RateDto
@@ -110,10 +116,15 @@ import com.darekbx.storage.words.WordDto
         WordDto::class,
         // Spreadsheet
         CellDto::class,
-        SpreadSheetDto::class
+        SpreadSheetDto::class,
+        // Notebookcheck
+        RssItemDto::class,
+        RssFavouriteItemDto::class,
+        // EmailBot
+        SpamDto::class
     ],
     exportSchema = true,
-    version = 19
+    version = 21
 )
 abstract class HomeDatabase : RoomDatabase() {
 
@@ -179,6 +190,14 @@ abstract class HomeDatabase : RoomDatabase() {
     abstract fun cellDao(): CellDao
 
     abstract fun spreadSheetDao(): SpreadSheetDao
+
+    // Notebookcheck
+    abstract fun rssDao(): RssDao
+
+    abstract fun rssFavouriteItemsDao(): RssFavouritesDao
+
+    // EmailBot
+    abstract fun spamDao(): SpamDao
 
     companion object {
         const val DB_NAME = "home_db"
@@ -321,6 +340,19 @@ abstract class HomeDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("CREATE TABLE IF NOT EXISTS `cell` (`uid` TEXT NOT NULL, `sheet_uid` TEXT NOT NULL, `row_index` INTEGER NOT NULL, `column_index` INTEGER NOT NULL, `value` TEXT NOT NULL, `formula` TEXT NOT NULL, `style` TEXT NOT NULL, `width` INTEGER NOT NULL, PRIMARY KEY(`uid`))")
                 database.execSQL("CREATE TABLE IF NOT EXISTS `spread_sheet` (`uid` TEXT NOT NULL, `name` TEXT NOT NULL, `parent_name` TEXT NOT NULL, `parent_uid` TEXT, `created_timestamp` INTEGER NOT NULL, `updated_timestamp` INTEGER NOT NULL, PRIMARY KEY(`uid`))")
+            }
+        }
+
+        val MIGRATION_19_20 = object : Migration(19, 20) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `rss_item` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `link` TEXT NOT NULL, `description` TEXT NOT NULL, `category` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `enclosure` TEXT NOT NULL, `isRead` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `rss_favourite_items` (`id` TEXT NOT NULL, `itemId` TEXT NOT NULL, PRIMARY KEY(`id`))")
+            }
+        }
+
+        val MIGRATION_20_21 = object : Migration(20, 21) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `spam_item` (`id` TEXT NOT NULL PRIMARY KEY, `from` TEXT, `subject` TEXT)")
             }
         }
     }

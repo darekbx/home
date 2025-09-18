@@ -1,5 +1,6 @@
 package com.darekbx.storage.di
 
+import android.app.NotificationManager
 import android.content.ContentResolver
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -21,6 +22,8 @@ import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_15_16
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_16_17
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_17_18
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_18_19
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_19_20
+import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_20_21
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_1_2
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_2_3
 import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_3_4
@@ -33,6 +36,7 @@ import com.darekbx.storage.HomeDatabase.Companion.MIGRATION_9_10
 import com.darekbx.storage.books.BookDao
 import com.darekbx.storage.diggpl.DiggDao
 import com.darekbx.storage.dotpad.DotsDao
+import com.darekbx.storage.emailbot.SpamDao
 import com.darekbx.storage.favourites.FavouritesDao
 import com.darekbx.storage.fuel.FuelDao
 import com.darekbx.storage.hejto.HejtoDao
@@ -42,6 +46,8 @@ import com.darekbx.storage.legacy.OwnSpaceHelper
 import com.darekbx.storage.lifetimememo.BackupDao
 import com.darekbx.storage.lifetimememo.MemoDao
 import com.darekbx.storage.lifetimememo.SearchDao
+import com.darekbx.storage.notebookcheckreader.RssDao
+import com.darekbx.storage.notebookcheckreader.RssFavouritesDao
 import com.darekbx.storage.stocks.StocksDao
 import com.darekbx.storage.notes.NotesDao
 import com.darekbx.storage.riverstatus.WaterLevelDao
@@ -67,6 +73,12 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ho
 @Module
 @InstallIn(SingletonComponent::class)
 class CommonModule {
+
+    @Provides
+    @Singleton
+    fun provideNotificationManager(@ApplicationContext context: Context): NotificationManager {
+        return context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
 
     @Provides
     fun provideContentResolver(@ApplicationContext context: Context): ContentResolver {
@@ -241,6 +253,21 @@ class CommonModule {
         return database.spreadSheetDao()
     }
 
+    @Provides
+    fun provideRssDao(database: HomeDatabase): RssDao {
+        return database.rssDao()
+    }
+
+    @Provides
+    fun provideRssFavouritesDao(database: HomeDatabase): RssFavouritesDao {
+        return database.rssFavouriteItemsDao()
+    }
+
+    @Provides
+    fun provideContentProviderDao(database: HomeDatabase): SpamDao {
+        return database.spamDao()
+    }
+
     @Singleton
     @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): HomeDatabase {
@@ -268,6 +295,8 @@ class CommonModule {
             .addMigrations(MIGRATION_16_17)
             .addMigrations(MIGRATION_17_18)
             .addMigrations(MIGRATION_18_19)
+            .addMigrations(MIGRATION_19_20)
+            .addMigrations(MIGRATION_20_21)
             .build()
     }
 }

@@ -1,0 +1,68 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'com.google.dagger.hilt.android'
+    id 'org.jetbrains.kotlin.plugin.compose'
+    id 'org.jetbrains.kotlin.plugin.serialization' version "1.7.20"
+}
+
+apply from: '../../dependencies.gradle'
+
+android {
+    namespace 'com.darekbx.notebookcheckreader'
+    compileSdk 35
+
+    defaultConfig {
+        minSdk 30
+        targetSdk 33
+
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        //kotlinCompilerExtensionVersion '1.4.0'
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+useCompose()
+useHilt()
+
+dependencies {
+
+    implementation project(':app:common')
+    implementation project(':app:storage')
+
+    implementation androidx.core_ktx
+    implementation androidx.lifecycle_runtime_ktx
+    implementation androidx.work
+    implementation other.coil
+    implementation other.ktor_client_core
+    implementation other.ktor_client_cio
+    implementation other.ktor_client_content_negotiation
+    implementation other.ktor_client_logging
+
+    testImplementation other.junit
+}
