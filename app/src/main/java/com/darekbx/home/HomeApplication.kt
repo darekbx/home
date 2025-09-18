@@ -51,7 +51,7 @@ class HomeApplication: Application(), Configuration.Provider {
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "CleanUpBotWork",
             ExistingPeriodicWorkPolicy.KEEP,
-            dataRefreshWorkRequest
+            cleanUpWorkRequest
         )
     }
 }
