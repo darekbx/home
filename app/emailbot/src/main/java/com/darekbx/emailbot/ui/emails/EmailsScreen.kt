@@ -1,5 +1,6 @@
 package com.darekbx.emailbot.ui.emails
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -28,9 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +48,7 @@ import com.darekbx.emailbot.ui.emails.dialogs.EmailDialog
 import com.darekbx.emailbot.ui.emails.dialogs.ReportSpamDialog
 import com.darekbx.emailbot.ui.ifTrue
 import com.darekbx.emailbot.ui.theme.EmailBotTheme
+import com.darekbx.emailbot.ui.theme.Pink40
 
 @Composable
 fun EmailsScreen(viewModel: EmailsViewModel = hiltViewModel()) {
@@ -61,7 +66,8 @@ fun EmailsScreen(viewModel: EmailsViewModel = hiltViewModel()) {
             is EmailsUiState.Loading -> ProgressView()
             is EmailsUiState.Error -> ErrorView(state.e) { viewModel.resetState() }
             is EmailsUiState.Success -> EmailsList(
-                state.emails,
+                emails = state.emails,
+                spamCount = state.spamCount,
                 onReportSpam = { emailToReport = it },
                 onEmailDelete = { viewModel.deleteEmail(it) },
                 onOpenEmail = { emailToView = it }
@@ -88,9 +94,11 @@ fun EmailsScreen(viewModel: EmailsViewModel = hiltViewModel()) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun EmailsList(
     emails: List<Email>,
+    spamCount: Int,
     onReportSpam: (Email) -> Unit = {},
     onEmailDelete: (Email) -> Unit = {},
     onOpenEmail: (Email) -> Unit = {}
@@ -100,6 +108,18 @@ private fun EmailsList(
             .fillMaxWidth()
             .padding(8.dp)
     ) {
+        if (spamCount > 0) {
+            stickyHeader {
+                Text(
+                    text = "You have $spamCount spam messages",
+                    color = Color(255, 230, 230),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
+                        .background(Pink40, RoundedCornerShape(8.dp)).padding(4.dp)
+                )
+            }
+        }
+
         itemsIndexed(items = emails) { index, email ->
             val backgroundColor = if (index % 2 == 0) {
                 MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
@@ -240,7 +260,7 @@ fun EmailsScreenPreview() {
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.background
         ) {
-            EmailsList(EmailsViewModel.MOCK_EMAILS)
+            EmailsList(EmailsViewModel.MOCK_EMAILS, 10)
         }
     }
 }

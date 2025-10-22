@@ -6,6 +6,7 @@ import com.darekbx.emailbot.BuildConfig
 import com.darekbx.emailbot.bot.CleanUpBot
 import com.darekbx.emailbot.repository.RefreshBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,6 +15,7 @@ import javax.inject.Inject
 
 sealed interface MainUiState {
     data object Idle : MainUiState
+    data class Done(val result: CleanUpBot.Result) : MainUiState
     data object Loading : MainUiState
     data class Error(val e: Throwable) : MainUiState
 }
@@ -31,7 +33,9 @@ class MainActivityViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = MainUiState.Loading
             try {
-                cleanUpBot.cleanUp()
+                val result = cleanUpBot.cleanUp()
+                _uiState.value = MainUiState.Done(result)
+                delay(100) // Wait for Toast
                 _uiState.value = MainUiState.Idle
             } catch (e: Exception) {
                 if (BuildConfig.DEBUG) {

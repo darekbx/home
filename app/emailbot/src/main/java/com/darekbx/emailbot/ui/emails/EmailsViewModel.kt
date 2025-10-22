@@ -24,7 +24,7 @@ sealed interface EmailsUiState {
     data object Idle : EmailsUiState
     data object Loading : EmailsUiState
     data class Error(val e: Throwable) : EmailsUiState
-    data class Success(val emails: List<Email>) : EmailsUiState
+    data class Success(val emails: List<Email>, val spamCount: Int) : EmailsUiState
 }
 
 @HiltViewModel
@@ -61,7 +61,8 @@ class EmailsViewModel @Inject constructor(
                     .sortedByDescending { it.messageNumber }
                 emails.markSpam(spamFilters)
                 val emailsWithoutSpam = emails.filter { !it.isSpam }
-                _uiState.value = EmailsUiState.Success(emailsWithoutSpam)
+                val spamCount = emails.size - emailsWithoutSpam.size
+                _uiState.value = EmailsUiState.Success(emailsWithoutSpam, spamCount)
             } catch (e: Exception) {
                 if (BuildConfig.DEBUG) {
                     e.printStackTrace()

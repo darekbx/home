@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -159,6 +160,7 @@ private fun AppBar(
     uiState: MainUiState = MainUiState.Idle,
     filtersUiState: FiltersUiState = FiltersUiState.Idle
 ) {
+    val context = LocalContext.current
     Surface(shadowElevation = 4.dp) {
         TopAppBar(
             title = { Text("Email Bot") },
@@ -212,6 +214,15 @@ private fun AppBar(
                                     contentDescription = state.e.message,
                                     modifier = Modifier.padding(8.dp)
                                 )
+                            }
+
+                            is MainUiState.Done -> {
+                                Toast.makeText(
+                                    context,
+                                    "Removed ${state.result.removedCount} messages, " +
+                                            "total removed: ${state.result.totalRemovedCount}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
 
                             else -> {
