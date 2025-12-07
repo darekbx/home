@@ -9,8 +9,8 @@ class GetLatestTracksUseCase @Inject constructor(
     private val repository: BaseRepository,
     private val settingsRepository: SettingsRepository
 ) {
-    suspend operator fun invoke(): Map<Long, List<SimplePointDto>> {
+    suspend operator fun invoke(year: Int?): Map<Long, List<SimplePointDto>> {
         val pointsToSkip = settingsRepository.nthPointsToSkip()
-        return repository.fetchYearTrackPoints(pointsToSkip)
+        return repository.fetchYearTrackPoints(year, pointsToSkip)
     }
 }

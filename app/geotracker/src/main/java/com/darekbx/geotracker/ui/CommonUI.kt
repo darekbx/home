@@ -23,10 +23,10 @@ fun LoadingProgress(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Modifier.defaultCard() = this
+fun Modifier.defaultCard(alpha: Float = 1F) = this
     .padding(top = 8.dp, start = 8.dp, end = 8.dp)
     .fillMaxWidth()
     .background(
-        MaterialTheme.colorScheme.primaryContainer,
+        MaterialTheme.colorScheme.primaryContainer.copy(alpha = alpha),
         RoundedCornerShape(8.dp)
     )

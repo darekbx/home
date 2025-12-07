@@ -23,7 +23,7 @@ interface BaseRepository {
 
     suspend fun fetchYears(): List<Int>
 
-    suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>>
+    suspend fun fetchYearTrackPoints(year: Int?, nthPointsToSkip: Int): Map<Long, List<SimplePointDto>>
 
     suspend fun fetchAllTrackPoints(nthPointsToSkip: Int): List<List<SimplePointDto>>
 
@@ -115,10 +115,11 @@ class Repository @Inject constructor(
         return trackDao.fetchAllTracks(startTimestamp.timeInMillis, endTimestamp.timeInMillis)
     }
 
-    override suspend fun fetchYearTrackPoints(nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
-        val startTimestamp = currentYearTimestamp()
+    override suspend fun fetchYearTrackPoints(year: Int?, nthPointsToSkip: Int): Map<Long, List<SimplePointDto>> {
+        val startTimestamp = year?.let { yearStartTimestamp(it) } ?: currentYearTimestamp()
+        val endTimestamp = year?.let { yearEndTimestamp(it) } ?: currentYearEndTimestamp()
         return pointDao
-            .fetchAllPoints(startTimestamp.timeInMillis, nthPointsToSkip)
+            .fetchAllPoints(startTimestamp.timeInMillis, endTimestamp.timeInMillis, nthPointsToSkip)
             .groupBy { it.trackId }
     }
 
@@ -224,6 +225,16 @@ class Repository @Inject constructor(
         return Calendar.getInstance().apply {
             set(Calendar.MONTH, 0)
             set(Calendar.DAY_OF_YEAR, 0)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
+    }
+
+    private fun currentYearEndTimestamp(): Calendar {
+        return Calendar.getInstance().apply {
+            set(Calendar.MONTH, Calendar.JANUARY)
+            set(Calendar.DAY_OF_YEAR, 1)
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)

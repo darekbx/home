@@ -22,6 +22,9 @@ interface PointDao {
     @Query("SELECT track_id, latitude, longitude FROM geo_point WHERE timestamp > :fromTimestamp AND ROWID % :nhtTwoToSkip == 0 ORDER BY timestamp DESC")
     suspend fun fetchAllPoints(fromTimestamp: Long, nhtTwoToSkip: Int): List<SimplePointDto>
 
+    @Query("SELECT track_id, latitude, longitude FROM geo_point WHERE timestamp > :fromTimestamp AND timestamp < :toTimestamp AND ROWID % :nhtTwoToSkip == 0 ORDER BY timestamp DESC")
+    suspend fun fetchAllPoints(fromTimestamp: Long, toTimestamp: Long, nhtTwoToSkip: Int): List<SimplePointDto>
+
     @Query("SELECT track_id, latitude, longitude FROM geo_point WHERE ROWID % :nhtTwoToSkip == 0 ORDER BY timestamp DESC")
     suspend fun fetchAllPoints(nhtTwoToSkip: Int): List<SimplePointDto>
 
