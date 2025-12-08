@@ -17,7 +17,7 @@ sealed class AllTracksUiState {
     object Idle : AllTracksUiState()
     object InProgress : AllTracksUiState()
     class Done(
-        val data: List<List<SimplePointDto>>,
+        val data: Map<Int, List<List<SimplePointDto>>>,
         val placesToVisit: List<PlaceToVisit>
     ) : AllTracksUiState()
 }
@@ -44,7 +44,7 @@ class AllTracksViewModel @Inject constructor(
         _uiState.value = AllTracksUiState.InProgress
         viewModelScope.launch {
             val placesToVisit = getPlacesToVisitUseCase()
-            val latestTracks = getAllTracksUseCase(skipActual = false)
+            val latestTracks = getAllTracksUseCase(skipActual = false, yearMap = true)
             _uiState.value = AllTracksUiState.Done(latestTracks, placesToVisit)
         }
     }

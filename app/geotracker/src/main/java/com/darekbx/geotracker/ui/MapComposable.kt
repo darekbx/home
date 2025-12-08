@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.DashPathEffect
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +29,7 @@ import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
 
 @Composable
-fun MapBox(modifier: Modifier = Modifier, contents: @Composable () -> Unit) {
+fun MapBox(modifier: Modifier = Modifier, contents: @Composable BoxScope.() -> Unit) {
     Box(
         modifier = modifier
             .defaultCard()
@@ -101,10 +102,11 @@ fun MapView.drawLine(
 
 fun MapView.drawLine(
     collection: List<SimplePointDto>,
-    dashed: Boolean = true
+    dashed: Boolean = true,
+    color: Int = Color.parseColor("#C4463B")
 ) {
     val polyline = Polyline().apply {
-        outlinePaint.color = android.graphics.Color.parseColor("#C4463B")
+        outlinePaint.color = color
         outlinePaint.strokeWidth = 6.0F
         if (dashed) {
             outlinePaint.pathEffect = DashPathEffect(floatArrayOf(20f, 10f, 20f), 0F)

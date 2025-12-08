@@ -16,8 +16,8 @@ class MapPreviewViewState(
     val mapPreferences: SharedPreferences
         get() = mapPreviewViewModel.mapPreferences
 
-    fun refresh(year: Int) {
-        mapPreviewViewModel.refresh(year)
+    fun refresh() {
+        mapPreviewViewModel.refresh()
     }
 }
 

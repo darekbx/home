@@ -31,13 +31,13 @@ class MapPreviewViewModel @Inject constructor(
         get() = osmMapPreferences
 
     init {
-        refresh(year = null)
+        refresh()
     }
 
-    fun refresh(year: Int?) {
+    fun refresh() {
         _uiState.value = MapPreviewUiState.InProgress
         viewModelScope.launch {
-            val latestTracks = getLatestTracksUseCase(year)
+            val latestTracks = getLatestTracksUseCase(year = null)
             if (latestTracks.isEmpty()) {
                 _uiState.value = MapPreviewUiState.Idle
             } else {

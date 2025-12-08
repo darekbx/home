@@ -449,6 +449,7 @@ fun YearsScroller(
     modifier: Modifier = Modifier,
     years: List<Int>,
     currentYear: Int,
+    withAll: Boolean = false,
     onYearSelected: (Int) -> Unit = { }
 ) {
     Box(
@@ -475,6 +476,22 @@ fun YearsScroller(
                         textDecoration = if (currentYear == year) TextDecoration.Underline else TextDecoration.None
                     )
                 )
+            }
+            if (withAll) {
+                item {
+                    Text(
+                        modifier = Modifier
+                            .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
+                            .clickable { onYearSelected(-1) },
+                        text = "All",
+                        color = if (currentYear == -1) LocalColors.current.red else Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = if (currentYear == -1) FontWeight.Bold else FontWeight.Normal,
+                        style = TextStyle(
+                            textDecoration = if (currentYear == -1) TextDecoration.Underline else TextDecoration.None
+                        )
+                    )
+                }
             }
         }
     }

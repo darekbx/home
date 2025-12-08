@@ -2,42 +2,23 @@ package com.darekbx.geotracker.ui.home.mappreview
 
 import android.content.SharedPreferences
 import android.graphics.Color
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.repository.entities.SimplePointDto
 import com.darekbx.geotracker.ui.LoadingProgress
 import com.darekbx.geotracker.ui.defaultCard
 import com.darekbx.geotracker.ui.rememberMapWithLifecycle
-import com.darekbx.geotracker.ui.theme.LocalColors
-import com.darekbx.geotracker.ui.trips.states.YearsViewState
-import com.darekbx.geotracker.ui.trips.states.rememberYearsViewState
-import com.darekbx.geotracker.ui.trips.viewmodels.YearsUiState
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -48,18 +29,12 @@ import org.osmdroid.views.overlay.TilesOverlay
 @Composable
 fun MapPreviewView(
     modifier: Modifier = Modifier,
-    mapPreviewViewState: MapPreviewViewState = rememberMapPreviewViewState(),
-    yearsViewState: YearsViewState = rememberYearsViewState()
+    mapPreviewViewState: MapPreviewViewState = rememberMapPreviewViewState()
 ) {
     val state = mapPreviewViewState.state
-    var year by remember { mutableIntStateOf(yearsViewState.currentYear()) }
-
-    LaunchedEffect(year) {
-        mapPreviewViewState.refresh(year)
-    }
 
     LaunchedEffect(Unit) {
-        yearsViewState.loadYears()
+        mapPreviewViewState.refresh()
     }
 
     Box(
@@ -80,65 +55,6 @@ fun MapPreviewView(
                 is MapPreviewUiState.InProgress -> LoadingProgress()
                 is MapPreviewUiState.Done -> MapView(state.data, mapPreviewViewState.mapPreferences)
                 else -> {}
-            }
-        }
-        yearsViewState.state.let {
-            when (it) {
-                is YearsUiState.Done -> YearsScroller(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .fillMaxWidth(),
-                    years = it.years,
-                    currentYear = year
-                ) { selectedYear ->
-                    year = selectedYear
-                }
-
-                YearsUiState.InProgress ->
-                    LoadingProgress(
-                        Modifier
-                            .padding(4.dp)
-                            .size(32.dp)
-                    )
-
-                YearsUiState.Idle -> {}
-            }
-        }
-    }
-}
-
-
-@Composable
-private fun YearsScroller(
-    modifier: Modifier = Modifier,
-    years: List<Int>,
-    currentYear: Int,
-    onYearSelected: (Int) -> Unit = { }
-) {
-    Box(
-        modifier = modifier.defaultCard(alpha = 0.7F),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        val state = rememberLazyListState()
-
-        LaunchedEffect(years) {
-            state.scrollToItem(years.size)
-        }
-
-        LazyRow(Modifier, state) {
-            items(years) { year ->
-                Text(
-                    modifier = Modifier
-                        .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
-                        .clickable { onYearSelected(year) },
-                    text = "$year",
-                    color = if (currentYear == year) LocalColors.current.red else androidx.compose.ui.graphics.Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = if (currentYear == year) FontWeight.Bold else FontWeight.Normal,
-                    style = TextStyle(
-                        textDecoration = if (currentYear == year) TextDecoration.Underline else TextDecoration.None
-                    )
-                )
             }
         }
     }

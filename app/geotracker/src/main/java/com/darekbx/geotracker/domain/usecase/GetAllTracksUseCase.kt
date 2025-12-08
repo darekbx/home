@@ -15,4 +15,13 @@ class GetAllTracksUseCase @Inject constructor(
             .fetchAllTrackPoints(pointsToSkip)
             .drop(if (skipActual) 1 else 0) // Skip actual track
     }
+
+    suspend operator fun invoke(
+        skipActual: Boolean = false,
+        yearMap: Boolean = false
+    ): Map<Int, List<List<SimplePointDto>>> {
+        val pointsToSkip = settingsRepository.nthPointsToSkip()
+        return repository
+            .fetchAllMappedTrackPoints(pointsToSkip)
+    }
 }

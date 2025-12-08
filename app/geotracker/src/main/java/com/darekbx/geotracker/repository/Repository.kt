@@ -69,6 +69,10 @@ interface BaseRepository {
 
     suspend fun countPoints(): Long
 
+    suspend fun fetchYearTrackPoints(year: Int, nthPointsToSkip: Int): List<List<SimplePointDto>>
+
+    suspend fun fetchAllMappedTrackPoints(nthPointsToSkip: Int): Map<Int, List<List<SimplePointDto>>>
+
     /**
      * WARNING
      * Deletes all data and restores from legacy db
@@ -128,6 +132,20 @@ class Repository @Inject constructor(
             .fetchAllPoints(nthPointsToSkip)
             .groupBy { it.trackId }
             .map { it.value }
+    }
+
+    override suspend fun fetchYearTrackPoints(year: Int, nthPointsToSkip: Int): List<List<SimplePointDto>> {
+        val startTimestamp = yearStartTimestamp(year)
+        val endTimestamp = yearEndTimestamp(year)
+        return pointDao
+            .fetchAllPoints(startTimestamp.timeInMillis, endTimestamp.timeInMillis, nthPointsToSkip)
+            .groupBy { it.trackId }
+            .map { it.value }
+    }
+
+    override suspend fun fetchAllMappedTrackPoints(nthPointsToSkip: Int): Map<Int, List<List<SimplePointDto>>> {
+        val years = fetchYears()
+        return years.associateWith { year -> fetchYearTrackPoints(year, nthPointsToSkip) }
     }
 
     override suspend fun fetchYears(): List<Int> {
@@ -233,11 +251,11 @@ class Repository @Inject constructor(
 
     private fun currentYearEndTimestamp(): Calendar {
         return Calendar.getInstance().apply {
-            set(Calendar.MONTH, Calendar.JANUARY)
-            set(Calendar.DAY_OF_YEAR, 1)
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
+            set(Calendar.MONTH, Calendar.DECEMBER)
+            set(Calendar.DAY_OF_MONTH, 31)
+            set(Calendar.HOUR_OF_DAY, 24)
+            set(Calendar.MINUTE, 60)
+            set(Calendar.SECOND, 60)
         }
     }
 
