@@ -1,6 +1,7 @@
 package com.darekbx.spreadsheet.ui.grid
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -30,6 +31,7 @@ import com.darekbx.spreadsheet.model.Style.Companion.toJson
 import com.darekbx.spreadsheet.ui.grid.dialog.CellDialog
 import com.darekbx.spreadsheet.ui.grid.viewmodel.CellViewModel
 import com.darekbx.spreadsheet.ui.theme.BasicSpreadsheetTheme
+import com.darekbx.spreadsheet.ui.theme.RED
 import com.darekbx.spreadsheet.ui.theme.cellStyle
 
 @Composable
@@ -91,10 +93,12 @@ private fun CellContent(
     onCellClick: () -> Unit
 ) {
     val style = cell.parsedStyle
+    val selectedModifier = if (cell.isSelected) Modifier.border(2.dp, RED) else Modifier
     CellWrapper(
         modifier = Modifier
             .clickable { onCellClick() }
-            .background(style.composeColor()),
+            .background(style.composeColor())
+            .then(selectedModifier),
         width = cell.width
     ) {
         val alignment = when (style.align) {

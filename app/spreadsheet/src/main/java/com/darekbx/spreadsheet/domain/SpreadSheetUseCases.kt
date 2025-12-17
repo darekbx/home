@@ -1,5 +1,6 @@
 package com.darekbx.spreadsheet.domain
 
+import com.darekbx.spreadsheet.model.Cell
 import com.darekbx.spreadsheet.model.Cell.Companion.fromEntity
 import com.darekbx.spreadsheet.model.SpreadSheet
 import com.darekbx.spreadsheet.model.SpreadSheet.Companion.fromEntity
@@ -17,6 +18,14 @@ class SpreadSheetUseCases(
     private val spreadSheetDao: SpreadSheetDao,
     private val cellDao: CellDao
 ) {
+    suspend fun search(phrase: String, spreadSheetUid: String): List<Cell> {
+        if (phrase.isBlank()) return emptyList()
+        return cellDao
+            .fetch(spreadSheetUid)
+            .filter { it.value.contains(phrase, ignoreCase = true) }
+            .map { it.fromEntity() }
+    }
+
     suspend fun addSheet(
         parentUid: String?,
         parentName: String,

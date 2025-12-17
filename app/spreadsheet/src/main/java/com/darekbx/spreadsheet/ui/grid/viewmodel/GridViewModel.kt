@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.spreadsheet.ui.grid.bus.SpreadSheetBus
 import com.darekbx.spreadsheet.domain.SpreadSheetUseCases
+import com.darekbx.spreadsheet.model.Cell
 import com.darekbx.spreadsheet.model.SpreadSheet
 import com.darekbx.spreadsheet.ui.grid.bus.SpreadSheetModification
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,6 +45,15 @@ class GridViewModel @Inject constructor(
                 applyChanges(modification)
             }
         }
+    }
+
+    /**
+     * @return uid of cells which contains searched phrase
+     */
+    suspend fun search(phrase: String): List<String> {
+        return currentSheet
+            ?.let { sheet -> spreadSheetUseCases.search(phrase, sheet.uid).map { it.uid } }
+            ?: emptyList()
     }
 
     fun setCurrentSheetUid(spreadSheet: SpreadSheet) {

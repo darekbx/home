@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.darekbx.spreadsheet.ui.grid.bus.SpreadSheetBus
 import com.darekbx.spreadsheet.model.Cell
+import com.darekbx.spreadsheet.ui.DeleteConfirmationDialog
 import com.darekbx.spreadsheet.ui.changestyle.ChangeStyleDialog
 import com.darekbx.spreadsheet.ui.theme.cellStyle
 import com.darekbx.spreadsheet.ui.theme.READ_ONLY_CELL_COLOR
@@ -41,6 +42,7 @@ fun ColumnHeader(columnIndex: Int, cell: Cell, spreadSheetBus: SpreadSheetBus) {
     val scope = rememberCoroutineScope()
     var showColumnMenu by remember { mutableStateOf(false) }
     var showColumnStyleDialog by remember { mutableStateOf(false) }
+    var showDeleteColumnDialog by remember { mutableStateOf(false) }
 
     CellWrapper(
         modifier = Modifier
@@ -72,7 +74,7 @@ fun ColumnHeader(columnIndex: Int, cell: Cell, spreadSheetBus: SpreadSheetBus) {
                 showColumnMenu = false
             }
             MenuItem("Delete column") {
-                spreadSheetBus.deleteColumn(columnIndex)
+                showDeleteColumnDialog = true
                 showColumnMenu = false
             }
         }
@@ -90,11 +92,24 @@ fun ColumnHeader(columnIndex: Int, cell: Cell, spreadSheetBus: SpreadSheetBus) {
             }
         )
     }
+
+    if (showDeleteColumnDialog) {
+        DeleteConfirmationDialog(
+            message = "Delete column '${Char(columnIndex + 1 + 64)}'?",
+            onConfirm = {
+                showDeleteColumnDialog = false
+                scope.launch { spreadSheetBus.deleteColumn(columnIndex) }
+            },
+            onDismiss = { showDeleteColumnDialog = false }
+        )
+    }
 }
 
 @Composable
 fun RowIndex(rowIndex: Int, spreadSheetBus: SpreadSheetBus) {
     var showRowMenu by remember { mutableStateOf(false) }
+    var showDeleteRowDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     CellWrapper(
         modifier = Modifier
@@ -123,9 +138,20 @@ fun RowIndex(rowIndex: Int, spreadSheetBus: SpreadSheetBus) {
             showRowMenu = false
         }
         MenuItem("Delete row") {
-            spreadSheetBus.deleteRow(rowIndex)
+            showDeleteRowDialog = true
             showRowMenu = false
         }
+    }
+
+    if (showDeleteRowDialog) {
+        DeleteConfirmationDialog(
+            message = "Delete row ${rowIndex + 1}?",
+            onConfirm = {
+                showDeleteRowDialog = false
+                scope.launch { spreadSheetBus.deleteRow(rowIndex) }
+            },
+            onDismiss = { showDeleteRowDialog = false }
+        )
     }
 }
 

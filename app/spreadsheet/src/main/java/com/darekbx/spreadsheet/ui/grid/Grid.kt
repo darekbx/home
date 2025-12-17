@@ -10,18 +10,27 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -33,18 +42,23 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Devices.PIXEL_6A
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.darekbx.spreadsheet.R
 import com.darekbx.spreadsheet.model.Cell
@@ -63,6 +77,7 @@ import com.darekbx.spreadsheet.ui.theme.BORDER_COLOR
 import com.darekbx.spreadsheet.ui.theme.BasicSpreadsheetTheme
 import com.darekbx.spreadsheet.ui.theme.READ_ONLY_CELL_COLOR
 import com.darekbx.spreadsheet.utils.NOOP
+import kotlinx.coroutines.launch
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.forEach
@@ -74,12 +89,16 @@ fun SpreadsheetGrid(
     parentName: String,
     viewModel: GridViewModel = hiltViewModel()
 ) {
+    val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
     var addNewItem by remember { mutableStateOf(false) }
     var renameDialog by remember { mutableStateOf(false) }
     var importDialog by remember { mutableStateOf(false) }
     var deleteDialog by remember { mutableStateOf(false) }
+    var showSearchBox by remember { mutableStateOf(false) }
     var activeSpreadSheet by remember { mutableStateOf<SpreadSheet?>(null) }
+
+    var selectedCells = remember { mutableStateOf<List<String>>(emptyList()) }
 
     LaunchedEffect(spreadSheetUid) {
         viewModel.fetchSpreadSheets(spreadSheetUid)
@@ -104,6 +123,9 @@ fun SpreadsheetGrid(
                                 Icon(Icons.Default.Delete, contentDescription = "Delete")
                             }
                         }
+                        IconButton(onClick = { showSearchBox = !showSearchBox }) {
+                            Icon(Icons.Default.Search, contentDescription = "Search")
+                        }
                     }
                 }
             )
@@ -118,19 +140,37 @@ fun SpreadsheetGrid(
                 is GridUiState.Loading -> LoadingBox()
                 is GridUiState.Error -> ErrorDialog(state.exception) { viewModel.resetState() }
                 is GridUiState.Success -> {
-                    Grid(
-                        modifier = Modifier.fillMaxSize(),
-                        spreadSheets = state.spreadSheets,
-                        initialSpreadSheet = state.currentSpreadSheet,
-                        onAddClick = { addNewItem = true },
-                        onImportClick = { importDialog = true },
-                        onActiveSheetChange = {
-                            viewModel.setCurrentSheetUid(it)
-                            activeSpreadSheet = it
-                        },
-                        spreadSheetBus = viewModel.spreadSheetBus,
-                        cellLoader = viewModel.cellLoader
-                    )
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        if (showSearchBox) {
+                            SearchBox { phrase ->
+                                scope.launch {
+                                    selectedCells.value = viewModel.search(phrase)
+                                }
+                            }
+                            if (selectedCells.value.isNotEmpty()) {
+                                Text(
+                                    "Found: ${selectedCells.value.size} items",
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    fontSize = 11.sp
+                                )
+                            }
+                            HorizontalDivider(color = Color.Gray)
+                        }
+
+                        Grid(
+                            spreadSheets = state.spreadSheets,
+                            initialSpreadSheet = state.currentSpreadSheet,
+                            onAddClick = { addNewItem = true },
+                            onImportClick = { importDialog = true },
+                            onActiveSheetChange = {
+                                viewModel.setCurrentSheetUid(it)
+                                activeSpreadSheet = it
+                            },
+                            spreadSheetBus = viewModel.spreadSheetBus,
+                            cellLoader = viewModel.cellLoader,
+                            selectedCells = selectedCells
+                        )
+                    }
                 }
 
                 is GridUiState.Idle -> NOOP
@@ -191,8 +231,47 @@ fun SpreadsheetGrid(
 }
 
 @Composable
-fun Grid(
-    modifier: Modifier = Modifier,
+private fun SearchBox(onSearch: (String) -> Unit) {
+    var searchPhrase by remember { mutableStateOf("") }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+            .background(Color.White, RoundedCornerShape(8.dp))
+            .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp)),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        BasicTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1F)
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            value = searchPhrase,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = { onSearch(searchPhrase) }),
+            onValueChange = { searchPhrase = it },
+            textStyle = TextStyle(fontSize = 14.sp)
+        )
+        Icon(
+            Icons.Default.Search,
+            modifier = Modifier.clickable { onSearch(searchPhrase) },
+            contentDescription = "Search"
+        )
+        Spacer(Modifier.width(8.dp))
+        Icon(
+            Icons.Default.Clear,
+            modifier = Modifier.clickable {
+                searchPhrase = ""
+                onSearch("")
+            },
+            contentDescription = "Clear"
+        )
+        Spacer(Modifier.width(8.dp))
+    }
+}
+
+@Composable
+fun ColumnScope.Grid(
     spreadSheets: List<SpreadSheet>,
     initialSpreadSheet: SpreadSheet? = null,
     onAddClick: () -> Unit = { },
@@ -200,6 +279,7 @@ fun Grid(
     onActiveSheetChange: (SpreadSheet) -> Unit = { },
     spreadSheetBus: SpreadSheetBus,
     cellLoader: CellsLoader,
+    selectedCells: MutableState<List<String>>
 ) {
     var isLoading by remember { mutableStateOf(false) }
     var cells by remember { mutableStateOf<List<Cell>>(emptyList()) }
@@ -211,17 +291,23 @@ fun Grid(
         isLoading = false
     }
 
-    LaunchedEffect(activeSpreadSheet) {
+    LaunchedEffect(activeSpreadSheet, selectedCells.value) {
         activeSpreadSheet?.uid?.let { uid ->
             spreadSheetBus.listenForRefresh()
-                .collect { cells = cellLoader.loadCells(uid) }
+                .collect {
+                    cells = cellLoader.loadCells(uid).map { cell ->
+                        cell.copy(isSelected = selectedCells.value.contains(cell.uid))
+                    }
+                }
         }
     }
 
-    LaunchedEffect(activeSpreadSheet) {
+    LaunchedEffect(activeSpreadSheet, selectedCells.value) {
         activeSpreadSheet?.uid?.let { uid ->
             loadingWrapper {
-                cells = cellLoader.loadCells(uid)
+                cells = cellLoader.loadCells(uid).map { cell ->
+                    cell.copy(isSelected = selectedCells.value.contains(cell.uid))
+                }
             }
         }
     }
@@ -233,20 +319,18 @@ fun Grid(
         }
     }
 
-    Column(modifier = modifier) {
-        Grid(modifier = Modifier.weight(1F), cells = cells, spreadSheetBus = spreadSheetBus)
-        HorizontalDivider(color = Color.Gray)
-        SpreadSheetsRow(
-            spreadSheets = spreadSheets,
-            initialSpreadSheet = initialSpreadSheet,
-            onAddClick = onAddClick,
-            onImportClick = onImportClick,
-            onActiveSheetChange = {
-                activeSpreadSheet = it
-                onActiveSheetChange(it)
-            }
-        )
-    }
+    Grid(modifier = Modifier.weight(1F), cells = cells, spreadSheetBus = spreadSheetBus)
+    HorizontalDivider(color = Color.Gray)
+    SpreadSheetsRow(
+        spreadSheets = spreadSheets,
+        initialSpreadSheet = initialSpreadSheet,
+        onAddClick = onAddClick,
+        onImportClick = onImportClick,
+        onActiveSheetChange = {
+            activeSpreadSheet = it
+            onActiveSheetChange(it)
+        }
+    )
 
     if (isLoading) {
         LoadingBox()
@@ -340,7 +424,11 @@ fun Grid(
 }
 
 @Composable
-private fun ColumnHeaders(cells: List<Cell>, horizontalScrollState: ScrollState, spreadSheetBus: SpreadSheetBus) {
+private fun ColumnHeaders(
+    cells: List<Cell>,
+    horizontalScrollState: ScrollState,
+    spreadSheetBus: SpreadSheetBus
+) {
     Row(
         modifier = Modifier
             .background(READ_ONLY_CELL_COLOR)
@@ -420,11 +508,47 @@ fun SpreadSheetsRowPreview() {
     BasicSpreadsheetTheme {
         SpreadSheetsRow(
             spreadSheets = listOf(
-                SpreadSheet(uid = "1", parentName = "Parent", name = "Sheet 1", created = "2024-06-01", updated = "2025-06-01", createdTimestamp = 123456789),
-                SpreadSheet(uid = "2", parentName = "", name = "Sheet 2", created = "2024-06-01", updated = "2025-06-01", createdTimestamp = 123456789),
-                SpreadSheet(uid = "3", parentName = "", name = "Sheet 3", created = "2024-06-01", updated = "2025-06-01", createdTimestamp = 123456789),
-                SpreadSheet(uid = "3", parentName = "", name = "Sheet 4", created = "2024-06-01", updated = "2025-06-01", createdTimestamp = 123456789),
+                SpreadSheet(
+                    uid = "1",
+                    parentName = "Parent",
+                    name = "Sheet 1",
+                    created = "2024-06-01",
+                    updated = "2025-06-01",
+                    createdTimestamp = 123456789
+                ),
+                SpreadSheet(
+                    uid = "2",
+                    parentName = "",
+                    name = "Sheet 2",
+                    created = "2024-06-01",
+                    updated = "2025-06-01",
+                    createdTimestamp = 123456789
+                ),
+                SpreadSheet(
+                    uid = "3",
+                    parentName = "",
+                    name = "Sheet 3",
+                    created = "2024-06-01",
+                    updated = "2025-06-01",
+                    createdTimestamp = 123456789
+                ),
+                SpreadSheet(
+                    uid = "3",
+                    parentName = "",
+                    name = "Sheet 4",
+                    created = "2024-06-01",
+                    updated = "2025-06-01",
+                    createdTimestamp = 123456789
+                ),
             )
         )
+    }
+}
+
+@Preview
+@Composable
+fun SearchBoxPreview() {
+    BasicSpreadsheetTheme {
+        SearchBox { }
     }
 }

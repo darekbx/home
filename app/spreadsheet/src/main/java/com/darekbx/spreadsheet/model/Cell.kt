@@ -12,7 +12,8 @@ data class Cell(
     val value: String,
     val formula: String? = null,
     val style: String? = null,
-    val width: Int = DEFAULT_WIDTH
+    val width: Int = DEFAULT_WIDTH,
+    val isSelected: Boolean = false
 ) {
     val name: String
         get() = "${('A' + columnIndex)}${rowIndex + 1}"
