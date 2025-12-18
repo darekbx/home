@@ -98,7 +98,7 @@ fun SpreadsheetGrid(
     var showSearchBox by remember { mutableStateOf(false) }
     var activeSpreadSheet by remember { mutableStateOf<SpreadSheet?>(null) }
 
-    var selectedCells = remember { mutableStateOf<List<String>>(emptyList()) }
+    val selectedCells = remember { mutableStateOf<List<String>?>(null) }
 
     LaunchedEffect(spreadSheetUid) {
         viewModel.fetchSpreadSheets(spreadSheetUid)
@@ -147,9 +147,9 @@ fun SpreadsheetGrid(
                                     selectedCells.value = viewModel.search(phrase)
                                 }
                             }
-                            if (selectedCells.value.isNotEmpty()) {
+                            if (selectedCells.value != null) {
                                 Text(
-                                    "Found: ${selectedCells.value.size} items",
+                                    "Found: ${selectedCells.value?.size ?: 0} items",
                                     modifier = Modifier.padding(start = 8.dp),
                                     fontSize = 11.sp
                                 )
@@ -279,7 +279,7 @@ fun ColumnScope.Grid(
     onActiveSheetChange: (SpreadSheet) -> Unit = { },
     spreadSheetBus: SpreadSheetBus,
     cellLoader: CellsLoader,
-    selectedCells: MutableState<List<String>>
+    selectedCells: MutableState<List<String>?>
 ) {
     var isLoading by remember { mutableStateOf(false) }
     var cells by remember { mutableStateOf<List<Cell>>(emptyList()) }
@@ -296,7 +296,9 @@ fun ColumnScope.Grid(
             spreadSheetBus.listenForRefresh()
                 .collect {
                     cells = cellLoader.loadCells(uid).map { cell ->
-                        cell.copy(isSelected = selectedCells.value.contains(cell.uid))
+                        selectedCells.value?.let { selection ->
+                            cell.copy(isSelected = selection.contains(cell.uid))
+                        } ?: cell
                     }
                 }
         }
@@ -306,7 +308,9 @@ fun ColumnScope.Grid(
         activeSpreadSheet?.uid?.let { uid ->
             loadingWrapper {
                 cells = cellLoader.loadCells(uid).map { cell ->
-                    cell.copy(isSelected = selectedCells.value.contains(cell.uid))
+                    selectedCells.value?.let { selection ->
+                        cell.copy(isSelected = selection.contains(cell.uid))
+                    } ?: cell
                 }
             }
         }
