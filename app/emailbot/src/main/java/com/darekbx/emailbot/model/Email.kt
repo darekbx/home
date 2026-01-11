@@ -10,6 +10,7 @@ data class Email(
     val dateTime: String
 ) {
     var isSpam: Boolean = false
+    var isDeleted: Boolean = false
 }
 
 sealed class EmailContent {

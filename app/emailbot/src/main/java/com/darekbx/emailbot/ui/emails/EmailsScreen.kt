@@ -151,9 +151,9 @@ private fun EmailItem(
     onEmailDelete: (Email) -> Unit = {},
     onOpenEmail: (Email) -> Unit = {}
 ) {
-    var reportSpamClicked by remember { mutableStateOf(false) }
-    var deleted by remember { mutableStateOf(false) }
-    val isSpecial = remember { SPECIAL_EMAILS_FROM.any { email.from.contains(it) } }
+    var reportSpamClicked by remember(email) { mutableStateOf(false) }
+    var deleted by remember(email) { mutableStateOf(email.isDeleted ?: false) }
+    val isSpecial = remember(email) { SPECIAL_EMAILS_FROM.any { email.from.contains(it) } }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -222,6 +222,7 @@ private fun EmailItem(
                     Text("Open")
                 }
                 OutlinedButton(onClick = {
+                    email.isDeleted = true
                     onEmailDelete(email)
                     deleted = true
                 }) {

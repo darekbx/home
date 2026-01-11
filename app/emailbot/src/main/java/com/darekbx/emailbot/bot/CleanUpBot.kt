@@ -57,6 +57,7 @@ class CleanUpBot(
 
             // 8. Get total removed spam count
             val totalRemovedCount = commonsPreferences.loadRemovedSpamCount()
+                .also { Log.d("CleanUpBot", "Total removed count from prefs: $it") }
 
             Result(removedCount, emails.size - removedCount, totalRemovedCount)
         }

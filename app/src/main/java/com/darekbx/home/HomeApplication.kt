@@ -22,7 +22,8 @@ class HomeApplication: Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-        schedulePeriodicDataRefresh()
+        // Disabled schedulers
+        //schedulePeriodicDataRefresh()
     }
 
     override fun getWorkManagerConfiguration() = Configuration.Builder()
