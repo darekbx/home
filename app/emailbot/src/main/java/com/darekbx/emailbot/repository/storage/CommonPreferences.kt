@@ -1,27 +1,23 @@
 package com.darekbx.emailbot.repository.storage
 
-import android.util.Log
 import androidx.datastore.preferences.core.*
-import kotlinx.coroutines.flow.first
 import androidx.datastore.core.DataStore
 
 class CommonPreferences(
     private val dataStore: DataStore<Preferences>
 ) {
+    private val removedSpamCount = stringSetPreferencesKey("removedSpamCount_set")
 
-    private val removedSpamCount = intPreferencesKey("removedSpamCount")
-
-    suspend fun incrementRemovedSpamCount(value: Int) {
+    suspend fun incrementRemovedSpamCount(value: Int): Pair<Int, Int> {
+        var sum = -1
+        var keys = 0
         dataStore.edit { prefs ->
-            val currentCount = prefs[removedSpamCount] ?: 0
-            Log.d("CommonPreferences", "Increment, currentCount: $currentCount, value to add: $value")
-            prefs[removedSpamCount] = currentCount + value
-            Log.d("CommonPreferences", "Increment, sum ${currentCount + value}, get value: ${prefs[removedSpamCount]}")
+            val actual = prefs[removedSpamCount] ?: setOf("126") // actual value
+            val updated = actual + "$value"
+            prefs[removedSpamCount] = updated
+            keys = updated.size
+            sum = updated.map { it.toIntOrNull() }.filterNotNull().sum()
         }
-    }
-
-    suspend fun loadRemovedSpamCount(): Int {
-        val prefs = dataStore.data.first()
-        return prefs[removedSpamCount] ?: 0
+        return sum to keys
     }
 }

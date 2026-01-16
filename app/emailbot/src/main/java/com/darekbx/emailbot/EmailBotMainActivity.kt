@@ -220,7 +220,7 @@ private fun AppBar(
                                 Toast.makeText(
                                     context,
                                     "Removed ${state.result.removedCount} messages, " +
-                                            "total removed: ${state.result.totalRemovedCount}",
+                                            "total removed: ${state.result.totalRemovedCount} (${state.result.keysCount} keys)",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
