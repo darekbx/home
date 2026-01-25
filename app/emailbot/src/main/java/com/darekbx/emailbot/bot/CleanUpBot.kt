@@ -23,8 +23,7 @@ class CleanUpBot(
     data class Result(
         val removedCount: Int,
         val messagesCount: Int,
-        val totalRemovedCount: Int,
-        val keysCount: Int
+        val totalRemovedCount: Int
     )
 
     suspend fun cleanUp() : Result {
@@ -54,11 +53,11 @@ class CleanUpBot(
             refreshBus.publishChanges()
 
             // 7. Increment removed spam count in preferences
-            val (totalRemovedCount, keysCount) = commonsPreferences.incrementRemovedSpamCount(removedCount)
+            val totalRemovedCount = commonsPreferences.incrementRemovedSpamCount(removedCount)
 
             Log.d("CleanUpBot", "Total removed count from prefs: $totalRemovedCount")
 
-            Result(removedCount, emails.size - removedCount, totalRemovedCount, keysCount)
+            Result(removedCount, emails.size - removedCount, totalRemovedCount)
         }
     }
 }

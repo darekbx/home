@@ -1,7 +1,5 @@
 package com.darekbx.geotracker.di
 
-import android.app.NotificationManager
-import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.LocationManager

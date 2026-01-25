@@ -1,23 +1,23 @@
 package com.darekbx.emailbot.repository.storage
 
-import androidx.datastore.preferences.core.*
-import androidx.datastore.core.DataStore
+import android.content.Context
+import android.content.SharedPreferences
 
-class CommonPreferences(
-    private val dataStore: DataStore<Preferences>
-) {
-    private val removedSpamCount = stringSetPreferencesKey("removedSpamCount_set")
+class CommonPreferences(context: Context) {
 
-    suspend fun incrementRemovedSpamCount(value: Int): Pair<Int, Int> {
-        var sum = -1
-        var keys = 0
-        dataStore.edit { prefs ->
-            val actual = prefs[removedSpamCount] ?: setOf("126") // actual value
-            val updated = actual + "$value"
-            prefs[removedSpamCount] = updated
-            keys = updated.size
-            sum = updated.map { it.toIntOrNull() }.filterNotNull().sum()
-        }
-        return sum to keys
+    private val prefs: SharedPreferences =
+        context.getSharedPreferences("email_bot_prefs", Context.MODE_PRIVATE)
+
+    private val removedSpamCountKey = "removedSpamCount"
+
+    fun incrementRemovedSpamCount(value: Int): Int {
+        val current = prefs.getInt(removedSpamCountKey, 137) /* actual value */
+        val updated = current + value
+
+        prefs.edit()
+            .putInt(removedSpamCountKey, updated)
+            .commit()
+
+        return updated
     }
 }

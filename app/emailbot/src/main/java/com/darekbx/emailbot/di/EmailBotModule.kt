@@ -54,8 +54,10 @@ object EmailBotModule {
 
     @Provides
     @Singleton
-    fun provideCommonPreferences(dataStore: DataStore<Preferences>): CommonPreferences {
-        return CommonPreferences(dataStore)
+    fun provideCommonPreferences(
+        @ApplicationContext context: Context
+    ): CommonPreferences {
+        return CommonPreferences(context)
     }
 
     @Provides
