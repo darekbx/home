@@ -1,9 +1,12 @@
 package com.darekbx.spreadsheet.ui.spreadsheet
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -51,6 +55,7 @@ import com.darekbx.spreadsheet.ui.LoadingBox
 import com.darekbx.spreadsheet.ui.theme.BasicSpreadsheetTheme
 import com.darekbx.spreadsheet.ui.theme.GREEN
 import com.darekbx.spreadsheet.ui.theme.RED
+import com.darekbx.spreadsheet.ui.theme.RED_DARK
 import de.charlex.compose.RevealDirection
 import de.charlex.compose.RevealSwipe
 import de.charlex.compose.rememberRevealState
@@ -63,6 +68,8 @@ fun SpreadSheets(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var addNewItem by remember { mutableStateOf(false) }
+    var showSyncDialog by remember { mutableStateOf(false) }
+    var shouldSynchronize by remember { mutableStateOf(false) }
     var deleteConfirmationFor by remember { mutableStateOf<SpreadSheet?>(null) }
 
     fun deleteItem(item: SpreadSheet) {
@@ -77,8 +84,28 @@ fun SpreadSheets(
         modifier = Modifier.fillMaxSize(),
         topBar = { TopAppBar(title = { Text("Spreadsheets") }) },
         floatingActionButton = {
-            FloatingActionButton(onClick = { addNewItem = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Add Expense")
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (uiState is SpreadSheetUIState.Success) {
+                    Box(contentAlignment = Alignment.Center) {
+                        FloatingActionButton(onClick = { showSyncDialog = true }) {
+                            Icon(
+                                painterResource(R.drawable.ic_sync),
+                                contentDescription = "Synchronize"
+                            )
+                        }
+                        if (shouldSynchronize) {
+                            Icon(
+                                Icons.Default.Warning,
+                                modifier = Modifier.align(Alignment.TopStart),
+                                tint = RED,
+                                contentDescription = "Sync Needed"
+                            )
+                        }
+                    }
+                    FloatingActionButton(onClick = { addNewItem = true }) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Expense")
+                    }
+                }
             }
         }
     ) { innerPadding ->
@@ -90,7 +117,11 @@ fun SpreadSheets(
             when (val state = uiState) {
                 is SpreadSheetUIState.Loading -> LoadingBox()
                 is SpreadSheetUIState.Error -> ErrorDialog(state.exception) { viewModel.resetState() }
-                is SpreadSheetUIState.Success -> ItemsList(state.items, openItem, ::deleteItem)
+                is SpreadSheetUIState.Success -> {
+                    shouldSynchronize = state.syncRequired
+                    ItemsList(state.items, openItem, ::deleteItem)
+                }
+
                 is SpreadSheetUIState.Idle -> {}
             }
         }
@@ -103,6 +134,10 @@ fun SpreadSheets(
                     viewModel.createSheet(parentUid = null, parentName, name, columns, rows)
                 }
             )
+        }
+
+        if (showSyncDialog) {
+            SyncDialog(viewModel) { showSyncDialog = false }
         }
 
         deleteConfirmationFor?.let {

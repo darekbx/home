@@ -45,6 +45,27 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+    buildTypes.all { type ->
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+        def cloudEmail = properties.getProperty('spreadsheets.cloud.email')
+        def cloudPassword = properties.getProperty('spreadsheets.cloud.password')
+        def applicationId = properties.getProperty('spreadsheets.cloud.applicationId')
+        def projectId = properties.getProperty('spreadsheets.cloud.projectId')
+        def storageBucket = properties.getProperty('spreadsheets.cloud.storageBucket')
+        def apiKey = properties.getProperty('spreadsheets.cloud.apiKey')
+        def gcmSenderId = properties.getProperty('spreadsheets.cloud.gcmSenderId')
+
+        buildConfigField 'String', 'CLOUD_EMAIL', "\"${cloudEmail}\""
+        buildConfigField 'String', 'CLOUD_PASSWORD', "\"${cloudPassword}\""
+        buildConfigField 'String', 'CLOUD_APPLICATION_ID', "\"${applicationId}\""
+        buildConfigField 'String', 'CLOUD_PROJECT_ID', "\"${projectId}\""
+        buildConfigField 'String', 'CLOUD_STORAGE_BUCKET', "\"${storageBucket}\""
+        buildConfigField 'String', 'CLOUD_API_KEY', "\"${apiKey}\""
+        buildConfigField 'String', 'CLOUD_CLOUD_PASSWORD', "\"${cloudPassword}\""
+        buildConfigField 'String', 'CLOUD_GCM_SENDER_ID', "\"${gcmSenderId}\""
+    }
 }
 
 useCompose()
@@ -55,9 +76,15 @@ dependencies {
     implementation project(':app:common')
     implementation project(':app:storage')
 
-    implementation androidx.core_ktx
     implementation other.swipe3
+    implementation other.gson
+    implementation androidx.core_ktx
     implementation androidx.lifecycle_runtime_ktx
+    implementation androidx.data_store
+
+    implementation platform('com.google.firebase:firebase-bom:32.7.4')
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
     testImplementation other.junit
 }

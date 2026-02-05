@@ -6,6 +6,7 @@ import com.darekbx.spreadsheet.model.SpreadSheet
 import com.darekbx.spreadsheet.model.SpreadSheet.Companion.fromEntity
 import com.darekbx.spreadsheet.model.Style
 import com.darekbx.spreadsheet.model.Style.Companion.toJson
+import com.darekbx.spreadsheet.repository.SettingsRepository
 import com.darekbx.storage.spreadsheet.CellDao
 import com.darekbx.storage.spreadsheet.SpreadSheetDao
 import com.darekbx.storage.spreadsheet.entities.CellDto
@@ -16,7 +17,8 @@ import java.util.UUID
 
 class SpreadSheetUseCases(
     private val spreadSheetDao: SpreadSheetDao,
-    private val cellDao: CellDao
+    private val cellDao: CellDao,
+    private val settingsRepository: SettingsRepository
 ) {
     suspend fun search(phrase: String, spreadSheetUid: String): List<Cell> {
         if (phrase.isBlank()) return emptyList()
@@ -47,6 +49,7 @@ class SpreadSheetUseCases(
             // Add cells for the new sheet
             val cellEntities = createCells(rows, columns, spreadSheetUid)
             cellDao.add(cellEntities)
+            increaseVersionForSync()
         }
     }
 
@@ -82,9 +85,21 @@ class SpreadSheetUseCases(
             })
         }
 
+    suspend fun fetchDataForSync(): Map<SpreadSheetDto, List<CellDto>> =
+        withContext(Dispatchers.IO) {
+            val items = mutableMapOf<SpreadSheetDto, List<CellDto>>()
+            spreadSheetDao.fetchAllForSync().forEach { sheet ->
+                val cells = cellDao.fetch(sheet.uid)
+                items.put(sheet, cells)
+            }
+            items
+        }
+
+
     suspend fun updateSheetName(spreadSheet: SpreadSheet) {
         withContext(Dispatchers.IO) {
             spreadSheetDao.updateName(spreadSheet.uid, spreadSheet.name, spreadSheet.parentName)
+            increaseVersionForSync()
         }
     }
 
@@ -100,6 +115,7 @@ class SpreadSheetUseCases(
                 spreadSheetDao.deleteByUid(childSheet.uid)
                 cellDao.deleteBySheetUid(childSheet.uid)
             }
+            increaseVersionForSync()
         }
     }
 
@@ -112,6 +128,7 @@ class SpreadSheetUseCases(
                 .filter { cell -> cell.rowIndex > row }
                 .map { cell -> cell.copy(rowIndex = cell.rowIndex - 1) }
                 .forEach { cellDao.update(it) }
+            increaseVersionForSync()
         }
     }
 
@@ -124,6 +141,7 @@ class SpreadSheetUseCases(
                 .filter { it.columnIndex > column }
                 .map { cell -> cell.copy(columnIndex = cell.columnIndex - 1) }
                 .forEach { cellDao.update(it) }
+            increaseVersionForSync()
         }
     }
 
@@ -155,6 +173,7 @@ class SpreadSheetUseCases(
                     )
                 }
                 .forEach { newCell -> cellDao.add(newCell) }
+            increaseVersionForSync()
         }
     }
 
@@ -173,6 +192,7 @@ class SpreadSheetUseCases(
             (0..maxRowIndex)
                 .map { rowIndex -> createCell(sheetUid, rowIndex, column) }
                 .forEach { newCell -> cellDao.add(newCell) }
+            increaseVersionForSync()
         }
     }
 
@@ -191,7 +211,12 @@ class SpreadSheetUseCases(
                     cell.copy(width = newWidth, style = style.copy(align = newAlign).toJson())
                 }
                 .forEach { cellDao.update(it) }
+            increaseVersionForSync()
         }
+    }
+
+    private suspend fun increaseVersionForSync() {
+        settingsRepository.increaseLocalVersion()
     }
 
     suspend fun updateParentUpdated(uid: String) {

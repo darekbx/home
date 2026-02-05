@@ -2,6 +2,7 @@ package com.darekbx.spreadsheet.domain
 
 import com.darekbx.spreadsheet.model.Cell
 import com.darekbx.spreadsheet.model.Cell.Companion.fromEntity
+import com.darekbx.spreadsheet.repository.SettingsRepository
 import com.darekbx.storage.spreadsheet.CellDao
 import com.darekbx.storage.spreadsheet.SpreadSheetDao
 import kotlinx.coroutines.Dispatchers
@@ -9,7 +10,8 @@ import kotlinx.coroutines.withContext
 
 class CellUseCases(
     private val cellDao: CellDao,
-    private val spreadSheetDao: SpreadSheetDao
+    private val spreadSheetDao: SpreadSheetDao,
+    private val settingsRepository: SettingsRepository
 ) {
 
     suspend fun fetchCells(sheetUid: String): List<Cell> =
@@ -37,6 +39,7 @@ class CellUseCases(
                 cell.style,
                 cell.width
             )
+            settingsRepository.increaseLocalVersion()
         }
     }
 

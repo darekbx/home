@@ -12,6 +12,9 @@ interface SpreadSheetDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun add(spreadSheet: SpreadSheetDto)
 
+    @Query("SELECT * FROM spread_sheet")
+    suspend fun fetchAllForSync(): List<SpreadSheetDto>
+
     @Query("SELECT * FROM spread_sheet WHERE parent_uid IS NULL ORDER BY created_timestamp DESC")
     suspend fun fetchAll(): List<SpreadSheetDto>
 
