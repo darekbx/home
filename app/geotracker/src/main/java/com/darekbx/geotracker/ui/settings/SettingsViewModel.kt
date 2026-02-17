@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.darekbx.geotracker.domain.usecase.AddLocationUseCase
 import com.darekbx.geotracker.domain.usecase.DeleteAndRestoreUseCase
 import com.darekbx.geotracker.domain.usecase.GetCountPointsUseCase
+import com.darekbx.geotracker.domain.usecase.GetFromCloudUseCase
 import com.darekbx.geotracker.domain.usecase.SynchronizeUseCase
 import com.darekbx.geotracker.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,7 +35,8 @@ class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val synchronizeUseCase: SynchronizeUseCase,
     private val addLocationUseCase: AddLocationUseCase,
-    private val getCountPointsUseCase: GetCountPointsUseCase
+    private val getCountPointsUseCase: GetCountPointsUseCase,
+    private val getFromCloudUseCase: GetFromCloudUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<SettingsUiState>(SettingsUiState.Idle)
@@ -112,6 +114,19 @@ class SettingsViewModel @Inject constructor(
             try {
                 synchronizeUseCase.onProgress = onProgress
                 synchronizeUseCase.synchronize()
+
+                // Comment out synchronize() and uncomment below code,
+                // change also date, to restore data from cloud.
+                /*
+                getFromCloudUseCase.restore(
+                    fromDate = Calendar
+                        .getInstance()
+                        .apply { set(2026, Calendar.FEBRUARY, 17, 0, 0) }
+                        .timeInMillis
+                )
+                synchronizeUseCase.onProgress(1, 1)
+                */
+
             } catch (e: Exception) {
                 e.printStackTrace()
             }
