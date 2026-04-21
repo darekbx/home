@@ -112,13 +112,11 @@ fun PreviewMap(
 
         map.drawDistanceCircles()
 
-        var alpha = 1F
         yearPoints.toSortedMap(compareByDescending { it }).forEach { _, tracks ->
-            val color = Color.argb(alpha, 1F, 0F, 0F)
+            val color = Color.argb(1F, 1F, 0F, 0F)
             tracks.forEach { points ->
                 map.drawLine(points, dashed = false, color = color)
             }
-            alpha -= 0.1F
         }
 
         placesToVisit.forEach {
