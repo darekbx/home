@@ -16,7 +16,6 @@ import com.darekbx.emailbot.repository.RefreshBus
 import com.darekbx.emailbot.repository.storage.CommonPreferences
 import com.darekbx.emailbot.repository.storage.CryptoUtils
 import com.darekbx.emailbot.repository.storage.EncryptedConfiguration
-import com.darekbx.emailbot.worker.BotNotificationManager
 import com.darekbx.storage.emailbot.SpamDao
 import dagger.Module
 import dagger.Provides
@@ -75,14 +74,6 @@ object EmailBotModule {
     @Singleton
     fun provideRefreshBus(): RefreshBus {
         return RefreshBus()
-    }
-
-    @Provides
-    fun provideBotNotificationManager(
-        @ApplicationContext context: Context,
-        notificationManager: NotificationManager
-    ): BotNotificationManager {
-        return BotNotificationManager(context, notificationManager)
     }
 }
 

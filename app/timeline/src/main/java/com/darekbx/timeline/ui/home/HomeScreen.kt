@@ -124,7 +124,8 @@ private fun CategoriesFlowRow(
     FlowRow(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         CategoryChip(
             Modifier.clickable {

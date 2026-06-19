@@ -1,7 +1,6 @@
 package com.darekbx.geotracker.ui.home.recording
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
@@ -41,7 +40,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.darekbx.common.ui.ConfirmationDialog
 import com.darekbx.geotracker.BuildConfig
 import com.darekbx.geotracker.R
 import com.darekbx.geotracker.gpx.Gpx
@@ -76,10 +77,11 @@ fun RecordingScreen(
     val gpxTrack by recordingViewState.loadGpx(gpxUri).collectAsState(initial = null)
 
     var isMapVisible by remember { mutableStateOf(false) }
+    var showConfirmationDialog by remember { mutableStateOf(false) }
     var map by remember { mutableStateOf<MapView?>(null) }
     val polyline by remember {
         mutableStateOf(Polyline().apply {
-            outlinePaint.color = android.graphics.Color.parseColor("#3175A5")
+            outlinePaint.color = "#3175A5".toColorInt()
             outlinePaint.strokeWidth = 10.0F
         })
     }
@@ -88,6 +90,11 @@ fun RecordingScreen(
     }
 
     var previousLocation by remember { mutableStateOf<GeoPoint?>(null) }
+
+    fun stopRecording() {
+        context.stopService(intent)
+        recordingViewState.stopRecording()
+    }
 
     LaunchedEffect(Unit) {
         recordingViewModel.lastPoint.collectLatest { lastPoint ->
@@ -106,7 +113,7 @@ fun RecordingScreen(
                 polyline.setPoints(mapPoints)
 
                 map?.run {
-                    val first= GeoPoint(mapPoints.first())
+                    val first = GeoPoint(mapPoints.first())
                     positionMarker?.position = GeoPoint(mapPoints.first())
                     overlays[overlays.size - 1] = polyline
                     if (!recordingViewModel.reCenterButtonVisible.value) {
@@ -168,7 +175,11 @@ fun RecordingScreen(
                                     positionMarker = marker
                                 }
 
-                                Column(Modifier.align(Alignment.BottomStart).padding(bottom = 12.dp)) {
+                                Column(
+                                    Modifier
+                                        .align(Alignment.BottomStart)
+                                        .padding(bottom = 12.dp)
+                                ) {
                                     RecenterButton()
                                     LockRotationButton()
                                 }
@@ -183,8 +194,21 @@ fun RecordingScreen(
         }
 
         StopButton {
-            context.stopService(intent)
-            recordingViewState.stopRecording()
+            if (!recordingViewModel.rotationLocked.value) {
+                // Location is locked, show stop confirmation to avoid unintentinal stop
+                showConfirmationDialog = true
+            } else {
+                stopRecording()
+            }
+        }
+
+        if (showConfirmationDialog) {
+            ConfirmationDialog(
+                message = "Stop recording?",
+                confirmButtonText = "Yes",
+                onDismiss = { showConfirmationDialog = false },
+                onConfirm = { stopRecording() }
+            )
         }
     }
 }
@@ -285,7 +309,7 @@ fun PreviewMap(
         }
 
         gpxTrack?.let {
-            map.drawLine(it.points, android.graphics.Color.parseColor("#0A247D"), 8F)
+            map.drawLine(it.points, "#0A247D".toColorInt(), 8F)
         }
 
         placesToVisit.forEach {

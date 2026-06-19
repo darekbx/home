@@ -51,12 +51,12 @@ class SpreadSheetViewModel @Inject constructor(
             _uiState.value = SpreadSheetUIState.Loading
             try {
                 val sheets = spreadSheetUseCases.fetchSheets(parentUid = null)
-                val syncRequired = if (sheets.isNotEmpty()) {
+                /*val syncRequired = if (sheets.isNotEmpty()) {
                     synchronizeUseCase.shouldSynchronize()
                 } else {
                     false
-                }
-                _uiState.value = SpreadSheetUIState.Success(syncRequired, sheets)
+                }*/
+                _uiState.value = SpreadSheetUIState.Success(syncRequired = false, sheets)
             } catch (e: Exception) {
                 _uiState.value = SpreadSheetUIState.Error(e)
             }

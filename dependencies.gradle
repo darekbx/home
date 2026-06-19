@@ -85,7 +85,7 @@ ext {
                     "androidx.activity:activity-compose",
                     "androidx.compose.runtime:runtime",
                     "androidx.compose.runtime:runtime-livedata",
-                    "androidx.paging:paging-compose:1.0.0-alpha17"
+                    "androidx.paging:paging-compose:3.2.0"
             ]
             debugCompose = [
                     "androidx.compose.ui:ui-tooling",
