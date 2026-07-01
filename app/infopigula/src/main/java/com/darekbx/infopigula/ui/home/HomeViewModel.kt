@@ -1,17 +1,10 @@
 package com.darekbx.infopigula.ui.home
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darekbx.infopigula.domain.GetNewsUseCase
-import com.darekbx.infopigula.model.Category
-import com.darekbx.infopigula.model.LastRelease
-import com.darekbx.infopigula.model.News
-import com.darekbx.infopigula.repository.Session
-import com.darekbx.infopigula.repository.SettingsRepository
+import com.darekbx.infopigula.model.NewsResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -20,40 +13,18 @@ import javax.inject.Inject
 sealed class HomeUiState {
     object Idle : HomeUiState()
     object InProgress : HomeUiState()
-    object Done : HomeUiState()
+    class Done(val data: NewsResponse) : HomeUiState()
     class Failed(val message: String) : HomeUiState()
 }
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getNewsUseCase: GetNewsUseCase,
-    private val settingsRepository: SettingsRepository,
-    private val session: Session
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Idle)
     val uiState: Flow<HomeUiState>
         get() = _uiState
-
-    var groups = mutableStateListOf<Category>()
-    var news = mutableStateListOf<News>()
-    var lastReleases = mutableStateListOf<LastRelease>()
-    var hasNextPage = true
-
-    init {
-        viewModelScope.launch {
-            /**
-             * Listen for sesison changes.
-             * When user is authorized, fetch news
-             */
-            session.isUserActive.consumeEach { isActive ->
-                if (isActive) {
-                    // Commented out to prevent duplicated news
-                    //loadNews()
-                }
-            }
-        }
-    }
 
     fun resetState() {
         viewModelScope.launch {
@@ -61,45 +32,20 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun loadNews(
-        groupId: Int = GetNewsUseCase.DEFAULT_GROUP,
-        page: Int = 0,
-        lastReleaseId: Int? = null,
-        done: (Category) -> Unit
-    ) {
+    fun loadNews() {
         viewModelScope.launch {
-            // Always clear news list when page is zero, to avoid duplications
-            if (page == 0) {
-                news.clear()
-            }
-
             _uiState.value = HomeUiState.InProgress
 
-            val result = getNewsUseCase
-                .invoke(groupId, page, lastReleaseId == null, lastReleaseId)
+            val result = getNewsUseCase.invoke()
 
             if (result.isSuccess) {
-                result.getOrNull()
-                    ?.let { newsWrapper ->
-                        val groupsFiltered = newsWrapper.categories
-                            .toMutableList()
-
-                        //lastReleases.replace(newsWrapper.releases)
-                        groups.replace(groupsFiltered)
-                        done(groups.first())
-
-                        _uiState.value = HomeUiState.Done
-                    }
-                    ?: run { _uiState.value = HomeUiState.Failed("Data is empty!") }
+                _uiState.value = result.getOrNull()
+                    ?.let { newsWrapper -> HomeUiState.Done(newsWrapper) }
+                    ?: HomeUiState.Failed("Data is empty!")
             } else {
                 _uiState.value =
                     HomeUiState.Failed(result.exceptionOrNull()?.message ?: "Unknown error")
             }
         }
-    }
-
-    private fun <T> SnapshotStateList<T>.replace(elements: Collection<T>) {
-        clear()
-        addAll(elements)
     }
 }

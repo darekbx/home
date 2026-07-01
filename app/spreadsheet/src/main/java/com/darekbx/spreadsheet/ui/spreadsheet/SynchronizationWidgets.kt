@@ -68,7 +68,7 @@ private fun SyncCard(state: SyncStatus, onDismiss: () -> Unit = {}) {
                     is SyncStatus.InProgress -> SyncProgress(state.progress)
                     is SyncStatus.Success -> SyncSucces(state.maxBlobSize, onDismiss)
                     is SyncStatus.UpToDate -> VersionMessage(state, onDismiss)
-                    SyncStatus.Idle -> NoOp()
+                    SyncStatus.Idle -> onDismiss()
                 }
             }
         }

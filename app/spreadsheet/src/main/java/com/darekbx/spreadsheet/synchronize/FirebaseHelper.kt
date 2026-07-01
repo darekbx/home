@@ -22,7 +22,7 @@ class FirebaseHelper @Inject constructor(private val context: Context) {
             .setApiKey(BuildConfig.CLOUD_API_KEY)
             .setGcmSenderId(BuildConfig.CLOUD_GCM_SENDER_ID)
             .build()
-        FirebaseApp.initializeApp(context, options, "spreadsheet_app")
+        FirebaseApp.initializeApp(context, options, "spreadsheet")
     }
 
     suspend fun checkAndAuthorize() {
