@@ -125,30 +125,24 @@ fun NewsItem(category: Category) {
                     style = MaterialTheme.typography.titleMedium,
                     color = Color(0xFFE0E0E0)
                 )
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp)
+                        .padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     MarkdownText(
                         markdown = news.source.name,
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Color(0xFFCCCCCC),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 11.sp
                     )
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .padding(end = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "${news.rating} (${news.totalVotes})",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontSize = 11.sp
-                        )
-                    }
+                    Text(
+                        text = "${news.rating} (${news.totalVotes})",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 11.sp
+                    )
                 }
             }
         }
