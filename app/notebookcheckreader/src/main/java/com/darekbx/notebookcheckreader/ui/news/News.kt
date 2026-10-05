@@ -1,7 +1,9 @@
 package com.darekbx.notebookcheckreader.ui.news
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -60,7 +62,8 @@ fun News(viewModel: NewsViewModel = hiltViewModel()) {
     Content(
         rssItems = items,
         markVisibleItems = { visibleItems -> viewModel.markAsRead(visibleItems.toList()) },
-        onFavouriteChanged = { itemId -> viewModel.markFavourite(itemId) }
+        onFavouriteChanged = { itemId -> viewModel.markFavourite(itemId) },
+        onDelete = { itemId -> viewModel.delete(itemId) }
     )
 }
 
@@ -68,7 +71,8 @@ fun News(viewModel: NewsViewModel = hiltViewModel()) {
 private fun Content(
     rssItems: List<RssItem>,
     markVisibleItems: (Set<String>) -> Unit = {},
-    onFavouriteChanged: (String) -> Unit = {}
+    onFavouriteChanged: (String) -> Unit = {},
+    onDelete: (String) -> Unit = { }
 ) {
     if (rssItems.isEmpty()) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -105,13 +109,24 @@ private fun Content(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         itemsIndexed(rssItems, key = { _, item -> item.localId }) { index, item ->
-            ListItem(item, index) { onFavouriteChanged(item.localId) }
+            ListItem(
+                item,
+                index,
+                onFavouriteChanged = { onFavouriteChanged(item.localId) },
+                onDelete = { onDelete(item.localId) }
+            )
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ListItem(item: RssItem, index: Int = 0, onFavouriteChanged: () -> Unit = {}) {
+fun ListItem(
+    item: RssItem,
+    index: Int = 0,
+    onFavouriteChanged: () -> Unit = {},
+    onDelete: () -> Unit = { }
+) {
     val uriHandler = LocalUriHandler.current
     Card(
         modifier = Modifier
@@ -121,9 +136,14 @@ fun ListItem(item: RssItem, index: Int = 0, onFavouriteChanged: () -> Unit = {})
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(8.dp),
     ) {
-        Box(Modifier
-            .fillMaxWidth()
-            .clickable { uriHandler.openUri(item.link) }) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = { uriHandler.openUri(item.link) },
+                    onLongClick = { onDelete() }
+                )
+        ) {
             Image(item)
             TitleDate(item)
             FavouriteIcon(item.isFavourite) { onFavouriteChanged() }
@@ -197,7 +217,7 @@ private fun BoxScope.ReadMark(item: RssItem) {
 }
 
 @Composable
-private fun BoxScope.FavouriteIcon(isFavourite: Boolean,  onFavouriteChanged: () -> Unit = {}) {
+private fun BoxScope.FavouriteIcon(isFavourite: Boolean, onFavouriteChanged: () -> Unit = {}) {
     var isFavourite by remember { mutableStateOf(isFavourite) }
     Box(
         Modifier

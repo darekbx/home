@@ -29,6 +29,9 @@ interface RssDao {
     @Query("SELECT COUNT(*) FROM rss_item")
     suspend fun fetchCountSync(): Int
 
+    @Query("DELETE FROM rss_item WHERE id = :id")
+    suspend fun delete(id: String)
+
     @Query("DELETE FROM rss_item WHERE id IN (SELECT id FROM rss_item ORDER BY timestamp ASC LIMIT :count) AND id NOT IN (:excludedIds)")
     suspend fun deleteOldest(count: Int, excludedIds: List<String>): Int
 }

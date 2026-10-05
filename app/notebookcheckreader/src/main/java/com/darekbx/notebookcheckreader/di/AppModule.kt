@@ -3,6 +3,7 @@ package com.darekbx.notebookcheckreader.di
 import android.app.NotificationManager
 import android.content.Context
 import com.darekbx.notebookcheckreader.domain.AddRemoveToFavouritesUseCase
+import com.darekbx.notebookcheckreader.domain.DeleteItemUseCase
 import com.darekbx.notebookcheckreader.domain.DeleteOldItemsUseCase
 import com.darekbx.notebookcheckreader.domain.FetchFavouriteItemsUseCase
 import com.darekbx.notebookcheckreader.domain.FetchFavouritesCountUseCase
@@ -134,5 +135,13 @@ object DomainModule {
         favouritesDao: RssFavouritesDao
     ): DeleteOldItemsUseCase {
         return DeleteOldItemsUseCase(rssDao, favouritesDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDeleteItemUseCase(
+        rssDao: RssDao,
+    ): DeleteItemUseCase {
+        return DeleteItemUseCase(rssDao)
     }
 }
